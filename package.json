@@ -1,0 +1,24 @@
+{
+  "name": "bastel",
+  "version": "1.0.0",
+  "description": "Javascript Basteleien",
+  "main": "hello.js",
+  "scripts": {
+    "test": "node hello.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/georgernstgraf/bastel.git"
+  },
+  "keywords": [
+    "html",
+    "css",
+    "javascript"
+  ],
+  "author": "Georg Graf (SPG)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/georgernstgraf/bastel/issues"
+  },
+  "homepage": "https://github.com/georgernstgraf/bastel#readme"
+}

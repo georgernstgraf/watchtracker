@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <link rel="stylesheet" href="solarized-dark.css">
+    <link rel="icon" href="data:">
+    <meta charset="utf-8">
+    <title>Home</title>
+</head>
+
+<body>
+    <h1>Uhren - Abweichungen</h1>
+    <h2 id="h2">Zeitmessung</h2>
+    <table id="container" margin="100px 100px">
+        <tbody>
+            <tr>
+                <th scope="col">Zeit der Messung</th>
+                <th scope="col">Abweichung (sek)</th>
+            </tr>
+            <tr>
+                <td>
+                    <input type="datetime-local" id="zeit_0" name="zeit_0">
+                </td>
+                <td>
+                    <input type="number" id="zeit_0_sec">
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <input type="datetime-local" id="zeit_1" name="zeit_1">
+                </td>
+                <td>
+                    <input type="number" id="zeit_1_sec">
+                </td>
+            </tr>
+            <tr>
+                <th scope="col">
+                    Messdauer in Tagen
+                </th>
+                <th scope="col">
+                    Fehler in Sekunden pro Tag
+                </th>
+            </tr>
+            <tr>
+                <td id="messdauer">
+
+                </td>
+                <td id="abweichung">
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <script src="hello.js"></script>
+</body>
+
+</html>
