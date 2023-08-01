@@ -4,7 +4,8 @@
   "description": "Javascript Basteleien",
   "main": "hello.js",
   "scripts": {
-    "test": "node hello.js"
+    "test": "node hello.js",
+    "devStart": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -20,5 +21,13 @@
   "bugs": {
     "url": "https://github.com/georgernstgraf/bastel/issues"
   },
-  "homepage": "https://github.com/georgernstgraf/bastel#readme"
+  "homepage": "https://github.com/georgernstgraf/bastel#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "mongoose": "^7.4.1"
+  },
+  "devDependencies": {
+    "dotenv": "^16.3.1",
+    "nodemon": "^3.0.1"
+  }
 }

@@ -1,0 +1,3 @@
+GET http://localhost:3000/uhren
+###
+GET http://localhost:3000/uhren/13
