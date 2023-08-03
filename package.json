@@ -4,8 +4,8 @@
   "description": "Javascript Basteleien",
   "main": "hello.js",
   "scripts": {
-    "test": "node hello.js",
-    "devStart": "nodemon server.js"
+    "test": "node server.js",
+    "devStart": "nodemon --inspect server.js"
   },
   "repository": {
     "type": "git",
