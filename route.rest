@@ -15,12 +15,12 @@ Content-Type: application/json
    "offsetSecs": -5
 }
 ### patch
-PATCH http://localhost:3000/uhren/64c9369e9406cbd9c5ffba8d
+PATCH http://localhost:3000/uhren/64da07babfb82d3e89db52e1
 Content-Type: application/json
 
 {
    "user": "Teresa",
-   "uhr": "dummy",
+   "uhr": "dummies",
    "dateMeasured": "2023-08-12T16:04:11.077Z",
    "offsetSecs": -12
 }

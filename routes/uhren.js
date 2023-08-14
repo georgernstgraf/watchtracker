@@ -32,6 +32,12 @@ router.post('/', async (req, res) => {
 })
 // Update One
 router.patch('/:id', getUhr, async (req, res) => {
+    if (req.body.uhr != null) {
+        res.uhr.uhr = req.body.uhr;
+    }
+    if (req.body.user != null) {
+        res.uhr.user = req.body.user;
+    }
     if (req.body.dateMeasured != null) {
         res.uhr.dateMeasured = req.body.dateMeasured;
     }
