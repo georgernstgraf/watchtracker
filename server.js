@@ -10,6 +10,7 @@ db.on('error', (error) => console.error(error));
 db.once('open', () => console.log('Connected to Database'));
 
 app.use(express.json());
+app.use(express.static('static'));
 
 const uhrenRouter = require('./routes/uhren');
 app.use('/uhren', uhrenRouter);

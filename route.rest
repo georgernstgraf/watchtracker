@@ -1,21 +1,21 @@
 ### alle!
 GET http://localhost:3000/uhren
 ### dummy uhr
-GET http://localhost:3000/uhren/64c9369e9406cbd9c5ffba8d
+GET http://localhost:3000/uhren/id/64e05b4c1576e8a621fe0e57
 ### error 404
-GET http://localhost:3000/uhren/64c92e83aa83214525332523a
+GET http://localhost:3000/uhren/id/64c92e83aa83214525332523a
 ###
 POST http://localhost:3000/uhren
 Content-Type: application/json
 
 {
    "user": "Georg",
-   "uhr": "dummy",
+   "uhr": "Tante Ju",
    "dateMeasured": "2023-08-01T16:04:11.077Z",
    "offsetSecs": -5
 }
 ### patch
-PATCH http://localhost:3000/uhren/64da07babfb82d3e89db52e1
+PATCH http://localhost:3000/uhren/id/64e05b4c1576e8a621fe0e57
 Content-Type: application/json
 
 {
@@ -26,4 +26,4 @@ Content-Type: application/json
 }
 
 ### delete
-DELETE http://localhost:3000/uhren/64c930cbaa8b93d759c2b15e
+DELETE http://localhost:3000/uhren/id/64e06548484674a31964dc9c

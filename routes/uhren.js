@@ -11,8 +11,23 @@ router.get('/', async (req, res) => {
         res.status(500).json({ message: err.message });
     }
 })
+
+router.get('/liste', async (req, res) => {
+    try {
+        const uhren = await Uhren.find(null, 'uhr -_id');
+        let myset = new Set();
+        uhren.forEach((uhr) => {
+            myset.add(uhr.uhr);
+        }); 
+        res.json(Array.from(myset));
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+})
+
+
 // Get One
-router.get('/:id', getUhr, (req, res) => {
+router.get('/id/:id', getUhr, (req, res) => {
     res.json(res.uhr);
 })
 // Create One
@@ -31,7 +46,7 @@ router.post('/', async (req, res) => {
     }
 })
 // Update One
-router.patch('/:id', getUhr, async (req, res) => {
+router.patch('/id/:id', getUhr, async (req, res) => {
     if (req.body.uhr != null) {
         res.uhr.uhr = req.body.uhr;
     }
@@ -52,7 +67,7 @@ router.patch('/:id', getUhr, async (req, res) => {
     }
 })
 // Delete One
-router.delete('/:id', getUhr, async (req, res) => {
+router.delete('/id/:id', getUhr, async (req, res) => {
     try {
         await res.uhr.deleteOne();
         res.json({ message: 'Eintrag entfernt' });
