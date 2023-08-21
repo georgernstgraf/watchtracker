@@ -5,7 +5,7 @@ GET http://localhost:3000/uhren/id/64e05b4c1576e8a621fe0e57
 ### error 404
 GET http://localhost:3000/uhren/id/64c92e83aa83214525332523a
 ###
-GET http://localhost:3000/uhren/daten/Tante Ju
+GET http://localhost:3000/uhren/daten/Tante%20Ju
 
 ###
 POST http://localhost:3000/uhren
