@@ -14,17 +14,21 @@ router.get('/', async (req, res) => {
 
 router.get('/liste', async (req, res) => {
     try {
-        const uhren = await Uhren.find(null, 'uhr -_id');
-        let myset = new Set();
-        uhren.forEach((uhr) => {
-            myset.add(uhr.uhr);
-        }); 
-        res.json(Array.from(myset));
+        const uhren = await Uhren.distinct('uhr');
+        res.json(Array.from(uhren));
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 })
 
+router.get('/daten/:uhr', async (req, res) => {
+try {
+    const uhren = await Uhren.find({uhr: req.params.uhr});
+    res.json(uhren);
+} catch (err) {
+    res.status(500).json({ message: err.message });
+}
+})
 
 // Get One
 router.get('/id/:id', getUhr, (req, res) => {
