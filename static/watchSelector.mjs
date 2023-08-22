@@ -9,11 +9,11 @@ class WatchSelector {
         // Löschen des Inhalts von this.dom
         this.dom.innerHTML = "";
         
-        // Label für Select-Element
+        /* Label für Select-Element
         let label = document.createElement("label");
         label.innerHTML = "Wähle: ";
         label.setAttribute("for", "watchSelector");
-        this.dom.appendChild(label);
+        this.dom.appendChild(label); */
 
         // Select-Element
         this.select = document.createElement("select");
