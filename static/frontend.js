@@ -8,7 +8,7 @@ console.log("frontend.js started @" + new Date().toLocaleTimeString());
 let watchSelector = new WatchSelector(document.getElementById("watchSelector"));
 window.myObjects.watchSelector = watchSelector;
 
-let watchTable = new WatchTable();
+let watchTable = new WatchTable(document.getElementById("watchTable"));
 window.myObjects.watchTable = watchTable;
 
 console.log("frontend.js finished @" + new Date().toLocaleTimeString());
