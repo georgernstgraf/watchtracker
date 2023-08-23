@@ -1,4 +1,4 @@
-#watchSelector {
+#watchSelector, #watchTable {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -6,3 +6,15 @@
 label {
     margin: 0 2.5em;
 }
+div {
+    margin: 1em 1em 1em 1em;
+}
+
+h1,h2,th,td {
+    text-align: center;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
