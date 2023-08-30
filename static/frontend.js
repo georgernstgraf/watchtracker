@@ -1,14 +1,22 @@
 import { WatchSelector } from "./watchSelector.mjs";
-import { WatchTable } from "./watchTable.mjs";  
+import { WatchTable } from "./watchTable.mjs";
 
-window.myObjects = {};
+/* GENERELL
+ * Jedes meiner Objekte bekommt im Konstruktor eine Referenz auf das domElement-Element, in dem es angezeigt werden soll.
+ * Sein eigenes HTML Element muß es selber erzeugen (und in das domElement-Element einfügen).
+ * Das domElement-Element bekommt eine Referenz auf das Objekt, entweder ist "obj" ein Array oder ein einzelnes Objekt.
+ */
+
+window.myObject = new Object();
 
 console.log("frontend.js started @" + new Date().toLocaleTimeString());
 
-let watchSelector = new WatchSelector(document.getElementById("watchSelector"));
-window.myObjects.watchSelector = watchSelector;
+window.myObject.watchSelector = new WatchSelector({
+    domElement: document.getElementById("watchSelector"),
+});
 
-let watchTable = new WatchTable(document.getElementById("watchTable"));
-window.myObjects.watchTable = watchTable;
+window.myObject.watchTable = new WatchTable({
+    domElement: document.getElementById("watchTable"),
+});
 
 console.log("frontend.js finished @" + new Date().toLocaleTimeString());
