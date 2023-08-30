@@ -1,86 +1,91 @@
-class WatchTable {
-    constructor(dom) {
-        this.dom = dom;
-        this.dom.obj = this;
-        this.entries;
+import { WatchRecord } from "./watchRecord.mjs";
+import { Component } from "./component.mjs";
 
-        // Löschen des Inhalts von this.dom
-        this.dom.innerHTML = "";
+class WatchTable extends Component {
+    currentWatch;
+    constructor(parent) {
+        // parent has domElement (<div>)
+        // Ich muß mich immer mit appendChild in das domElement des Parents hineinerzeugen
+        super(parent);
 
-        // table
+        // table, caption, thead, tbody erzeugen
+        this.domElement = document.createElement("table");
+        this.display();
 
-        this.table = document.createElement("table");
-        this.dom.appendChild(this.table);
         this.caption = document.createElement("caption");
-        this.table.appendChild(this.caption);
-        this.thead = document.createElement("thead");
-        this.table.appendChild(this.thead);
-        this.tbody = document.createElement("tbody");
-        this.table.appendChild(this.tbody);
+        this.domElement.appendChild(this.caption);
         this.setInfo("Time to select a watch!");
+
+        this.thead = document.createElement("thead");
+        this.domElement.appendChild(this.thead);
+        this.fillTHeader();
+
+        this.tbody = document.createElement("tbody");
+        this.domElement.appendChild(this.tbody);
     }
 
     setInfo(msg) {
         this.caption.innerHTML = msg;
     }
 
-    makeTHeader(name) {
-        // 2 Zeilen header  
-        this.setInfo(`Bearbeite: ${name}`);
+    fillTHeader() {
+        // 2 Zeilen header
         this.thead.innerHTML = "";
-        this.tbody.innerHTML = "";
-        let tr, th;
+        let tr, th, butt;
 
-        // 1. Zeile
+        // Headerzeile
         tr = document.createElement("tr");
         this.thead.appendChild(tr);
+
+        // plus button
         th = document.createElement("th");
-        th.setAttribute("scope", "col");
-        th.innerHTML = "\uff0b";
-        th.addEventListener("click", (e) => {
-            console.log("click", e.target);
-        });
+        th.setAttribute("scope", "rowgroup");
         tr.appendChild(th);
+        butt = document.createElement("button");
+        th.appendChild(butt);
+        butt.innerHTML = "new"; // Unicode für Pluszeichen
+        butt.addEventListener("click", this.newEmpty.bind(this));
+
         th = document.createElement("th");
         th.setAttribute("scope", "col");
         th.innerHTML = "Messzeitpunkt";
         tr.appendChild(th);
+
         th = document.createElement("th");
         th.setAttribute("scope", "col");
         th.innerHTML = "Abweichung";
         tr.appendChild(th);
     }
+
+    newEmpty() {
+        this.children.push(new WatchRecord(this, this.tbody)); // TOFO
+    }
+
     async load_watch(name) {
+        this.currentWatch = name;
+        this.tbody.innerHTML = "";
         this.setInfo("Loading...");
         await fetch("http://localhost:3000/uhren/daten/" + name)
-            .then(response => {
-                window.myObjects.response = response;
+            .then((response) => {
                 if (!response.ok) {
-                    throw new Error(`Error: ${response.status} ${response.statusText}`);
+                    throw new Error(
+                        `Error: ${response.status} ${response.statusText}`
+                    );
                 }
                 return response.json();
             })
-            .then(data => {
-                this.entries = data
-                this.makeTHeader(name);
-                let tr, td;
-                for (let i = 0; i < this.entries.length; i++) {
-                    tr = document.createElement("tr");
-                    this.tbody.appendChild(tr);
-                    td = document.createElement("td");
-                    td.setAttribute("scope", "row");
-                    td.innerHTML = "\uff0d";
-                    tr.appendChild(td);
-                    td = document.createElement("td");
-                    td.setAttribute("scope", "row");
-                    td.innerHTML = this.entries[i].dateMeasured;
-                    tr.appendChild(td);
-                    td = document.createElement("td");
-                    td.innerHTML = this.entries[i].offsetSecs;
-                    tr.appendChild(td);
+            .then((data) => {
+                this.children = [];
+                for (let entry of data) {
+                    this.children.push(
+                        new WatchRecord(this, this.tbody, entry)
+                    );
                 }
+                this.setInfo(`Bearbeite: ${name}`);
             })
-            .catch(err => { this.setInfo(`Fehler: ${err.message}`) });
+            .catch((err) => {
+                this.setInfo(`Fehler: ${err.message}`);
+            });
         console.log("load_watch", name);
     }
 }
