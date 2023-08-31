@@ -11,10 +11,8 @@ class WatchRecord extends Component {
         super(parent, anchor);
         // domElement is a <tr> element
         // data is a json object
-        this.domElement = this.anchor.insertRow();
-        this.domElement.obj = this;
         if (data == undefined) {
-            // TODO: new empty record
+            this.domElement = this.anchor.insertRow(0);
             this._id = undefined;
             this._date = new Date();
             this._date.setMinutes(
@@ -25,6 +23,7 @@ class WatchRecord extends Component {
             this._user = "Georg"; // TODO login
             this.setDirty();
         } else {
+            this.domElement = this.anchor.insertRow();
             this.data = data;
             // zerlegen des JSON (5 Werte)
             this._id = data._id;
@@ -34,6 +33,7 @@ class WatchRecord extends Component {
             this._user = data.user;
             this.setDirty(false);
         }
+        this.domElement.obj = this;
 
         this.fillTR();
     }

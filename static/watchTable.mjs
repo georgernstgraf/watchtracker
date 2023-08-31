@@ -139,13 +139,19 @@ class WatchTable extends Component {
         console.log("loadWatch", name);
     }
     remove(child) {
-        // TODO setDirty(false) wenn letztes dirty child gelöscht wurde
         super.remove(child);
-        console.log("remove", child);
         if (this.children.length == 0) {
             this.clear();
             window.myObject.watchSelector.populate();
         }
+        let dirty = false;
+        for (let child of this.children) {
+            if (child.dirty) {
+                dirty = true;
+                break;
+            }
+        }
+        this.setDirty(dirty);
     }
     addRecord(data) {
         if (data instanceof Event) {

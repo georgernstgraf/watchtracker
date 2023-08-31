@@ -38,11 +38,13 @@ class WatchSelector extends Component {
         let sel = target.selectedIndex;
         for (let i = 0; i < target.options.length; i++) {
             if (i == sel) {
-                target.options[i].style.color = "red";
+                target.options[i].style.color = "#d33682";
                 target.options[i].style.fontWeight = "bold";
+                target.options[i].style.backgroundColor = "#002b36";
             } else {
                 target.options[i].style.color = null;
                 target.options[i].style.fontWeight = null;
+                target.options[i].style.backgroundColor = null;
             }
         }
         window.myObject.watchTable.loadWatch(target.value);
