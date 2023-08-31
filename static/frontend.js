@@ -1,5 +1,6 @@
 import { WatchSelector } from "./watchSelector.mjs";
 import { WatchTable } from "./watchTable.mjs";
+import { AddWatch } from "./addWatch.mjs";
 
 /* GENERELL
  * Jedes meiner Objekte bekommt im Konstruktor eine Referenz auf das domElement-Element, in dem es angezeigt werden soll.
@@ -13,6 +14,10 @@ console.log("frontend.js started @" + new Date().toLocaleTimeString());
 
 window.myObject.watchSelector = new WatchSelector({
     domElement: document.getElementById("watchSelector"),
+});
+
+window.myObject.addWatch = new AddWatch({
+    domElement: document.getElementById("addWatch"),
 });
 
 window.myObject.watchTable = new WatchTable({

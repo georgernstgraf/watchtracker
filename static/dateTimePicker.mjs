@@ -1,7 +1,7 @@
 import { Component } from "./component.mjs";
 
 class DateTimePicker extends Component {
-    _date;
+    static timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
     domElement;
 
     constructor(parent, anchor, date) {
@@ -9,18 +9,17 @@ class DateTimePicker extends Component {
         this.domElement = document.createElement("input");
         this.domElement.obj = this;
         this.domElement.type = "datetime-local";
-        this.domElement.addEventListener("change", this.change);
+        this.domElement.addEventListener("change", this.change.bind(this));
         this.domElement.valueAsDate = date;
         this.display();
     }
 
     change() {
-        this._date = this.domElement.valueAsDate;
-        // TODO implement logic
+        this.parent.setDirty();
     }
 
     get date() {
-        return this._date;
+        return this.domElement.valueAsDate;
     }
 }
 export { DateTimePicker };

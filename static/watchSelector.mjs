@@ -5,7 +5,7 @@ class WatchSelector extends Component {
         super(parent);
         this.watches;
         this.domElement = document.createElement("select");
-        this.domElement.setAttribute("id", "watchSelector");
+        this.domElement.setAttribute("id", "watchSelect");
         this.display();
         this.populate();
         this.domElement.addEventListener("change", (e) =>
@@ -35,7 +35,17 @@ class WatchSelector extends Component {
     }
 
     change(target) {
-        window.myObject.watchTable.load_watch(target.value);
+        let sel = target.selectedIndex;
+        for (let i = 0; i < target.options.length; i++) {
+            if (i == sel) {
+                target.options[i].style.color = "red";
+                target.options[i].style.fontWeight = "bold";
+            } else {
+                target.options[i].style.color = null;
+                target.options[i].style.fontWeight = null;
+            }
+        }
+        window.myObject.watchTable.loadWatch(target.value);
     }
 }
 export { WatchSelector };

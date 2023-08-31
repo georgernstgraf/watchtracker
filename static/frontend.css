@@ -9,12 +9,19 @@ label {
 div {
     margin: 1em 1em 1em 1em;
 }
-
+button,select,input {
+    margin: 0 1em;
+    background-color: rgb(243, 210, 131);
+}   
 h1,h2,th,td {
     text-align: center;
 }
 table {
-    border-collapse: collapse;
+/*    border-collapse: collapse; */
     width: 100%;
 }
-
+tfoot::before {
+    content: '';
+    display: block;
+    height: 15px;
+}
