@@ -17,7 +17,7 @@ class Second extends Component {
         } else {
             this.domElement.style.backgroundColor = "#fff";
         }
-        // TODO implement logic
+        this.parent.setDirty();
     }
     get secs() {
         return this.domElement.valueAsNumber;

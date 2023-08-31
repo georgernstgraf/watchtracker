@@ -14,12 +14,12 @@ Content-Type: application/json
 
 {
    "user": "Georg",
-   "uhr": "Tante Ju",
+   "uhr": "Presage",
    "dateMeasured": "2023-08-31T09:04:11.077Z",
-   "offsetSecs": -102
+   "offsetSecs": -3
 }
 ### patch
-PATCH http://localhost:3000/uhren/id/64e05b4c1576e8a621fe0e57
+PATCH http://localhost:3000/uhren/id/64e05d761576e8a621fe0e5d
 Content-Type: application/json
 
 {
