@@ -1,10 +1,12 @@
 import { WatchRecord } from "./watchRecord.mjs";
 import { Component } from "./component.mjs";
+import { SekPerDay } from "./sekPerDay.mjs";
 
 class WatchTable extends Component {
     currentWatch;
     saveButton;
     dirty;
+    stats;
     constructor(parent) {
         // parent has domElement (<div>)
         // Ich muß mich immer mit appendChild in das domElement des Parents hineinerzeugen
@@ -53,6 +55,7 @@ class WatchTable extends Component {
         // plus button
         th = document.createElement("th");
         th.setAttribute("scope", "rowgroup");
+        th.style.width = "5%";
         tr.appendChild(th);
         butt = document.createElement("button");
         th.appendChild(butt);
@@ -61,25 +64,38 @@ class WatchTable extends Component {
 
         th = document.createElement("th");
         th.setAttribute("scope", "col");
+        th.style.width = "40%";
         th.innerHTML = "Messzeitpunkt";
         tr.appendChild(th);
 
         th = document.createElement("th");
         th.setAttribute("scope", "col");
+        th.style.width = "10%";
         th.innerHTML = "Abweichung";
+        tr.appendChild(th);
+
+        th = document.createElement("th");
+        th.setAttribute("scope", "col");
+        th.style.width = "25%";
+        th.innerHTML = "Sek / Tag";
         tr.appendChild(th);
     }
     fillTfoot() {
-        let tr, th, butt;
+        let tr, th, td;
         this.tfoot.innerHTML = "";
         tr = document.createElement("tr");
         this.tfoot.appendChild(tr);
+
+        // save(d) button
         th = document.createElement("th");
         tr.appendChild(th);
         this.saveButton = document.createElement("button");
         this.saveButton.innerHTML = "save";
         this.saveButton.addEventListener("click", this.save.bind(this));
         th.appendChild(this.saveButton);
+
+        td = document.createElement("td");
+        tr.appendChild(td);
     }
 
     save() {
@@ -93,6 +109,7 @@ class WatchTable extends Component {
                 child.save();
             }
         }
+        this.loadCalcAfterLoad();
         this.setDirty(false);
         window.myObject.watchSelector.populate();
     }
@@ -132,11 +149,26 @@ class WatchTable extends Component {
                     // );
                     this.addRecord(entry);
                 }
+                this.loadCalcAfterLoad();
             })
             .catch((err) => {
                 this.setInfo(`Fehler: ${err.message}`);
             });
         console.log("loadWatch", name);
+    }
+    loadCalcAfterLoad() {
+        for (let i = 1; i < this.children.length; i++) {
+            this.children[i].calcAfterLoad(this.children[i - 1]);
+        }
+        if (this.children.length > 1) {
+            let x = this.tfoot.children[0]; // the only tr
+            x.removeChild(x.children[x.children.length - 1]); // previous sstats
+            this.stats = new SekPerDay(
+                this.children[this.children.length - 1],
+                x
+            );
+            this.stats.fullFill(this.children[0]);
+        }
     }
     remove(child) {
         super.remove(child);

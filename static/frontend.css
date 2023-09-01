@@ -13,15 +13,26 @@ button,select,input {
     margin: 0 1em;
     background-color: rgb(243, 210, 131);
 }   
-h1,h2,th,td {
+h1,h2,th,td,thead,tbody,tfoot {
     text-align: center;
 }
 table {
-/*    border-collapse: collapse; */
     width: 100%;
+}
+caption {
+    font-size: large;
+    font-weight: bold;
+    margin: 1em 0;
 }
 tfoot::before {
     content: '';
     display: block;
     height: 15px;
+}
+.sekPerDay {
+    font-size: large;
+    /* font-weight: bold; */
+    /* color: #d33682; */
+    color: #859900;
+    text-align: left;
 }

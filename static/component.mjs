@@ -4,7 +4,7 @@ class Component {
     parent; // Component
     children; // Component[]
     dirty; // boolean
-    domElement; // wird in child-klasse mit createElement selbst erzeugt
+    domElement; // wird in child-klasse mit document.createElement selbst erzeugt
 
     constructor(parent, anchor) {
         // parent has .domElement

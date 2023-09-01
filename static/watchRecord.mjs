@@ -1,24 +1,25 @@
 import { DateTimePicker } from "./dateTimePicker.mjs";
 import { Second } from "./second.mjs";
 import { Component } from "./component.mjs";
+import { SekPerDay } from "./sekPerDay.mjs";
 class WatchRecord extends Component {
     domElement; // domElementtype: <tr> (line)
     data; // json object
     picker;
     abw;
     dirty;
+    sekPerDay;
     constructor(parent, anchor, data) {
         super(parent, anchor);
         // domElement is a <tr> element
         // data is a json object
+        let _date, _offsetSecs;
         if (data == undefined) {
             this.domElement = this.anchor.insertRow(0);
             this._id = undefined;
-            this._date = new Date();
-            this._date.setMinutes(
-                this._date.getMinutes() - this._date.getTimezoneOffset()
-            );
-            this._offsetSecs = 0;
+            _date = new Date();
+            _date.setMinutes(_date.getMinutes() - _date.getTimezoneOffset());
+            _offsetSecs = 0;
             this._uhr = this.parent.currentWatch;
             this._user = "Georg"; // TODO login
             this.setDirty();
@@ -27,15 +28,21 @@ class WatchRecord extends Component {
             this.data = data;
             // zerlegen des JSON (5 Werte)
             this._id = data._id;
-            this._date = new Date(data.dateMeasured);
-            this._offsetSecs = data.offsetSecs;
+            _date = new Date(data.dateMeasured);
+            _offsetSecs = data.offsetSecs;
             this._uhr = data.uhr;
             this._user = data.user;
             this.setDirty(false);
         }
         this.domElement.obj = this;
+        this.fillTR(_date, _offsetSecs);
+    }
+    get date() {
+        return this.picker.date;
+    }
 
-        this.fillTR();
+    get offsetSecs() {
+        return this.abw.secs;
     }
 
     setDirty(dirty) {
@@ -119,7 +126,7 @@ class WatchRecord extends Component {
             });
     }
 
-    fillTR() {
+    fillTR(_date, _offsetSecs) {
         let th, td, input, butt;
         // MINUS - Button
         th = document.createElement("th");
@@ -136,12 +143,19 @@ class WatchRecord extends Component {
         // datum (mit picker)
         td = document.createElement("td");
         this.domElement.appendChild(td);
-        this.picker = new DateTimePicker(this, td, this._date);
+        this.picker = new DateTimePicker(this, td, _date);
 
         // abweichung
         td = document.createElement("td");
         this.domElement.appendChild(td);
-        this.abw = new Second(this, td, this._offsetSecs);
+        this.abw = new Second(this, td, _offsetSecs);
+
+        // Sek / Tag
+        this.sekPerDay = new SekPerDay(this);
+        this.sekPerDay.domElement.innerHTML = "n/a";
+    }
+    calcAfterLoad(prev) {
+        this.sekPerDay.fill(prev); // TODO call
     }
 }
 export { WatchRecord };
