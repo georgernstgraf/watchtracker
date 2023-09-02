@@ -155,7 +155,7 @@ class WatchRecord extends Component {
         this.sekPerDay.domElement.innerHTML = "n/a";
     }
     calcAfterLoad(prev) {
-        this.sekPerDay.fill(prev); // TODO call
+        this.sekPerDay.fill(prev);
     }
 }
 export { WatchRecord };
