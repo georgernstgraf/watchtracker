@@ -15,7 +15,7 @@ class WatchRecord extends Component {
         // data is a json object
         let _date, _offsetSecs;
         if (data == undefined) {
-            this.domElement = this.anchor.insertRow(0);
+            this.domElement = this.anchor.insertRow();
             this._id = undefined;
             _date = new Date();
             _date.setMinutes(_date.getMinutes() - _date.getTimezoneOffset());
@@ -152,10 +152,14 @@ class WatchRecord extends Component {
 
         // Sek / Tag
         this.sekPerDay = new SekPerDay(this);
-        this.sekPerDay.domElement.innerHTML = "n/a";
+        this.sekPerDay.setContent("start");
     }
     calcAfterLoad(prev) {
-        this.sekPerDay.fill(prev);
+        if (this.abw.secs == 0) {
+            this.sekPerDay.setContent("start");
+        } else {
+            this.sekPerDay.fill(prev);
+        }
     }
 }
 export { WatchRecord };

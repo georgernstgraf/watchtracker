@@ -13,7 +13,7 @@ class SekPerDay extends Component {
         this.domElement.obj = this;
     }
     calculate(prev) {
-        let mine = this.parent;
+        const mine = this.parent;
         this.durationInDays = (mine.date - prev.date) / 86400000; // ms per day
         this.diffSecs = mine.offsetSecs - prev.offsetSecs;
         this.diffSekPerDay = this.diffSecs / this.durationInDays;
@@ -21,9 +21,12 @@ class SekPerDay extends Component {
         this.diffSekPerDay = Math.abs(this.diffSekPerDay);
         this.outText = this.diffSekPerDay.toFixed(1);
     }
+    setContent(text) {
+        this.domElement.innerHTML = text;
+    }
     fill(prev) {
         this.calculate(prev);
-        this.domElement.innerHTML = `${this.speedType} ${this.outText}`;
+        this.setContent(`${this.speedType} ${this.outText}`);
     }
     fullFill(prev) {
         this.calculate(prev);
@@ -33,7 +36,9 @@ class SekPerDay extends Component {
         this.domElement.style.color = "#d33682";
         this.domElement.style.fontSize = "larger";
         this.domElement.style.fontWeight = "bold";
-        this.domElement.innerHTML = `(Dauer: ${dauer} Tage, Gang: ${this.diffSecs}   =>   ${this.speedType} ${this.outText} / Tag)`;
+        this.setContent(
+            `(Dauer: ${dauer} Tage, Gang: ${this.diffSecs}   =>   ${this.speedType} ${this.outText} / Tag)`
+        );
     }
 }
 export { SekPerDay };
