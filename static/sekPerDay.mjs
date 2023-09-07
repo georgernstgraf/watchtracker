@@ -14,8 +14,15 @@ class SekPerDay extends Component {
     }
     calculate(prev) {
         const mine = this.parent;
-        this.durationInDays = (mine.date - prev.date) / 86400000; // ms per day
         this.diffSecs = mine.offsetSecs - prev.offsetSecs;
+        this.calculateFromVals(
+            mine.date - prev.date,
+            mine.offsetSecs - prev.offsetSecs
+        );
+    }
+    calculateFromVals(periodLen, drift) {
+        this.durationInDays = periodLen / 86400000;
+        this.diffSecs = drift;
         this.diffSekPerDay = this.diffSecs / this.durationInDays;
         this.speedType = this.diffSekPerDay > 0 ? "schnell" : "langsam";
         this.diffSekPerDay = Math.abs(this.diffSekPerDay);
@@ -26,18 +33,21 @@ class SekPerDay extends Component {
     }
     fill(prev) {
         this.calculate(prev);
-        this.setContent(`${this.speedType} ${this.outText}`);
+        this.setContent(`${this.outText} s/d ${this.speedType}`);
     }
-    fullFill(prev) {
-        this.calculate(prev);
-        let dauer = this.durationInDays.toFixed(1);
-        this.domElement.setAttribute("colspan", "3");
+    makeBold() {
+        this.domElement.colSpan = 4;
         this.domElement.style.textAlign = "center";
         this.domElement.style.color = "#d33682";
         this.domElement.style.fontSize = "larger";
         this.domElement.style.fontWeight = "bold";
+    }
+    fullFill(periodLen, drift) {
+        this.calculateFromVals(periodLen, drift);
+        let dauer = this.durationInDays.toFixed(1);
+        this.makeBold();
         this.setContent(
-            `(Dauer: ${dauer} Tage, Gang: ${this.diffSecs}   =>   ${this.speedType} ${this.outText} / Tag)`
+            `(Dauer: ${dauer} Tage, Drift: ${this.diffSecs} Sek   =>   ${this.outText} s/d ${this.speedType})`
         );
     }
 }

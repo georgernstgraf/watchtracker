@@ -8,7 +8,7 @@ class Second extends Component {
         this.domElement.obj = this;
         this.domElement.addEventListener("change", this.change.bind(this));
         this.domElement.valueAsNumber = secs;
-        this.display();
+        this.addToDom();
         window.myObject.second = this;
     }
     change() {

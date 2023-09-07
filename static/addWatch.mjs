@@ -10,7 +10,7 @@ class AddWatch extends Component {
     init() {
         this.domElement.innerHTML = "";
         this.domElement.appendChild(this.getAddButton());
-        this.display();
+        this.addToDom();
     }
 
     getAddButton() {

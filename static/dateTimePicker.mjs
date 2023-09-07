@@ -11,7 +11,7 @@ class DateTimePicker extends Component {
         this.domElement.type = "datetime-local";
         this.domElement.addEventListener("change", this.change.bind(this));
         this.domElement.valueAsDate = date;
-        this.display();
+        this.addToDom();
     }
 
     change() {

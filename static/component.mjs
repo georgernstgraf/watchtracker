@@ -22,7 +22,7 @@ class Component {
     }
     remove(child) {
         // 1. from domElement
-        child.hide();
+        child.removeFromDom();
         // 2. from children array
         let index = this.children.indexOf(child);
         if (index > -1) {
@@ -30,11 +30,18 @@ class Component {
         }
     }
     display() {
-        this.anchor.appendChild(this.domElement);
+        this.domElement.hidden = false;
     }
     hide() {
+        this.domElement.hidden = true;
+    }
+    addToDom() {
+        this.anchor.appendChild(this.domElement);
+    }
+    removeFromDom() {
         this.anchor.removeChild(this.domElement);
     }
+
     setDirty(dirty = true) {
         this.dirty = dirty;
     }

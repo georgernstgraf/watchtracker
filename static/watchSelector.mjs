@@ -6,7 +6,7 @@ class WatchSelector extends Component {
         this.watches;
         this.domElement = document.createElement("select");
         this.domElement.setAttribute("id", "watchSelect");
-        this.display();
+        this.addToDom();
         this.populate();
         this.domElement.addEventListener("change", (e) =>
             this.change(e.target)

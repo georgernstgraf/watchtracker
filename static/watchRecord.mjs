@@ -2,6 +2,8 @@ import { DateTimePicker } from "./dateTimePicker.mjs";
 import { Second } from "./second.mjs";
 import { Component } from "./component.mjs";
 import { SekPerDay } from "./sekPerDay.mjs";
+import { SaveButton } from "./saveButton.mjs";
+
 class WatchRecord extends Component {
     domElement; // domElementtype: <tr> (line)
     data; // json object
@@ -9,10 +11,11 @@ class WatchRecord extends Component {
     abw;
     dirty;
     sekPerDay;
+    saveButton;
     constructor(parent, anchor, data) {
         super(parent, anchor);
         // domElement is a <tr> element
-        // data is a json object
+        // data is a json object from db or undefined (if new record)
         let _date, _offsetSecs;
         if (data == undefined) {
             this.domElement = this.anchor.insertRow();
@@ -22,7 +25,6 @@ class WatchRecord extends Component {
             _offsetSecs = 0;
             this._uhr = this.parent.currentWatch;
             this._user = "Georg"; // TODO login
-            this.setDirty();
         } else {
             this.domElement = this.anchor.insertRow();
             this.data = data;
@@ -32,10 +34,14 @@ class WatchRecord extends Component {
             _offsetSecs = data.offsetSecs;
             this._uhr = data.uhr;
             this._user = data.user;
-            this.setDirty(false);
         }
         this.domElement.obj = this;
         this.fillTR(_date, _offsetSecs);
+        if (data == undefined) {
+            this.setDirty();
+        } else {
+            this.setDirty(false);
+        }
     }
     get date() {
         return this.picker.date;
@@ -49,10 +55,14 @@ class WatchRecord extends Component {
         super.setDirty(dirty);
         if (this.dirty) {
             this.domElement.style.backgroundColor = this.constructor.dirtyColor;
+            this.sekPerDay.hide();
+            this.saveButton.display();
         } else {
             this.domElement.style.backgroundColor = null;
+            this.sekPerDay.display();
+            this.saveButton.hide();
         }
-        this.parent.setDirty(dirty);
+        // this.parent.setDirty(dirty); // TODO check if this is necessary
     }
     async delete() {
         if (this._id != undefined) {
@@ -120,6 +130,7 @@ class WatchRecord extends Component {
                 console.log("Record.save");
                 this._id = data._id;
                 this.setDirty(false);
+                this.parent.recalc();
             })
             .catch((err) => {
                 console.error("Record.save", err.message);
@@ -153,7 +164,11 @@ class WatchRecord extends Component {
         // Sek / Tag
         this.sekPerDay = new SekPerDay(this);
         this.sekPerDay.setContent("start");
+
+        // save button
+        this.saveButton = new SaveButton(this);
     }
+
     calcAfterLoad(prev) {
         if (this.abw.secs == 0) {
             this.sekPerDay.setContent("start");

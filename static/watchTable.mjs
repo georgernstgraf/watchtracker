@@ -7,13 +7,15 @@ class WatchTable extends Component {
     saveButton;
     dirty;
     stats;
+    children = []; // WatchRecords
     constructor(parent) {
         // parent has domElement (<div>)
         // Ich muß mich immer mit appendChild in das domElement des Parents hineinerzeugen
         super(parent);
         // table, caption, thead, tbody erzeugen
         this.domElement = document.createElement("table");
-        this.display();
+        this.domElement.obj = this;
+        this.addToDom();
 
         this.caption = document.createElement("caption");
         this.domElement.appendChild(this.caption);
@@ -85,34 +87,9 @@ class WatchTable extends Component {
         this.tfoot.innerHTML = "";
         tr = document.createElement("tr");
         this.tfoot.appendChild(tr);
-
-        // save(d) button
-        th = document.createElement("th");
-        tr.appendChild(th);
-        this.saveButton = document.createElement("button");
-        this.saveButton.innerHTML = "save";
-        this.saveButton.addEventListener("click", this.save.bind(this));
-        th.appendChild(this.saveButton);
-
-        td = document.createElement("td");
-        tr.appendChild(td);
+        this.stats = new SekPerDay(this, tr);
     }
 
-    save() {
-        console.log("save", this.currentWatch);
-        if (!this.dirty) {
-            console.error("save called, but not dirty");
-            return;
-        }
-        for (let child of this.children) {
-            if (child.dirty) {
-                child.save();
-            }
-        }
-        this.loadCalcAfterLoad();
-        this.setDirty(false);
-        window.myObject.watchSelector.populate();
-    }
     loadCommon(name) {
         this.currentWatch = name;
         this.thead.hidden = false;
@@ -149,25 +126,62 @@ class WatchTable extends Component {
                     // );
                     this.addRecord(entry);
                 }
-                this.loadCalcAfterLoad();
+                this.recalc();
             })
             .catch((err) => {
                 this.setInfo(`Fehler: ${err.message}`);
             });
         console.log("loadWatch", name);
     }
-    loadCalcAfterLoad() {
+    recalc() {
         for (let i = 1; i < this.children.length; i++) {
             this.children[i].calcAfterLoad(this.children[i - 1]);
         }
         if (this.children.length > 1) {
-            let x = this.tfoot.children[0]; // the only tr
-            x.removeChild(x.children[x.children.length - 1]); // previous sstats
-            this.stats = new SekPerDay(
-                this.children[this.children.length - 1],
-                x
-            );
-            this.stats.fullFill(this.children[0]);
+            this.stats.fullFill(...this.driftPerDay);
+        }
+    }
+
+    get driftPerDay() {
+        this.sort();
+        let periodLen = 0;
+        let drift = 0;
+        let startIndex = 0;
+        for (let i = 1; i < this.children.length; i++) {
+            if (
+                this.children[i].offsetSecs == 0 ||
+                i == this.children.length - 1 // last record
+            ) {
+                let j;
+                if (i == this.children.length - 1) {
+                    j = i; // if it's the last record, take it
+                } else {
+                    j = i - 1; // otherwise the record before
+                }
+                periodLen +=
+                    this.children[j].date - this.children[startIndex].date;
+                drift +=
+                    this.children[j].offsetSecs -
+                    this.children[startIndex].offsetSecs;
+                startIndex = i;
+            }
+        }
+        return [periodLen, drift];
+    }
+
+    sort() {
+        this.children.sort((a, b) => {
+            return a.date.getTime() - b.date.getTime();
+        });
+        this.reRender();
+    }
+
+    reRender() {
+        for (let child of this.children) {
+            child.removeFromDom();
+        }
+        for (let child of this.children) {
+            child.addToDom();
         }
     }
     remove(child) {
@@ -196,16 +210,6 @@ class WatchTable extends Component {
         }
         console.log("addRecord");
         this.children.push(new WatchRecord(this, this.tbody, data));
-    }
-    setDirty(dirty) {
-        super.setDirty(dirty);
-        if (this.dirty) {
-            this.saveButton.style.backgroundColor = this.constructor.dirtyColor;
-            this.saveButton.innerHTML = "save";
-        } else {
-            this.saveButton.style.backgroundColor = null;
-            this.saveButton.innerHTML = "saved";
-        }
     }
 }
 export { WatchTable };
