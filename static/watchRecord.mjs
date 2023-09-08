@@ -12,6 +12,7 @@ class WatchRecord extends Component {
     dirty;
     sekPerDay;
     saveButton;
+    isNew;
     constructor(parent, anchor, data) {
         super(parent, anchor);
         // domElement is a <tr> element
@@ -22,9 +23,12 @@ class WatchRecord extends Component {
             this._id = undefined;
             _date = new Date();
             _date.setMinutes(_date.getMinutes() - _date.getTimezoneOffset());
+            _date.setSeconds(0);
+            _date.setMilliseconds(0);
             _offsetSecs = 0;
             this._uhr = this.parent.currentWatch;
             this._user = "Georg"; // TODO login
+            this.isNew = true;
         } else {
             this.domElement = this.anchor.insertRow();
             this.data = data;
@@ -34,6 +38,7 @@ class WatchRecord extends Component {
             _offsetSecs = data.offsetSecs;
             this._uhr = data.uhr;
             this._user = data.user;
+            this.isNew = false;
         }
         this.domElement.obj = this;
         this.fillTR(_date, _offsetSecs);
@@ -130,7 +135,7 @@ class WatchRecord extends Component {
                 console.log("Record.save");
                 this._id = data._id;
                 this.setDirty(false);
-                this.parent.recalc();
+                this.parent.recalc((fresh = this.isNew));
             })
             .catch((err) => {
                 console.error("Record.save", err.message);

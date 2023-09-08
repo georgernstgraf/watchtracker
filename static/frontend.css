@@ -1,4 +1,5 @@
-#watchSelector, #watchTable {
+#watchSelector,
+#watchTable {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -9,23 +10,32 @@ label {
 div {
     margin: 1em 1em 1em 1em;
 }
-button,select,input {
+button,
+select,
+input {
     margin: 0 1em;
     background-color: rgb(243, 210, 131);
-}   
-h1,h2,th,td,thead,tbody,tfoot {
+}
+h1,
+h2,
+th,
+td,
+thead,
+tbody,
+tfoot {
     text-align: center;
 }
 table {
     width: 100%;
 }
 caption {
+    color: #859900;
     font-size: large;
     font-weight: bold;
     margin: 1em 0;
 }
 tfoot::before {
-    content: '';
+    content: "";
     display: block;
     height: 15px;
 }

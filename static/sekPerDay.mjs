@@ -4,7 +4,7 @@ class SekPerDay extends Component {
     diffSecs;
     diffSekPerDay;
     speedType;
-    outText;
+    diffSekPerDayFixed;
     constructor(parent, anchor) {
         super(parent, anchor);
         this.domElement = document.createElement("td");
@@ -22,18 +22,22 @@ class SekPerDay extends Component {
     }
     calculateFromVals(periodLen, drift) {
         this.durationInDays = periodLen / 86400000;
+        this.durationInHours = (periodLen / 3600000).toFixed(0);
+        this.dauer = this.durationInDays.toFixed(1);
         this.diffSecs = drift;
         this.diffSekPerDay = this.diffSecs / this.durationInDays;
         this.speedType = this.diffSekPerDay > 0 ? "schnell" : "langsam";
         this.diffSekPerDay = Math.abs(this.diffSekPerDay);
-        this.outText = this.diffSekPerDay.toFixed(1);
+        this.diffSekPerDayFixed = this.diffSekPerDay.toFixed(1);
     }
     setContent(text) {
         this.domElement.innerHTML = text;
     }
     fill(prev) {
         this.calculate(prev);
-        this.setContent(`${this.outText} s/d ${this.speedType}`);
+        this.setContent(
+            `${this.diffSekPerDayFixed} s/d (${this.durationInHours}h) ${this.speedType}`
+        );
     }
     makeBold() {
         this.domElement.colSpan = 4;
@@ -44,10 +48,8 @@ class SekPerDay extends Component {
     }
     fullFill(periodLen, drift) {
         this.calculateFromVals(periodLen, drift);
-        let dauer = this.durationInDays.toFixed(1);
-        this.makeBold();
         this.setContent(
-            `(Dauer: ${dauer} Tage, Drift: ${this.diffSecs} Sek   =>   ${this.outText} s/d ${this.speedType})`
+            `(Dauer: ${this.dauer} Tage, Drift: ${this.diffSecs} Sek   =>   ${this.diffSekPerDayFixed} s/d ${this.speedType})`
         );
     }
 }

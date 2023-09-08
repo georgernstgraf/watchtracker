@@ -66,7 +66,7 @@ class WatchTable extends Component {
 
         th = document.createElement("th");
         th.setAttribute("scope", "col");
-        th.style.width = "40%";
+        th.style.width = "30%";
         th.innerHTML = "Messzeitpunkt";
         tr.appendChild(th);
 
@@ -78,7 +78,7 @@ class WatchTable extends Component {
 
         th = document.createElement("th");
         th.setAttribute("scope", "col");
-        th.style.width = "25%";
+        th.style.width = "55%";
         th.innerHTML = "Sek / Tag";
         tr.appendChild(th);
     }
@@ -88,6 +88,7 @@ class WatchTable extends Component {
         tr = document.createElement("tr");
         this.tfoot.appendChild(tr);
         this.stats = new SekPerDay(this, tr);
+        this.stats.makeBold();
     }
 
     loadCommon(name) {
@@ -133,12 +134,19 @@ class WatchTable extends Component {
             });
         console.log("loadWatch", name);
     }
-    recalc() {
+    recalc(fresh = false) {
+        // wird aufgerufen aus der save() Methode von WatchRecord
+        // und aus der loadWatch() Methode
+        if (fresh) {
+            window.myObject.watchSelector.populate();
+        }
         for (let i = 1; i < this.children.length; i++) {
             this.children[i].calcAfterLoad(this.children[i - 1]);
         }
         if (this.children.length > 1) {
             this.stats.fullFill(...this.driftPerDay);
+        } else {
+            this.stats.setContent("(noch keine Daten)");
         }
     }
 
