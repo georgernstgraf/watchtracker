@@ -5,17 +5,19 @@ Verwendet Vanilla Javascript
 
 ## Bugs
 
--   selector updaten wenn erster record neuer Uhr gespeichert wird
--   ebenso fliegt da ein Fehler wenn vorher children drin waren
+-   more to come!
 
 ## TODO
 
--   checken wenn 0 der letzte Wert ist ob Berechnung stimmt
 -   login / creds
 -   irgendwann mal mit react nachbauen
 
 ## Changelog
 
+-   2023-09-10
+    -   done (bugfix): checken wenn 0 der letzte Wert ist ob Berechnung stimmt
+    -   bugfix: selector updaten wenn erster record neuer Uhr gespeichert wird
+    -   bugfix: ebenso fliegt da ein Fehler wenn vorher children drin waren
 -   2023-09-08
     -   Einbau von Beobachtungsdauer
     -   Erstes Speichern neuer Uhr muß Liste updaten

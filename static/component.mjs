@@ -5,6 +5,7 @@ class Component {
     children; // Component[]
     dirty; // boolean
     domElement; // wird in child-klasse mit document.createElement selbst erzeugt
+    isDomChild; // boolean
 
     constructor(parent, anchor) {
         // parent has .domElement
@@ -15,12 +16,15 @@ class Component {
         }
         this.parent = parent;
         this.children = [];
+        this.isDomChild = false;
     }
+    
     delete() {
         // tell the parent: remove me
         this.parent.remove(this);
     }
     remove(child) {
+        // WARN not usable in a loop
         // 1. from domElement
         child.removeFromDom();
         // 2. from children array
@@ -37,9 +41,16 @@ class Component {
     }
     addToDom() {
         this.anchor.appendChild(this.domElement);
+        this.isDomChild = true;
     }
     removeFromDom() {
-        this.anchor.removeChild(this.domElement);
+        if (this.isDomChild) {
+            this.anchor.removeChild(this.domElement);
+            this.isDomChild = false;
+        } else {
+            console.warn("Component.removeFromDom: was not a dom child:");
+            console.warn(this.domElement);
+        }
     }
 
     setDirty(dirty = true) {

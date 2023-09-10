@@ -9,7 +9,7 @@ class WatchSelector extends Component {
         this.addToDom();
         this.populate();
         this.domElement.addEventListener("change", (e) =>
-            this.change(e.target)
+            this.watchChosen(e.target)
         );
     }
 
@@ -34,7 +34,8 @@ class WatchSelector extends Component {
         }
     }
 
-    change(target) {
+    watchChosen(target) {
+        // Es geht nur um die Optik
         let sel = target.selectedIndex;
         for (let i = 0; i < target.options.length; i++) {
             if (i == sel) {

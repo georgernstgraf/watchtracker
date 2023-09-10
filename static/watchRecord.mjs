@@ -47,6 +47,7 @@ class WatchRecord extends Component {
         } else {
             this.setDirty(false);
         }
+        this.addToDom();
     }
     get date() {
         return this.picker.date;
@@ -87,7 +88,7 @@ class WatchRecord extends Component {
                     console.log("Record.delete");
                 })
                 .catch((err) => {
-                    console.log("Record.delete", err.message);
+                    console.error("Record.delete", err.message);
                 });
         } else {
             console.log("Record.delete", "no id, i am safe!");
@@ -135,7 +136,7 @@ class WatchRecord extends Component {
                 console.log("Record.save");
                 this._id = data._id;
                 this.setDirty(false);
-                this.parent.recalc((fresh = this.isNew));
+                this.parent.recalc(this.isNew);
             })
             .catch((err) => {
                 console.error("Record.save", err.message);
@@ -150,10 +151,7 @@ class WatchRecord extends Component {
         this.domElement.appendChild(th);
         butt = document.createElement("button");
         butt.innerHTML = "\uff0d"; // Unicode für Minuszeichen
-        butt.addEventListener("click", (e) => {
-            e.target.parentElement.parentElement.obj.delete();
-            // butt..th............tr (this.domElement)
-        });
+        butt.addEventListener("click", this.delete.bind(this));
         th.appendChild(butt);
 
         // datum (mit picker)

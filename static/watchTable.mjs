@@ -7,7 +7,6 @@ class WatchTable extends Component {
     saveButton;
     dirty;
     stats;
-    children = []; // WatchRecords
     constructor(parent) {
         // parent has domElement (<div>)
         // Ich muß mich immer mit appendChild in das domElement des Parents hineinerzeugen
@@ -36,7 +35,6 @@ class WatchTable extends Component {
 
     clear() {
         this.thead.hidden = true;
-        this.tbody.innerHTML = "";
         this.tfoot.hidden = true;
         this.setInfo("Wählen oder erstellen");
     }
@@ -95,10 +93,10 @@ class WatchTable extends Component {
         this.currentWatch = name;
         this.thead.hidden = false;
         this.tfoot.hidden = false;
-        this.tbody.innerHTML = "";
     }
 
     loadNew(name) {
+        this.removeAllChildren();
         this.loadCommon(name);
         this.setInfo(`Aktuell: ${name}`);
         this.addRecord();
@@ -106,6 +104,7 @@ class WatchTable extends Component {
     }
 
     async loadWatch(name) {
+        console.log("loadWatch", name);
         this.loadCommon(name);
         this.setInfo("Loading...");
         await fetch("http://localhost:3000/uhren/daten/" + name)
@@ -118,22 +117,21 @@ class WatchTable extends Component {
                 return response.json();
             })
             .then((data) => {
+                this.removeAllChildren();
                 this.setInfo(`Aktuell: ${name}`);
                 this.setDirty(false);
-                this.children = [];
                 for (let entry of data) {
-                    // this.children.push(
-                    //     new WatchRecord(this, this.tbody, entry)
-                    // );
                     this.addRecord(entry);
                 }
                 this.recalc();
+                this.thead.hidden = false;
+                this.tfoot.hidden = false;
             })
             .catch((err) => {
                 this.setInfo(`Fehler: ${err.message}`);
             });
-        console.log("loadWatch", name);
     }
+
     recalc(fresh = false) {
         // wird aufgerufen aus der save() Methode von WatchRecord
         // und aus der loadWatch() Methode
@@ -155,21 +153,24 @@ class WatchTable extends Component {
         let periodLen = 0;
         let drift = 0;
         let startIndex = 0;
-        for (let i = 1; i < this.children.length; i++) {
+        let lastIndex = this.children.length - 1;
+        for (let i = 1; i <= lastIndex; i++) {
             if (
+                // Wenn Nullwert oder letzter Eintrag muss ich was machen, sonst nicht
                 this.children[i].offsetSecs == 0 ||
-                i == this.children.length - 1 // last record
+                i == lastIndex
             ) {
-                let j;
-                if (i == this.children.length - 1) {
-                    j = i; // if it's the last record, take it
+                let indexToCalcWith;
+                if (i == lastIndex && this.children[i].offsetSecs != 0) {
+                    indexToCalcWith = i; // if it's the last record and it's not zero, take it
                 } else {
-                    j = i - 1; // otherwise the record before
+                    indexToCalcWith = i - 1; // otherwise the record before
                 }
                 periodLen +=
-                    this.children[j].date - this.children[startIndex].date;
+                    this.children[indexToCalcWith].date -
+                    this.children[startIndex].date;
                 drift +=
-                    this.children[j].offsetSecs -
+                    this.children[indexToCalcWith].offsetSecs -
                     this.children[startIndex].offsetSecs;
                 startIndex = i;
             }
@@ -190,6 +191,11 @@ class WatchTable extends Component {
         }
         for (let child of this.children) {
             child.addToDom();
+        }
+    }
+    removeAllChildren() {
+        while (this.children.length > 0) {
+            this.remove(this.children[0]);
         }
     }
     remove(child) {
