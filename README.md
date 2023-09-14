@@ -5,7 +5,7 @@ Verwendet Vanilla Javascript
 
 ## Bugs
 
--   more to come!
+-   after deleting rows, the total calc is not correct
 
 ## TODO
 
