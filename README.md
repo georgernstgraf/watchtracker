@@ -3,9 +3,10 @@
 Konsumiert ein REST Api  
 Verwendet Vanilla Javascript
 
-## Bugs
+## Bugs & Feature Requests
 
-- catches in save & delete Method in Watchrecod do nothing
+-   catches in save & delete Method in Watchrecod do nothing
+-   Add Possibility to remove a watch at one (implies new Api Endpoint)
 
 ## TODO
 
