@@ -133,9 +133,11 @@ class WatchTable extends Component {
     }
 
     recalc(fresh = false) {
-        // wird aufgerufen aus der save() Methode von WatchRecord
-        // und aus der loadWatch() Methode
-        if (fresh) {
+        // wird aufgerufen von
+        // - loadWatch() Methode (hier)
+        // - save() Methode von WatchRecord
+        // - delete() Methode von WatchRecord
+        if (fresh && this.children.length == 1) {
             window.myObject.watchSelector.populate();
         }
         for (let i = 1; i < this.children.length; i++) {

@@ -94,6 +94,7 @@ class WatchRecord extends Component {
             console.log("Record.delete", "no id, i am safe!");
         }
         super.delete();
+        this.parent.recalc();
     }
     async save() {
         let method, url;
