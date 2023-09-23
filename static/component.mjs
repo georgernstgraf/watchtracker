@@ -1,5 +1,10 @@
 class Component {
-    static dirtyColor = "rgb(255, 144, 85)";
+    static dirtyColor = "#ff9055";
+    static headerColorMagenta = "#d33682"; /* magenta,  */
+    static inputColor = "#f3d283"; /* yellow,  */
+    static headerColorGreen = "#859900"; /* green, */
+    static invalidColor = "#ff5555"; /* red,  */
+    static backgroundColor = "#002b36"; /* dark blue,  */
     anchor; // DOM-Element, in das ich mich einhänge
     parent; // Component
     children; // Component[]
@@ -18,7 +23,7 @@ class Component {
         this.children = [];
         this.isDomChild = false;
     }
-    
+
     delete() {
         // tell the parent: remove me
         this.parent.remove(this);

@@ -7,6 +7,7 @@ class WatchTable extends Component {
     saveButton;
     dirty;
     stats;
+    infoTxt;
     constructor(parent) {
         // parent has domElement (<div>)
         // Ich muß mich immer mit appendChild in das domElement des Parents hineinerzeugen
@@ -39,8 +40,18 @@ class WatchTable extends Component {
         this.setInfo("Wählen oder erstellen");
     }
 
-    setInfo(msg) {
+    setInfo(msg, error = false) {
+        if (!error) {
+            this.caption.style.backgroundColor = null;
+            this.infoTxt = msg;
+        } else {
+            this.caption.style.backgroundColor = this.constructor.invalidColor;
+        }
         this.caption.innerHTML = msg;
+    }
+
+    clearError() {
+        this.setInfo(this.infoTxt);
     }
 
     fillThead() {
@@ -128,7 +139,7 @@ class WatchTable extends Component {
                 this.tfoot.hidden = false;
             })
             .catch((err) => {
-                this.setInfo(`Fehler: ${err.message}`);
+                this.setInfo(`Fehler: ${err.message}`, true);
             });
     }
 

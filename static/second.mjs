@@ -13,9 +13,9 @@ class Second extends Component {
     }
     change() {
         if (isNaN(this.secs)) {
-            this.domElement.style.backgroundColor = "#f55";
+            this.domElement.style.backgroundColor = this.constructor.invalidColor;
         } else {
-            this.domElement.style.backgroundColor = "#fff";
+            this.domElement.style.backgroundColor = this.constructor.inputColor;
         }
         this.parent.setDirty();
     }

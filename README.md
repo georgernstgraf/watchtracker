@@ -5,7 +5,6 @@ Verwendet Vanilla Javascript
 
 ## Bugs & Feature Requests
 
--   catches in save & delete Method in Watchrecod do nothing
 -   Add Possibility to remove a watch at once (implies new Api Endpoint)
 
 ## TODO
@@ -16,7 +15,11 @@ Verwendet Vanilla Javascript
 ## Changelog
 
 -   2023-09-23
+
+    -   cleanup: colors
+    -   bugfix: catches in save & delete Method in Watchrecod do nothing
     -   Fix: Selector does not need to be populated always
+
 -   2023-09-15
 
     -   fix: after deleting rows, the total calc is not correct

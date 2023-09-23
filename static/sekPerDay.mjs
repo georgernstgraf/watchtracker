@@ -42,7 +42,7 @@ class SekPerDay extends Component {
     makeBold() {
         this.domElement.colSpan = 4;
         this.domElement.style.textAlign = "center";
-        this.domElement.style.color = "#d33682";
+        this.domElement.style.color = this.constructor.headerColorMagenta;
         this.domElement.style.fontSize = "larger";
         this.domElement.style.fontWeight = "bold";
     }

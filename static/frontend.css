@@ -4,6 +4,14 @@
     align-items: center;
     justify-content: center;
 }
+.mycolors {
+    color: #d33682; /* magenta, headerColorMagenta */
+    color: #f3d283; /* yellow, inputColor */
+    color: #859900; /* green, headerColorGreen*/
+    color: #ff9055; /* orange, dirtycolor */
+    color: #ff5555; /* red, invalidColor */
+    color: #002b36; /* darkblue, backgroundColor */
+}
 label {
     margin: 0 2.5em;
 }
@@ -14,7 +22,7 @@ button,
 select,
 input {
     margin: 0 1em;
-    background-color: rgb(243, 210, 131);
+    background-color: #f3d283;
 }
 h1,
 h2,

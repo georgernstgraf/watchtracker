@@ -138,9 +138,13 @@ class WatchRecord extends Component {
                 this._id = data._id;
                 this.setDirty(false);
                 this.parent.recalc(this.isNew);
+                this.parent.clearError();
             })
             .catch((err) => {
                 console.error("Record.save", err.message);
+                console.error("Record.save", err.stack);
+                console.error(`dirty: ${this.dirty}`);
+                this.parent.setInfo(`Fehler: ${err.message}`, true);
             });
     }
 
