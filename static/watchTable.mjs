@@ -197,12 +197,12 @@ class WatchTable extends Component {
     }
     removeAllChildren() {
         while (this.children.length > 0) {
-            this.remove(this.children[0]);
+            this.remove(this.children[0], false);
         }
     }
-    remove(child) {
+    remove(child, notifySelector = true) {
         super.remove(child);
-        if (this.children.length == 0) {
+        if (this.children.length == 0 && notifySelector) {
             this.clear();
             window.myObject.watchSelector.populate();
         }
