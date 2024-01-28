@@ -38,8 +38,7 @@ app.use(
     })
 );
 app.use(express.static('static'));
-const uhrenRouter = require('./routes/uhren');
-app.use('/uhren', uhrenRouter);
+app.use('/uhren', require('./routes/uhren'));
 app.use('/login', require('./routes/login'));
 
 app.use(function (err, req, res, next) {
