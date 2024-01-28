@@ -1,6 +1,6 @@
-import { WatchRecord } from "./watchRecord.mjs";
-import { Component } from "./component.mjs";
-import { SekPerDay } from "./sekPerDay.mjs";
+import { WatchRecord } from './watchRecord.mjs';
+import { Component } from './component.mjs';
+import { SekPerDay } from './sekPerDay.mjs';
 
 class WatchTable extends Component {
     currentWatch;
@@ -13,22 +13,22 @@ class WatchTable extends Component {
         // Ich muß mich immer mit appendChild in das domElement des Parents hineinerzeugen
         super(parent);
         // table, caption, thead, tbody erzeugen
-        this.domElement = document.createElement("table");
+        this.domElement = document.createElement('table');
         this.domElement.obj = this;
         this.addToDom();
 
-        this.caption = document.createElement("caption");
+        this.caption = document.createElement('caption');
         this.domElement.appendChild(this.caption);
 
-        this.thead = document.createElement("thead");
+        this.thead = document.createElement('thead');
         this.domElement.appendChild(this.thead);
         this.thead.hidden = true;
         this.fillThead();
 
-        this.tbody = document.createElement("tbody");
+        this.tbody = document.createElement('tbody');
         this.domElement.appendChild(this.tbody);
 
-        this.tfoot = document.createElement("tfoot");
+        this.tfoot = document.createElement('tfoot');
         this.domElement.appendChild(this.tfoot);
         this.tfoot.hidden = true;
         this.fillTfoot();
@@ -37,7 +37,7 @@ class WatchTable extends Component {
     clear() {
         this.thead.hidden = true;
         this.tfoot.hidden = true;
-        this.setInfo("Wählen oder erstellen");
+        this.setInfo('Wählen oder erstellen');
     }
 
     setInfo(msg, error = false) {
@@ -56,45 +56,45 @@ class WatchTable extends Component {
 
     fillThead() {
         // 2 Zeilen header
-        this.thead.innerHTML = "";
+        this.thead.innerHTML = '';
         let tr, th, butt;
 
         // Headerzeile
-        tr = document.createElement("tr");
+        tr = document.createElement('tr');
         this.thead.appendChild(tr);
 
         // plus button
-        th = document.createElement("th");
-        th.setAttribute("scope", "rowgroup");
-        th.style.width = "5%";
+        th = document.createElement('th');
+        th.setAttribute('scope', 'rowgroup');
+        th.style.width = '5%';
         tr.appendChild(th);
-        butt = document.createElement("button");
+        butt = document.createElement('button');
         th.appendChild(butt);
-        butt.innerHTML = "\uff0b"; // Unicode für Pluszeichen
-        butt.addEventListener("click", this.addRecord.bind(this));
+        butt.innerHTML = '\uff0b'; // Unicode für Pluszeichen
+        butt.addEventListener('click', this.addRecord.bind(this));
 
-        th = document.createElement("th");
-        th.setAttribute("scope", "col");
-        th.style.width = "30%";
-        th.innerHTML = "Messzeitpunkt";
+        th = document.createElement('th');
+        th.setAttribute('scope', 'col');
+        th.style.width = '30%';
+        th.innerHTML = 'Messzeitpunkt';
         tr.appendChild(th);
 
-        th = document.createElement("th");
-        th.setAttribute("scope", "col");
-        th.style.width = "10%";
-        th.innerHTML = "Abweichung";
+        th = document.createElement('th');
+        th.setAttribute('scope', 'col');
+        th.style.width = '10%';
+        th.innerHTML = 'Abweichung';
         tr.appendChild(th);
 
-        th = document.createElement("th");
-        th.setAttribute("scope", "col");
-        th.style.width = "55%";
-        th.innerHTML = "Sek / Tag";
+        th = document.createElement('th');
+        th.setAttribute('scope', 'col');
+        th.style.width = '55%';
+        th.innerHTML = 'Sek / Tag';
         tr.appendChild(th);
     }
     fillTfoot() {
         let tr, th, td;
-        this.tfoot.innerHTML = "";
-        tr = document.createElement("tr");
+        this.tfoot.innerHTML = '';
+        tr = document.createElement('tr');
         this.tfoot.appendChild(tr);
         this.stats = new SekPerDay(this, tr);
         this.stats.makeBold();
@@ -115,10 +115,12 @@ class WatchTable extends Component {
     }
 
     async loadWatch(name) {
-        console.log("loadWatch", name);
+        console.log('loadWatch', name);
         this.loadCommon(name);
-        this.setInfo("Loading...");
-        await fetch("http://localhost:3000/uhren/daten/" + name)
+        this.setInfo('Loading...');
+        await fetch('http://localhost:3000/uhren/daten/' + name, {
+            credentials: 'include',
+        })
             .then((response) => {
                 if (!response.ok) {
                     throw new Error(
@@ -157,7 +159,7 @@ class WatchTable extends Component {
         if (this.children.length > 1) {
             this.stats.fullFill(...this.driftPerDay);
         } else {
-            this.stats.setContent("(noch keine Daten)");
+            this.stats.setContent('(noch keine Daten)');
         }
     }
 
@@ -235,7 +237,7 @@ class WatchTable extends Component {
         } else {
             this.setDirty(false);
         }
-        console.log("addRecord");
+        console.log('addRecord');
         this.children.push(new WatchRecord(this, this.tbody, data));
     }
 }

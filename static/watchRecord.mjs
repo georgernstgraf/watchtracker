@@ -1,8 +1,8 @@
-import { DateTimePicker } from "./dateTimePicker.mjs";
-import { Second } from "./second.mjs";
-import { Component } from "./component.mjs";
-import { SekPerDay } from "./sekPerDay.mjs";
-import { SaveButton } from "./saveButton.mjs";
+import { DateTimePicker } from './dateTimePicker.mjs';
+import { Second } from './second.mjs';
+import { Component } from './component.mjs';
+import { SekPerDay } from './sekPerDay.mjs';
+import { SaveButton } from './saveButton.mjs';
 
 class WatchRecord extends Component {
     domElement; // domElementtype: <tr> (line)
@@ -27,7 +27,7 @@ class WatchRecord extends Component {
             _date.setMilliseconds(0);
             _offsetSecs = 0;
             this._uhr = this.parent.currentWatch;
-            this._user = "Georg"; // TODO login
+            this._user = 'Georg'; // TODO login
             this.isNew = true;
         } else {
             this.domElement = this.anchor.insertRow();
@@ -72,9 +72,10 @@ class WatchRecord extends Component {
     }
     async delete() {
         if (this._id != undefined) {
-            console.log("Record.delete", this._id, "from db");
+            console.log('Record.delete', this._id, 'from db');
             await fetch(`/uhren/id/${this._id}`, {
-                method: "DELETE",
+                method: 'DELETE',
+                credentials: 'include',
             })
                 .then((response) => {
                     if (!response.ok) {
@@ -85,22 +86,22 @@ class WatchRecord extends Component {
                     return response.json();
                 })
                 .then((data) => {
-                    console.log("Record.delete");
+                    console.log('Record.delete');
                 })
                 .catch((err) => {
-                    console.error("Record.delete", err.message);
+                    console.error('Record.delete', err.message);
                 });
         } else {
-            console.log("Record.delete", "no id, i am safe!");
+            console.log('Record.delete', 'no id, i am safe!');
         }
         super.delete();
         this.parent.recalc();
     }
     async save() {
         let method, url;
-        console.log("Record.save called");
+        console.log('Record.save called');
         if (!this.dirty) {
-            console.warn("Record.save", "called, but no changes");
+            console.warn('Record.save', 'called, but no changes');
             return;
         }
         let data = {
@@ -110,18 +111,19 @@ class WatchRecord extends Component {
             user: this._user,
         };
         if (this._id == undefined) {
-            method = "POST";
-            url = "/uhren";
-            console.log("Record.save NEW!");
+            method = 'POST';
+            url = '/uhren';
+            console.log('Record.save NEW!');
         } else {
-            method = "PATCH";
+            method = 'PATCH';
             url = `/uhren/id/${this._id}`;
-            console.log("Record.save UPDATE!");
+            console.log('Record.save UPDATE!');
         }
         await fetch(url, {
             method: method,
+            credentials: 'include',
             headers: {
-                "Content-Type": "application/json",
+                'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
         })
@@ -134,15 +136,15 @@ class WatchRecord extends Component {
                 return response.json();
             })
             .then((data) => {
-                console.log("Record.save");
+                console.log('Record.save');
                 this._id = data._id;
                 this.setDirty(false);
                 this.parent.recalc(this.isNew);
                 this.parent.clearError();
             })
             .catch((err) => {
-                console.error("Record.save", err.message);
-                console.error("Record.save", err.stack);
+                console.error('Record.save', err.message);
+                console.error('Record.save', err.stack);
                 console.error(`dirty: ${this.dirty}`);
                 this.parent.setInfo(`Fehler: ${err.message}`, true);
             });
@@ -151,27 +153,27 @@ class WatchRecord extends Component {
     fillTR(_date, _offsetSecs) {
         let th, td, input, butt;
         // MINUS - Button
-        th = document.createElement("th");
-        th.setAttribute("scope", "row");
+        th = document.createElement('th');
+        th.setAttribute('scope', 'row');
         this.domElement.appendChild(th);
-        butt = document.createElement("button");
-        butt.innerHTML = "\uff0d"; // Unicode für Minuszeichen
-        butt.addEventListener("click", this.delete.bind(this));
+        butt = document.createElement('button');
+        butt.innerHTML = '\uff0d'; // Unicode für Minuszeichen
+        butt.addEventListener('click', this.delete.bind(this));
         th.appendChild(butt);
 
         // datum (mit picker)
-        td = document.createElement("td");
+        td = document.createElement('td');
         this.domElement.appendChild(td);
         this.picker = new DateTimePicker(this, td, _date);
 
         // abweichung
-        td = document.createElement("td");
+        td = document.createElement('td');
         this.domElement.appendChild(td);
         this.abw = new Second(this, td, _offsetSecs);
 
         // Sek / Tag
         this.sekPerDay = new SekPerDay(this);
-        this.sekPerDay.setContent("start");
+        this.sekPerDay.setContent('start');
 
         // save button
         this.saveButton = new SaveButton(this);
@@ -179,7 +181,7 @@ class WatchRecord extends Component {
 
     calcAfterLoad(prev) {
         if (this.abw.secs == 0) {
-            this.sekPerDay.setContent("start");
+            this.sekPerDay.setContent('start');
         } else {
             this.sekPerDay.fill(prev);
         }
