@@ -1,7 +1,6 @@
-# Uhren Abweichungstracker
+# Watch Deviation Tracker
 
-Konsumiert ein REST Api  
-Verwendet Vanilla Javascript
+Consumes a REST API Uses Vanilla Javascript
 
 ## Bugs & Feature Requests
 
@@ -28,15 +27,18 @@ Verwendet Vanilla Javascript
         and only then re-render)
 
 -   2023-09-10
-    -   done (bugfix): checken wenn 0 der letzte Wert ist ob Berechnung stimmt
-    -   bugfix: selector updaten wenn erster record neuer Uhr gespeichert wird
-    -   bugfix: ebenso fliegt da ein Fehler wenn vorher children drin waren
+
+    -   done (bugfix): check if 0 is the last value calculation is still valid
+    -   bugfix: update selector when first record of new watch is saved
+    -   bugfix: error is raised if children had been present prior
+
 -   2023-09-08
-    -   Einbau von Beobachtungsdauer
-    -   Erstes Speichern neuer Uhr muß Liste updaten
-    -   Datumseingaben ohne sekunden und millis
+
+    -   implement survey duration
+    -   saving of first record should update watchtable
+    -   Date Entries w/o seconds and millis
+
 -   2023-09-07
-    -   save nur mehr auf Zeilen-Ebene
-    -   Kalkulation auch über mehrere Etappen ermöglichen (mit Gewichtung) =>
-        also gut rechnen!
-    -   gleich neusortieren nach Eingabe
+    -   save only lines
+    -   Kalkulation also over more stages!
+    -   immediately sort upon entry of a record
