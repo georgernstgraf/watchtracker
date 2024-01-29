@@ -12,6 +12,10 @@
     color: #ff5555; /* red, invalidColor */
     color: #002b36; /* darkblue, backgroundColor */
 }
+nav {
+    display: flex;
+    flex-direction: row-reverse;
+}
 label {
     margin: 0 2.5em;
 }
@@ -43,7 +47,7 @@ caption {
     margin: 1em 0;
 }
 tfoot::before {
-    content: "";
+    content: '';
     display: block;
     height: 15px;
 }

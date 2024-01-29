@@ -20,11 +20,22 @@ class WatchSelector extends Component {
         await fetch('/uhren/liste', {
             credentials: 'include',
         })
-            .then((response) => response.json())
+            .then((response) => {
+                if (!response.ok) {
+                    if (response.status == 401) {
+                        window.location.href = '/login.html';
+                    }
+                    throw new Error(
+                        `Error: ${response.status} ${response.statusText}`
+                    );
+                }
+                return response.json();
+            })
             .then((data) => {
                 this.watches = data;
             })
             .catch((err) => {
+                console.log('WatchSelector.populate', err.message);
                 this.watches = ['Fehler', err.message];
             });
         this.domElement.setAttribute('size', this.watches.length);
