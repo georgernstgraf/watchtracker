@@ -118,7 +118,7 @@ class WatchTable extends Component {
         console.log('loadWatch', name);
         this.loadCommon(name);
         this.setInfo('Loading...');
-        await fetch('http://localhost:3000/uhren/daten/' + name, {
+        await fetch(`/uhren/daten/${name}`, {
             credentials: 'include',
         })
             .then((response) => {

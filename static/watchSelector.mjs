@@ -17,7 +17,7 @@ class WatchSelector extends Component {
         // Füllen des Select-Elements
         this.domElement.innerHTML = '';
         let option;
-        await fetch('http://localhost:3000/uhren/liste', {
+        await fetch('/uhren/liste', {
             credentials: 'include',
         })
             .then((response) => response.json())

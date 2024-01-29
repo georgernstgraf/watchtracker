@@ -46,4 +46,6 @@ app.use(function (err, req, res, next) {
         res.status(401).redirect('/login.html');
     }
 });
-app.listen(3000, () => console.log('Server running on port 3000'));
+app.listen(process.env.APP_PORT, () => {
+    console.log(`App running: ${process.env.APP_URL}`);
+});
