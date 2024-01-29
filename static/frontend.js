@@ -28,6 +28,9 @@ window.myObject.watchTable = new WatchTable({
     domElement: document.getElementById('watchTable'),
 });
 
+// Username
+
+// Logout
 document.getElementById('logout_button').addEventListener('click', function () {
     fetch('/logout', { method: 'GET' })
         .then((response) => {
@@ -40,4 +43,16 @@ document.getElementById('logout_button').addEventListener('click', function () {
         })
         .catch((error) => console.error('Error:', error));
 });
+
+// Get username from /whoami endpoint
+fetch('/whoami', { method: 'GET' })
+    .then((response) => {
+        if (!response.ok) throw new Error('Failed to get username');
+        return response.json();
+    })
+    .then((data) => {
+        document.getElementById('username').innerHTML = data.user;
+    })
+    .catch((error) => console.error('Error:', error));
+
 console.log('frontend.js finished @' + new Date().toLocaleTimeString());

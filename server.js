@@ -28,8 +28,11 @@ app.use(express.json());
 // block-list of paths that should require authentication
 const blockList = [
     { url: /^\/uhren(.*)/, methods: ['GET', 'POST', 'PUT', 'DELETE'] },
-    // Add more paths as needed
+    { url: /^\/index.html$/, methods: ['GET'] },
+    { url: /^\/$/, methods: ['GET'] },
+    { url: /^\/whoami$/, methods: ['GET'] }, // Block /whoami path
 ];
+
 app.use(
     expressJwt({
         secret: process.env.JWT_SECRET,
@@ -50,10 +53,14 @@ app.use(express.static('static'));
 app.use('/uhren', require('./routes/uhren'));
 app.use('/login', require('./routes/login'));
 app.use('/logout', require('./routes/logout'));
+app.use('/whoami', require('./routes/whoami'));
 
 app.use(function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {
-        res.status(401).json({ error: 'Unauthorized' });
+        if (req.path === '/' || req.path === '/index.html') {
+            return res.redirect('/login.html');
+        }
+        return res.status(401).json({ error: 'Unauthorized' });
     }
 });
 app.listen(process.env.APP_PORT, () => {

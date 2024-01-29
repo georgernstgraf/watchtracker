@@ -22,7 +22,7 @@ async function submit() {
             headers: { 'Content-Type': 'application/json' },
         });
         if (fetched.ok) {
-            return (window.location.href = '/index.html');
+            return (window.location.href = `/index.html`);
         }
         const status = fetched.status;
         let json;

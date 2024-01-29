@@ -18,16 +18,17 @@ router.post('/', async (req, res) => {
         });
         if (!auth.ok) {
             const resp = await auth.json();
+            resp.status = auth.status;
             throw resp;
         }
         const resp = await auth.json();
         const token = jwt.sign({ user: user.user }, process.env.JWT_SECRET, {
-            expiresIn: '1w',
+            expiresIn: '4w',
         });
         res.cookie('token', token, { httpOnly: true, sameSite: 'Strict' });
         res.status(200).json(resp);
     } catch (err) {
-        res.status(400).json(err);
+        res.status(err.status).json(err);
     }
 });
 module.exports = router;
