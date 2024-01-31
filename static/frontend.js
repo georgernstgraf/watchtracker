@@ -28,8 +28,6 @@ window.myObject.watchTable = new WatchTable({
     domElement: document.getElementById('watchTable'),
 });
 
-// Username
-
 // Logout
 document.getElementById('logout_button').addEventListener('click', function () {
     fetch('/logout', { method: 'GET' })
@@ -52,7 +50,9 @@ fetch('/whoami', { method: 'GET' })
     })
     .then((data) => {
         document.getElementById('username').innerHTML = data.user;
+        window.myObject.user = data.user;
     })
     .catch((error) => console.error('Error:', error));
 
+window.myObject.watchSelector.autoChoose();
 console.log('frontend.js finished @' + new Date().toLocaleTimeString());

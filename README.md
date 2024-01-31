@@ -8,8 +8,7 @@ Consumes a REST API Uses Vanilla Javascript
 
 ## TODO
 
--   login / creds
--   irgendwann mal mit react nachbauen
+-   vue.js
 
 ## Changelog
 

@@ -45,6 +45,10 @@ class WatchSelector extends Component {
             option.innerHTML = this.watches[i];
             this.domElement.appendChild(option);
         }
+        if (this.watches.length == 1) {
+            this.domElement.selectedIndex = 0;
+            this.watchChosen(this.domElement);
+        }
     }
 
     watchChosen(target) {

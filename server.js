@@ -4,7 +4,6 @@ const express = require('express');
 const app = express();
 const cors = require('cors');
 const expressJwt = require('express-jwt').expressjwt;
-const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 
 // mongodb
@@ -27,10 +26,8 @@ app.use(express.json());
 // place jwt middleware before any route handlers and after cors
 // block-list of paths that should require authentication
 const blockList = [
-    { url: /^\/uhren(.*)/, methods: ['GET', 'POST', 'PUT', 'DELETE'] },
-    { url: /^\/index.html$/, methods: ['GET'] },
-    { url: /^\/$/, methods: ['GET'] },
-    { url: /^\/whoami$/, methods: ['GET'] }, // Block /whoami path
+    { url: /^\/uhren(.*)/, methods: ['GET', 'POST', 'DELETE', 'PATCH'] },
+    { url: /^\/whoami$/, methods: ['GET'] }, // let the client decide
 ];
 
 app.use(
@@ -57,9 +54,7 @@ app.use('/whoami', require('./routes/whoami'));
 
 app.use(function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {
-        if (req.path === '/' || req.path === '/index.html') {
-            return res.redirect('/login.html');
-        }
+        console.log(err.constructor.name, err.message);
         return res.status(401).json({ error: 'Unauthorized' });
     }
 });

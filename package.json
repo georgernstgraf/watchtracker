@@ -4,13 +4,14 @@
     "description": "Javascript Basteleien",
     "main": "hello.js",
     "scripts": {
-        "server": "node server.js",
+        "start": "node server.js",
         "test": "node --watch server.js",
-        "dev": "node --inspect --watch server.js"
+        "dev": "node --inspect --watch server.js",
+        "build": "npm install"
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/georgernstgraf/bastel.git"
+        "url": "https://github.com/georgernstgraf/Uhrentracker.git"
     },
     "keywords": [
         "html",
@@ -20,9 +21,9 @@
     "author": "Georg Graf (SPG)",
     "license": "ISC",
     "bugs": {
-        "url": "https://github.com/georgernstgraf/bastel/issues"
+        "url": "https://github.com/georgernstgraf/Uhrentracker/issues"
     },
-    "homepage": "https://github.com/georgernstgraf/bastel#readme",
+    "homepage": "https://github.com/georgernstgraf/Uhrentracker#readme",
     "dependencies": {
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",

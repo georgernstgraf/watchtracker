@@ -27,7 +27,7 @@ class WatchRecord extends Component {
             _date.setMilliseconds(0);
             _offsetSecs = 0;
             this._uhr = this.parent.currentWatch;
-            this._user = 'Georg'; // TODO login
+            this._user = window.myObject.user;
             this.isNew = true;
         } else {
             this.domElement = this.anchor.insertRow();

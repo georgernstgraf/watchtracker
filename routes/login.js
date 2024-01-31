@@ -11,7 +11,7 @@ router.post('/', async (req, res) => {
         if (!user.user || !user.passwd) {
             throw new Error('missing user or passwd');
         }
-        const auth = await fetch('https://grafg1.spengergasse.at/verify', {
+        const auth = await fetch(process.env.AUTH_API_URL, {
             method: 'POST',
             body: JSON.stringify(user),
             headers: { 'Content-Type': 'application/json' },
