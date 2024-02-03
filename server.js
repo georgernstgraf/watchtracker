@@ -1,5 +1,3 @@
-require('dotenv').config();
-
 const express = require('express');
 const app = express();
 const cors = require('cors');
@@ -26,8 +24,11 @@ app.use(express.json());
 // place jwt middleware before any route handlers and after cors
 // block-list of paths that should require authentication
 const blockList = [
-    { url: /^\/uhren(.*)/, methods: ['GET', 'POST', 'DELETE', 'PATCH'] },
-    { url: /^\/whoami$/, methods: ['GET'] }, // let the client decide
+    {
+        url: new RegExp(`^${process.env.LOCATION}/uhren(.*)`),
+        methods: ['GET', 'POST', 'DELETE', 'PATCH'],
+    },
+    { url: new RegExp(`^${process.env.LOCATION}/whoami$`), methods: ['GET'] }, // let the client decide
 ];
 
 app.use(
@@ -46,11 +47,11 @@ app.use(
         },
     })
 );
-app.use(express.static('static'));
-app.use('/uhren', require('./routes/uhren'));
-app.use('/login', require('./routes/login'));
-app.use('/logout', require('./routes/logout'));
-app.use('/whoami', require('./routes/whoami'));
+app.use(process.env.LOCATION, express.static('static'));
+app.use(`${process.env.LOCATION}/uhren`, require('./routes/uhren'));
+app.use(`${process.env.LOCATION}/login`, require('./routes/login'));
+app.use(`${process.env.LOCATION}/logout`, require('./routes/logout'));
+app.use(`${process.env.LOCATION}/whoami`, require('./routes/whoami'));
 
 app.use(function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {
@@ -60,5 +61,5 @@ app.use(function (err, req, res, next) {
 });
 
 app.listen(process.env.APP_PORT, () => {
-    console.log(`App running: ${process.env.APP_URL}`);
+    console.log(`App running: ${process.env.APP_URL}${process.env.LOCATION}`);
 });

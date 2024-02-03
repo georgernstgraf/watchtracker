@@ -17,13 +17,13 @@ class WatchSelector extends Component {
         // Füllen des Select-Elements
         this.domElement.innerHTML = '';
         let option;
-        await fetch('/uhren/liste', {
+        await fetch('uhren/liste', {
             credentials: 'include',
         })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status == 401) {
-                        window.location.href = '/login.html';
+                        window.location.href = 'login.html';
                     }
                     throw new Error(
                         `Error: ${response.status} ${response.statusText}`

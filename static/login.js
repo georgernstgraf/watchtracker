@@ -16,13 +16,13 @@ async function submit() {
     console.log(`submit: ${userInput.value}`);
     const o = { user: userInput.value, passwd: passInput.value };
     try {
-        const fetched = await fetch('/login', {
+        const fetched = await fetch('login', {
             method: 'POST',
             body: JSON.stringify(o),
             headers: { 'Content-Type': 'application/json' },
         });
         if (fetched.ok) {
-            return (window.location.href = `/index.html`);
+            return (window.location.href = `index.html`);
         }
         const status = fetched.status;
         let json;

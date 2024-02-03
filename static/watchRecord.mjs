@@ -73,7 +73,7 @@ class WatchRecord extends Component {
     async delete() {
         if (this._id != undefined) {
             console.log('Record.delete', this._id, 'from db');
-            await fetch(`/uhren/id/${this._id}`, {
+            await fetch(`uhren/id/${this._id}`, {
                 method: 'DELETE',
                 credentials: 'include',
             })
@@ -112,11 +112,11 @@ class WatchRecord extends Component {
         };
         if (this._id == undefined) {
             method = 'POST';
-            url = '/uhren';
+            url = 'uhren';
             console.log('Record.save NEW!');
         } else {
             method = 'PATCH';
-            url = `/uhren/id/${this._id}`;
+            url = `uhren/id/${this._id}`;
             console.log('Record.save UPDATE!');
         }
         await fetch(url, {

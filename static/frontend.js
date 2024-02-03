@@ -30,20 +30,20 @@ window.myObject.watchTable = new WatchTable({
 
 // Logout
 document.getElementById('logout_button').addEventListener('click', function () {
-    fetch('/logout', { method: 'GET' })
+    fetch('logout', { method: 'GET' })
         .then((response) => {
             if (!response.ok) throw new Error('Logout failed');
             return response.json();
         })
         .then((data) => {
             console.log(`logout: ${data.message}`);
-            window.location.href = '/login.html';
+            window.location.href = 'login.html';
         })
         .catch((error) => console.error('Error:', error));
 });
 
 // Get username from /whoami endpoint
-fetch('/whoami', { method: 'GET' })
+fetch('whoami', { method: 'GET' })
     .then((response) => {
         if (!response.ok) throw new Error('Failed to get username');
         return response.json();
