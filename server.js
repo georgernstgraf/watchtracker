@@ -59,8 +59,6 @@ app.use(function (err, req, res, next) {
     }
 });
 
-/* app.listen(process.env.APP_PORT, () => {
+app.listen(process.env.APP_PORT, () => {
     console.log(`App running: ${process.env.APP_URL}`);
 });
- */
-module.exports = app;
