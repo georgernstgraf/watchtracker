@@ -4,9 +4,9 @@
     "description": "Javascript Basteleien",
     "main": "hello.js",
     "scripts": {
-        "start": "node --env-file=.env server.js server.js",
-        "test": "node --watch --env-file=.env server.js server.js",
-        "dev": "node --inspect --watch --env-file=.env server.js server.js",
+        "start": "node --env-file=.env server.js",
+        "test": "node --watch --env-file=.env server.js",
+        "dev": "node --inspect --watch --env-file=.env server.js",
         "build": "npm install"
     },
     "repository": {

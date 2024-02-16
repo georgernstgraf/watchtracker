@@ -87,8 +87,9 @@ class WatchTable extends Component {
 
         th = document.createElement('th');
         th.setAttribute('scope', 'col');
-        th.style.width = '55%';
-        th.innerHTML = 'Sek / Tag';
+        th.style.width = '15em';
+        th.style.textAlign = 'center';
+        th.innerHTML = 'Drift';
         tr.appendChild(th);
     }
     fillTfoot() {
