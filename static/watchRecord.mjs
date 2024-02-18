@@ -27,7 +27,7 @@ class WatchRecord extends Component {
             _date.setMilliseconds(0);
             _offsetSecs = 0;
             this._uhr = this.parent.currentWatch;
-            this._user = window.myObject.user;
+            this._user = window.app.user;
             this.isNew = true;
         } else {
             this.domElement = this.anchor.insertRow();
@@ -146,7 +146,7 @@ class WatchRecord extends Component {
                 console.error('Record.save', err.message);
                 console.error('Record.save', err.stack);
                 console.error(`dirty: ${this.dirty}`);
-                this.parent.setInfo(`Fehler: ${err.message}`, true);
+                this.parent.setCaption(`Fehler: ${err.message}`, true);
             });
     }
 

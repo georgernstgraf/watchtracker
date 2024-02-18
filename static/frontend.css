@@ -1,8 +1,19 @@
+#github,
 #watchSelector,
 #watchTable {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+#watchSelect {
+    min-width: 5em;
+}
+#add-and-delete {
+    display: flex;
+    margin-top: 1em;
+}
+#github {
+    margin-top: 1em;
 }
 .mycolors {
     color: #d33682; /* magenta, headerColorMagenta */
@@ -19,13 +30,29 @@ nav {
 label {
     margin: 0 2.5em;
 }
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.3em;
+}
+dialog {
+    border-radius: 2em;
+    color: #ff9055;
+    background: #002b36;
+}
+#loginFormResult {
+    display: contents;
+}
+dialog::backdrop {
+    backdrop-filter: blur(0.5em);
+}
 div#addWatch {
     margin: 1em auto;
     display: flex;
     margin-bottom: 0;
     justify-content: space-evenly;
 }
-
 button,
 select,
 input {
@@ -49,6 +76,7 @@ caption {
     font-size: large;
     font-weight: bold;
     margin: 1em 0;
+    width: fit-content;
 }
 tfoot::before {
     content: '';

@@ -18,10 +18,10 @@ class WatchTable extends Component {
         this.addToDom();
 
         this.caption = document.createElement('caption');
-        this.domElement.appendChild(this.caption);
+        this.domElement.appendChild(this.caption); // table caption
 
         this.thead = document.createElement('thead');
-        this.domElement.appendChild(this.thead);
+        this.domElement.appendChild(this.thead); // table thead
         this.thead.hidden = true;
         this.fillThead();
 
@@ -34,13 +34,19 @@ class WatchTable extends Component {
         this.fillTfoot();
     }
 
+    logout() {
+        this.thead.hidden = true;
+        this.tfoot.hidden = true;
+        this.removeAllChildren();
+        this.setCaption('not logged in');
+    }
     clear() {
         this.thead.hidden = true;
         this.tfoot.hidden = true;
-        this.setInfo('Wählen oder erstellen');
+        this.setCaption('Wählen oder anlegen');
     }
 
-    setInfo(msg, error = false) {
+    setCaption(msg, error = false) {
         if (!error) {
             this.caption.style.backgroundColor = null;
             this.infoTxt = msg;
@@ -51,7 +57,7 @@ class WatchTable extends Component {
     }
 
     clearError() {
-        this.setInfo(this.infoTxt);
+        this.setCaption(this.infoTxt);
     }
 
     fillThead() {
@@ -110,7 +116,7 @@ class WatchTable extends Component {
     loadNew(name) {
         this.removeAllChildren();
         this.loadCommon(name);
-        this.setInfo(`Aktuell: ${name}`);
+        this.setCaption(`Aktuell: ${name}`);
         this.addRecord();
         this.setDirty();
     }
@@ -118,7 +124,7 @@ class WatchTable extends Component {
     async loadWatch(name) {
         console.log('loadWatch', name);
         this.loadCommon(name);
-        this.setInfo('Loading...');
+        this.setCaption('Loading...');
         await fetch(`uhren/daten/${name}`, {
             credentials: 'include',
         })
@@ -132,7 +138,7 @@ class WatchTable extends Component {
             })
             .then((data) => {
                 this.removeAllChildren();
-                this.setInfo(`Aktuell: ${name}`);
+                this.setCaption(`Aktuell: ${name}`);
                 this.setDirty(false);
                 for (let entry of data) {
                     this.addRecord(entry);
@@ -142,7 +148,7 @@ class WatchTable extends Component {
                 this.tfoot.hidden = false;
             })
             .catch((err) => {
-                this.setInfo(`Fehler: ${err.message}`, true);
+                this.setCaption(`Fehler: ${err.message}`, true);
             });
     }
 
@@ -152,7 +158,7 @@ class WatchTable extends Component {
         // - save() Methode von WatchRecord
         // - delete() Methode von WatchRecord
         if (fresh && this.children.length == 1) {
-            window.myObject.watchSelector.populate();
+            window.app.watchSelector.populate();
         }
         for (let i = 1; i < this.children.length; i++) {
             this.children[i].calcAfterLoad(this.children[i - 1]);
@@ -218,7 +224,7 @@ class WatchTable extends Component {
         super.remove(child);
         if (this.children.length == 0 && notifySelector) {
             this.clear();
-            window.myObject.watchSelector.populate();
+            window.app.watchSelector.populate();
         }
         let dirty = false;
         for (let child of this.children) {

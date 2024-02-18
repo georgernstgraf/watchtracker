@@ -11,16 +11,32 @@
 </head>
 
 <body>
-    <nav>
-        <button id="logout_button" class="logout">logout</button>
-        <span id="username"></span>
+    <nav id="profile">
+        <button id="profileLogoutButton" class="logout">logout</button>
+        <span id="profileUsername"></span>
     </nav>
     <h1>Uhren</h1>
     <h2 id="h2">Abweichungen</h2>
     <div id="watchSelector"></div>
-    <div id="addWatch"></div>
+    <div id="add-and-delete">
+        <span id="addWatch"></span>
+        <span id="deleteWatch"></span>
+    </div>
     <div id="watchTable"></div>
-    <a href="https://github.com/georgernstgraf/watchtracker/issues">Create an Issue on Github</a>
+    <a id="github" href="https://github.com/georgernstgraf/watchtracker/issues">Create an Issue on Github</a>
+    <dialog id="loginForm">
+        <div class="flex-container">
+            <p>You're not logged in</p>
+            <label>Username:
+                <input type="text" id="loginFormUsername" name="username">
+            </label><br>
+            <label>Password:
+                <input type="password" id="loginFormPassword" name="password">
+            </label><br>
+            <input type="submit" value="Submit" id="loginFormSubmit">
+            <pre id="loginFormResult"></pre>
+        </div>
+    </dialog>
 </body>
 
 </html>

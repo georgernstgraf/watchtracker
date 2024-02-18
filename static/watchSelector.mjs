@@ -6,24 +6,30 @@ class WatchSelector extends Component {
         this.watches;
         this.domElement = document.createElement('select');
         this.domElement.setAttribute('id', 'watchSelect');
+        this.domElement.obj = this;
         this.addToDom();
-        this.populate();
         this.domElement.addEventListener('change', (e) =>
             this.watchChosen(e.target)
         );
     }
-
-    async populate() {
+    async populate(username) {
         // Füllen des Select-Elements
         this.domElement.innerHTML = '';
-        let option;
+        if (!username) {
+            const nothing = document.createElement('option');
+            nothing.innerHTML = 'nothing to show';
+            this.domElement.appendChild(nothing);
+            this.domElement.setAttribute('size', 1);
+            this.domElement.selectedIndex = 0;
+            return;
+        }
         await fetch('uhren/liste', {
             credentials: 'include',
         })
             .then((response) => {
                 if (!response.ok) {
                     if (response.status == 401) {
-                        window.location.href = 'login.html';
+                        return window.app.unauthorized();
                     }
                     throw new Error(
                         `Error: ${response.status} ${response.statusText}`
@@ -38,9 +44,10 @@ class WatchSelector extends Component {
                 console.log('WatchSelector.populate', err.message);
                 this.watches = ['Fehler', err.message];
             });
+        if (!this.watches) return;
         this.domElement.setAttribute('size', this.watches.length);
         for (let i = 0; i < this.watches.length; i++) {
-            option = document.createElement('option');
+            const option = document.createElement('option');
             option.setAttribute('value', this.watches[i]);
             option.innerHTML = this.watches[i];
             this.domElement.appendChild(option);
@@ -50,7 +57,6 @@ class WatchSelector extends Component {
             this.watchChosen(this.domElement);
         }
     }
-
     watchChosen(target) {
         // Es geht nur um die Optik
         let sel = target.selectedIndex;
@@ -67,7 +73,7 @@ class WatchSelector extends Component {
                 target.options[i].style.backgroundColor = null;
             }
         }
-        window.myObject.watchTable.loadWatch(target.value);
+        window.app.watchTable.loadWatch(target.value);
     }
 }
 export { WatchSelector };

@@ -1,10 +1,9 @@
 import { WatchSelector } from './watchSelector.mjs';
 import { WatchTable } from './watchTable.mjs';
 import { AddWatch } from './addWatch.mjs';
-
-window.addEventListener('error', function (event) {
-    console.error('Window Event Error:', event.error);
-});
+import { DeleteWatch } from './deleteWatch.mjs';
+import { LoginForm } from './loginForm.mjs';
+import { Profile } from './profile.mjs';
 
 /* GENERELL
  * Jedes meiner Objekte bekommt im Konstruktor eine Referenz auf das domElement-Element, in dem es angezeigt werden soll.
@@ -12,47 +11,58 @@ window.addEventListener('error', function (event) {
  * Das domElement-Element bekommt eine Referenz auf das Objekt, entweder ist "obj" ein Array oder ein einzelnes Objekt.
  */
 
-window.myObject = new Object();
+class App {
+    constructor() {
+        this.watchSelector = new WatchSelector({
+            domElement: document.getElementById('watchSelector'),
+        });
+        this.addWatch = new AddWatch({
+            domElement: document.getElementById('addWatch'),
+        });
+        this.deleteWatch = new DeleteWatch({
+            domElement: document.getElementById('deleteWatch'),
+        });
+        this.watchTable = new WatchTable({
+            domElement: document.getElementById('watchTable'),
+        });
+        this.loginForm = new LoginForm({
+            domElement: document.getElementById('loginForm'),
+        });
+        this.profile = new Profile({
+            domElement: document.getElementById('profile'),
+        });
+        this.profile.setApp(this);
+        this.profile.whoami();
+        //window.app.watchSelector.autoChoose();
+    }
+    handleLogin(user) {
+        this.profile.populate(user);
+        this.watchSelector.populate(user);
+        this.watchTable.setCaption('Wählen oder anlegen');
+    }
+    handleLogout() {
+        this.profile.populate();
+        this.watchSelector.populate();
+        this.watchTable.logout();
+    }
+    unauthorized() {
+        this.showLoginForm();
+    }
+    handleError(err) {
+        console.error(err);
+        alert(err.message);
+        // TODO alert / modal
+    }
+    showLoginForm() {
+        this.loginForm.display();
+    }
+    hideLoginForm() {
+        this.loginForm.hide();
+    }
+}
 
-console.log('frontend.js started @' + new Date().toLocaleTimeString());
+window.app = new App(); // for storing the apps global Objects
 
-window.myObject.watchSelector = new WatchSelector({
-    domElement: document.getElementById('watchSelector'),
-});
+console.log('frontend.js starting @' + new Date().toLocaleTimeString());
 
-window.myObject.addWatch = new AddWatch({
-    domElement: document.getElementById('addWatch'),
-});
-
-window.myObject.watchTable = new WatchTable({
-    domElement: document.getElementById('watchTable'),
-});
-
-// Logout
-document.getElementById('logout_button').addEventListener('click', function () {
-    fetch('logout', { method: 'GET' })
-        .then((response) => {
-            if (!response.ok) throw new Error('Logout failed');
-            return response.json();
-        })
-        .then((data) => {
-            console.log(`logout: ${data.message}`);
-            window.location.href = 'login.html';
-        })
-        .catch((error) => console.error('Error:', error));
-});
-
-// Get username from /whoami endpoint
-fetch('whoami', { method: 'GET' })
-    .then((response) => {
-        if (!response.ok) throw new Error('Failed to get username');
-        return response.json();
-    })
-    .then((data) => {
-        document.getElementById('username').innerHTML = data.user;
-        window.myObject.user = data.user;
-    })
-    .catch((error) => console.error('Error:', error));
-
-window.myObject.watchSelector.autoChoose();
 console.log('frontend.js finished @' + new Date().toLocaleTimeString());
