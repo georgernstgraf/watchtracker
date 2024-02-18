@@ -37,6 +37,7 @@ label {
     gap: 0.3em;
 }
 dialog {
+    margin-top: 15vh;
     border-radius: 2em;
     color: #ff9055;
     background: #002b36;
