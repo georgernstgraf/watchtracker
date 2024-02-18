@@ -38,7 +38,7 @@ class WatchTable extends Component {
         this.thead.hidden = true;
         this.tfoot.hidden = true;
         this.removeAllChildren();
-        this.setCaption('not logged in');
+        this.setCaption('nicht eingeloggt');
     }
     clear() {
         this.thead.hidden = true;
