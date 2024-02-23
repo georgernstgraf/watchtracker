@@ -51,8 +51,9 @@ class LoginForm extends Component {
             });
             if (fetched.ok) {
                 const response = await fetched.json();
+                this.clearResult();
                 this.anchor.close();
-                window.app.handleLogin(response.user);
+                return window.app.handleLogin(response.user);
             }
             const status = fetched.status;
             let message;
@@ -73,6 +74,10 @@ class LoginForm extends Component {
     }
     displayResult(stat, res) {
         this.resultOut.innerHTML = `Status: ${stat}<br>${res}`;
+        this.body.style.cursor = 'default';
+    }
+    clearResult() {
+        this.resultOut.innerHTML = '';
         this.body.style.cursor = 'default';
     }
 }
