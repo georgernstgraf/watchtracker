@@ -30,10 +30,10 @@
         "express": "^4.18.2",
         "express-jwt": "^8.4.1",
         "jsonwebtoken": "^9.0.2",
-        "mongoose": "^7.4.1"
-    },
-    "devDependencies": {
+        "mongoose": "^7.4.1",
         "webpack": "^5.90.3",
         "webpack-cli": "^5.1.4"
+    },
+    "devDependencies": {
     }
 }
