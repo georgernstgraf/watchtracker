@@ -69,12 +69,11 @@ class LoginForm extends Component {
             this.displayResult(status, message);
         } catch (err) {
             this.displayResult(undefined, err.message);
-        } finally {
-            this.displayLoading(false);
         }
     }
     displayResult(stat, res) {
         this.resultOut.innerHTML = `Status: ${stat}<br>${res}`;
+        this.body.style.cursor = 'default';
     }
 }
 export { LoginForm };
