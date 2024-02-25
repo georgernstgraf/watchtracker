@@ -7,7 +7,8 @@
         "start": "node --env-file=.env server.js",
         "test": "node --watch --env-file=.env server.js",
         "dev": "node --inspect --watch --env-file=.env server.js",
-        "build": "npx webpack"
+        "build": "npx webpack",
+        "custom": "node --inspect prisma/custom.js"
     },
     "repository": {
         "type": "git",

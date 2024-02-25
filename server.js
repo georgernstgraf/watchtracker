@@ -4,14 +4,6 @@ const cors = require('cors');
 const expressJwt = require('express-jwt').expressjwt;
 const cookieParser = require('cookie-parser');
 
-// mongodb
-const mongoose = require('mongoose');
-mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true });
-const db = mongoose.connection;
-db.on('error', (error) => console.error(error));
-db.once('open', () => console.log('Connected to Database'));
-
-// middleware
 app.use(
     cors({
         origin: (origin, callback) => callback(null, true),
