@@ -3,7 +3,7 @@ module.exports = {
     entry: './src_frontend/frontend.js',
     output: {
         path: path.resolve(__dirname, 'static'),
-        filename: 'bundle.js',
+        filename: 'frontend.js',
     },
     mode: 'none',
 };

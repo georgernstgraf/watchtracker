@@ -5,5 +5,5 @@ debug.js
 playground.mongodb.js
 .vscode
 .vercel
-bundle.js
+static/*.js
 dev.db
