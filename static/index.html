@@ -10,18 +10,74 @@
 </head>
 
 <body>
+    <div hx-boost="true">
+        <a href="https://orf.at/">ORF</a>
+    </div>
+
+    <button hx-post="/example" hx-on:htmx:config-request="event.detail.parameters.example = 'Hello Scripting!'">
+        Post Me!
+    </button>
+    <!-- END HX TRALALA -->
     <nav id="profile">
         <button id="profileLogoutButton" class="logout">logout</button>
         <span id="profileUsername"></span>
     </nav>
-    <h1>Uhren</h1>
-    <h2 id="h2">Abweichungen</h2>
-    <div id="watchSelector"></div>
-    <div id="add-and-delete">
-        <span id="addWatch"></span>
-        <span id="deleteWatch"></span>
+    <h1>Watchtracker</h1>
+    <!-- TODO for grafg -->
+    <div id="watchSelector">
+        <select id="watchSelect" size="2">
+            <option value="Elgin">Elgin</option>
+            <option value="Sturmanskie">Sturmanskie</option>
+        </select>
+        <button id="deleteWatch">Remove current</button>
+        <!-- TODO current -->
     </div>
-    <div id="watchTable"></div>
+    <div id="add-and-delete">
+        <button id="addWatch">Add new</button>
+    </div>
+    <div id="watchTable">
+        <table>
+            <caption>Aktuell: Sturmanskie</caption>
+            <thead>
+                <tr>
+                    <th scope="rowgroup" style="width: 5%;"><button>＋</button></th>
+                    <th scope="col" style="width: 30%;">Messzeitpunkt</th>
+                    <th scope="col" style="width: 10%;">Abweichung</th>
+                    <th scope="col" style="width: 15em; text-align: center;">Drift</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row"><button>－</button></th>
+                    <td><input type="datetime-local"></td>
+                    <td><input type="number"></td>
+                    <td class="sekPerDay">start</td>
+                    <td hidden=""><button>Speichern</button></td>
+                </tr>
+                <tr>
+                    <th scope="row"><button>－</button></th>
+                    <td><input type="datetime-local"></td>
+                    <td><input type="number"></td>
+                    <td class="sekPerDay">3.3 s/d (22h) schnell</td>
+                    <td hidden=""><button>Speichern</button></td>
+                </tr>
+                <tr>
+                    <th scope="row"><button>－</button></th>
+                    <td><input type="datetime-local"></td>
+                    <td><input type="number"></td>
+                    <td class="sekPerDay">9.9 s/d (24h) schnell</td>
+                    <td hidden=""><button>Speichern</button></td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <td class="sekPerDay" colspan="4"
+                        style="text-align: center; color: rgb(211, 54, 130); font-size: larger; font-weight: bold; --darkreader-inline-color: #c67586;"
+                        data-darkreader-inline-color="">(Dauer: 1.9 Tage, Drift: 13 Sek =&gt; 6.8 s/d schnell)</td>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
     <a id="github" href="https://github.com/georgernstgraf/watchtracker/issues">Create an Issue on Github</a>
     <dialog id="loginForm">
         <div class="flex-container">
