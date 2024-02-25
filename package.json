@@ -1,8 +1,8 @@
 {
-    "name": "bastel",
-    "version": "1.0.0",
-    "description": "Javascript Basteleien",
-    "main": "hello.js",
+    "name": "watchtracker",
+    "version": "2.0.0",
+    "description": "Tracker for wristwatch inaccuracies",
+    "main": "server.js",
     "scripts": {
         "start": "node --env-file=.env server.js",
         "test": "node --watch --env-file=.env server.js",
@@ -11,7 +11,7 @@
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/georgernstgraf/Uhrentracker.git"
+        "url": "https://github.com/georgernstgraf/watchtracker.git"
     },
     "keywords": [
         "html",
@@ -25,6 +25,7 @@
     },
     "homepage": "https://github.com/georgernstgraf/Uhrentracker#readme",
     "dependencies": {
+        "@prisma/client": "^5.10.2",
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
         "express": "^4.18.2",
@@ -35,5 +36,9 @@
         "webpack-cli": "^5.1.4"
     },
     "devDependencies": {
+        "prisma": "^5.10.2"
+    },
+    "prisma": {
+        "seed": "node seed.js"
     }
 }

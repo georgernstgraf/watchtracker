@@ -6,3 +6,4 @@ playground.mongodb.js
 .vscode
 .vercel
 bundle.js
+dev.db
