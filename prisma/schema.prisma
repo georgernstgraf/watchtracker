@@ -28,6 +28,7 @@ model Measurement {
     id        String   @id @default(uuid())
     createdAt DateTime @default(now())
     value     Int
+    isStart   Boolean
     comment   String?
     watch     Watch    @relation(fields: [watchId], references: [id], onDelete: Cascade, onUpdate: Cascade)
     watchId   String
