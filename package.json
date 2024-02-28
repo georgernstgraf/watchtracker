@@ -38,9 +38,10 @@
         "webpack-cli": "^5.1.4"
     },
     "devDependencies": {
+        "@faker-js/faker": "^8.4.1",
         "prisma": "^5.10.2"
     },
     "prisma": {
-        "seed": "node seed.js"
+        "seed": "node prisma/seed.js"
     }
 }
