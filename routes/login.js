@@ -20,9 +20,9 @@ router.post('/', async (req, res) => {
             headers: { 'Content-Type': 'application/json' },
         });
         if (!auth.ok) {
-            const resp = await auth.json();
-            resp.status = auth.status;
-            throw resp;
+            const err = new Error(auth.statusText);
+            err.status = auth.status;
+            throw err;
         }
         const resp = await auth.json();
         const token = jwt.sign({ user: user.user }, process.env.JWT_SECRET, {
