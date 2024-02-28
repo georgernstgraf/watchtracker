@@ -51,7 +51,8 @@ app.use(`${process.env.LOCATION}/whoami`, require('./routes/whoami'));
 app.use(function (err, req, res, next) {
     if (err.name === 'UnauthorizedError') {
         console.log(err.constructor.name, err.message);
-        return res.status(401).json({ error: 'Unauthorized' });
+        res.set('Content-Type', 'text/plain');
+        return res.status(401).send('Unauthorized');
     }
 });
 
