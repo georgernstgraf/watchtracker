@@ -7,6 +7,6 @@ router.get('/', async (req, res) => {
         httpOnly: true,
         sameSite: 'Strict',
     });
-    res.status(200).json({ message: 'logged out' });
+    res.status(200).send('logged out');
 });
 module.exports = router;

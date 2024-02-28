@@ -1,16 +1,30 @@
 const express = require('express');
 const router = express.Router();
-const Uhren = require('../models/uhren');
+const db = require('../lib/db');
 // Get  all
 router.get('/', async (req, res) => {
     const userName = req.auth.user;
+    if (!userName) {
+        return res.status(401).send('Unauthorized');
+    }
     try {
-        const uhren = await Uhren.find({ user: userName });
-        res.json(uhren);
+        const uhren = (
+            await db.findMany({
+                where: {
+                    user: {
+                        name: userName,
+                    },
+                },
+            })
+        ).map((uhr) => {
+            uhr.name;
+        });
+        res.send(uhren);
     } catch (err) {
-        res.status(500).json({ message: err.message });
+        res.status(500).send(err.message);
     }
 });
+/*
 router.get('/liste', async (req, res) => {
     const userName = req.auth.user;
     try {
@@ -100,4 +114,6 @@ async function getUhr(req, res, next) {
     res.uhr = uhr;
     next();
 }
+*/
+
 module.exports = router;

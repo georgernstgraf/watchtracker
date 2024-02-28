@@ -2,14 +2,6 @@
 
 Consumes a REST API Uses Vanilla Javascript
 
-## Bugs & Feature Requests
-
--   Add Possibility to remove a watch at once (implies new Api Endpoint)
-
-## TODO
-
--   vue.js
-
 ## Changelog
 
 -   2023-09-23

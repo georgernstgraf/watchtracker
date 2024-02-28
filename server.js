@@ -17,12 +17,14 @@ app.use(express.json());
 // block-list of paths that should require authentication
 const blockList = [
     {
-        url: new RegExp(`^${process.env.LOCATION}/uhren(.*)`),
+        url: new RegExp(`^${process.env.LOCATION}/watches(.*)`),
         methods: ['GET', 'POST', 'DELETE', 'PATCH'],
     },
-    { url: new RegExp(`^${process.env.LOCATION}/whoami$`), methods: ['GET'] }, // let the client decide
+    {
+        url: new RegExp(`^${process.env.LOCATION}/(logout|whoami)$`),
+        methods: ['GET'],
+    },
 ];
-
 app.use(
     expressJwt({
         secret: process.env.JWT_SECRET,
@@ -39,8 +41,9 @@ app.use(
         },
     })
 );
+
 app.use(process.env.LOCATION, express.static('static'));
-app.use(`${process.env.LOCATION}/uhren`, require('./routes/uhren'));
+app.use(`${process.env.LOCATION}/watches`, require('./routes/watches'));
 app.use(`${process.env.LOCATION}/login`, require('./routes/login'));
 app.use(`${process.env.LOCATION}/logout`, require('./routes/logout'));
 app.use(`${process.env.LOCATION}/whoami`, require('./routes/whoami'));

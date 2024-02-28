@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+router.use(express.urlencoded({ extended: true }));
 
 router.post('/', async (req, res) => {
     const user = {
@@ -9,7 +10,9 @@ router.post('/', async (req, res) => {
     };
     try {
         if (!user.user || !user.passwd) {
-            throw new Error('missing user or passwd');
+            const err = new Error('missing user and / or passwd');
+            err.status = 400;
+            throw err;
         }
         const auth = await fetch(process.env.AUTH_API_URL, {
             method: 'POST',
@@ -28,7 +31,8 @@ router.post('/', async (req, res) => {
         res.cookie('token', token, { httpOnly: true, sameSite: 'Strict' });
         res.status(200).json(resp);
     } catch (err) {
-        res.status(err.status).json(err);
+        res.set('Content-Type', 'text/plain');
+        res.status(err.status).send(err.message);
     }
 });
 module.exports = router;
