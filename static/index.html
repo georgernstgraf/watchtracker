@@ -4,34 +4,24 @@
 <head>
     <link rel="stylesheet" href="frontend.css" />
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <script src="frontend.js" defer></script>
+    <script src="htmx.js" type="module"></script>
+    <script src="script.js" defer></script>
     <meta charset="utf-8" />
     <title>Watchtracker</title>
 </head>
 
 <body>
-    <a href="removeme.html">Login Form</a>
-    <div hx-boost="true">
-        <a href="https://orf.at/">ORF</a>
-    </div>
-
-    <button hx-post="/example" hx-on:htmx:config-request="event.detail.parameters.example = 'Hello Scripting!'">
-        Post Me!
-    </button>
-    <!-- END HX TRALALA -->
-    <nav id="profile">
-        <button id="profileLogoutButton" class="logout">logout</button>
-        <span id="profileUsername"></span>
+    <!-- Login - Button / Profile -->
+    <nav id="profile" hx-get="profile" hx-trigger="load refresh">
     </nav>
     <h1>Watchtracker</h1>
-    <!-- TODO for grafg -->
+    <!-- TODO for grafg
     <div id="watchSelector">
         <select id="watchSelect" size="2">
             <option value="Elgin">Elgin</option>
             <option value="Sturmanskie">Sturmanskie</option>
         </select>
         <button id="deleteWatch">Remove current</button>
-        <!-- TODO current -->
     </div>
     <div id="add-and-delete">
         <button id="addWatch">Add new</button>
@@ -80,16 +70,19 @@
         </table>
     </div>
     <a id="github" href="https://github.com/georgernstgraf/watchtracker/issues">Create an Issue on Github</a>
+        -->
     <dialog id="loginForm">
         <div class="flex-container">
             <p>Bitte einloggen!</p>
             <label>Username:
-                <input type="text" id="loginFormUsername" name="username">
+                <input type="text" id="loginFormUsername" name="user">
             </label><br>
             <label>Password:
-                <input type="password" id="loginFormPassword" name="password">
+                <input type="password" id="loginFormPassword" name="passwd">
             </label><br>
-            <input type="submit" value="Submit" id="loginFormSubmit">
+            <button type="submit" id="loginFormSubmit" hx-post="login"
+                hx-vars="{'user': document.getElementById('loginFormUsername').value, 'passwd': document.getElementById('loginFormPassword').value}"
+                hx-trigger="click">Login</button>
             <pre id="loginFormResult"></pre>
         </div>
     </dialog>

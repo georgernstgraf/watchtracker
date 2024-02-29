@@ -4,11 +4,11 @@
     "description": "Tracker for wristwatch inaccuracies",
     "main": "server.js",
     "scripts": {
-        "start": "node --env-file=.env server.js",
-        "test": "node --watch --env-file=.env server.js",
-        "dev": "node --inspect --watch --env-file=.env server.js",
         "build": "npx webpack",
-        "custom": "node --inspect prisma/custom.js"
+        "custom": "node --inspect prisma/custom.js",
+        "dev": "npx nodemon --inspect --env-file=.env server.js",
+        "start": "node --env-file=.env server.js",
+        "test": "npx nodemon --env-file=.env server.js"
     },
     "repository": {
         "type": "git",

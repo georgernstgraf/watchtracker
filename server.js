@@ -15,7 +15,7 @@ app.use(express.json());
 
 // place jwt middleware before any route handlers and after cors
 // block-list of paths that should require authentication
-const blockList = [
+const protectedRoutes = [
     {
         url: new RegExp(`^${process.env.LOCATION}/watches(.*)`),
         methods: ['GET', 'POST', 'DELETE', 'PATCH'],
@@ -30,10 +30,13 @@ app.use(
         secret: process.env.JWT_SECRET,
         algorithms: ['HS256'],
         getToken: (req) => req.cookies.token,
-    }).unless({
+        credentialsRequired: false,
+    })
+);
+/*.unless({
         custom: (req) => {
             // Check if the request path is in the block-list
-            return !blockList.some((path) => {
+            return !protectedRoutes.some((path) => {
                 return (
                     path.url.test(req.path) && path.methods.includes(req.method)
                 );
@@ -41,21 +44,21 @@ app.use(
         },
     })
 );
-
+*/
 app.use(process.env.LOCATION, express.static('static'));
-app.use(`${process.env.LOCATION}/watches`, require('./routes/watches'));
 app.use(`${process.env.LOCATION}/login`, require('./routes/login'));
 app.use(`${process.env.LOCATION}/logout`, require('./routes/logout'));
+app.use(`${process.env.LOCATION}/profile`, require('./routes/profile'));
+app.use(`${process.env.LOCATION}/watches`, require('./routes/watches'));
 app.use(`${process.env.LOCATION}/whoami`, require('./routes/whoami'));
 
 app.use(function (err, req, res, next) {
+    res.set('Content-Type', 'text/plain');
+    return res.status(401).send('Unauthorized');
     if (err.name === 'UnauthorizedError') {
         console.log(err.constructor.name, err.message);
-        res.set('Content-Type', 'text/plain');
-        return res.status(401).send('Unauthorized');
     }
 });
-
 app.listen(process.env.APP_PORT, () => {
     console.log(`App running: ${process.env.APP_URL}${process.env.LOCATION}`);
 });

@@ -1,9 +1,9 @@
 const path = require('path');
 module.exports = {
-    entry: './src_frontend/frontend.js',
+    entry: './src_frontend/htmx.js',
     output: {
         path: path.resolve(__dirname, 'static'),
-        filename: 'frontend.js',
+        filename: 'htmx.js',
     },
     mode: 'none',
 };

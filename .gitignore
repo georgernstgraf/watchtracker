@@ -7,4 +7,4 @@ playground.mongodb.js
 .vercel
 static/*.js
 dev.db
-secrets.rest
+*.rest
