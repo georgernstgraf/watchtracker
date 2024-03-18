@@ -1,20 +1,8 @@
-<!DOCTYPE html>
-<html lang="de">
+<%- include('head') %>
 
-<head>
-    <link rel="stylesheet" href="frontend.css" />
-    <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <script src="htmx.min.js" type="module"></script>
-    <script src="script.js" defer></script>
-    <meta charset="utf-8" />
-    <title>Watchtracker</title>
-</head>
-
-<body>
     <!-- Login - Button / Profile -->
     <nav id="profile" hx-get="profile" hx-trigger="load refresh">
     </nav>
-    <h1>Watchtracker</h1>
     <!-- TODO for grafg
     <div id="watchSelector">
         <select id="watchSelect" size="2">
@@ -86,6 +74,5 @@
             <pre id="loginFormResult"></pre>
         </div>
     </dialog>
-</body>
 
-</html>
+    <%- include('foot') %>

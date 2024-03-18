@@ -2,8 +2,9 @@
 module.exports = function (app, opts) {
     // Setup routes, middleware, and handlers
     app.get('/', (req, res) => {
-        const userName = req.auth.user;
-        res.locals.name = 'tmp';
-        res.render('index');
+        if (req.auth?.user) {
+            return res.render('index');
+        }
+        return res.render('login');
     });
 };

@@ -65,6 +65,7 @@ select,
 input {
     margin: 0 1em;
     background-color: var(--background-color);
+    color: var(--input-color);
 }
 input[type='number'] {
     width: 4em;

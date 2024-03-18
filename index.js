@@ -1,5 +1,7 @@
 'use strict';
 const express = require('express');
+const expressJwt = require('express-jwt').expressjwt;
+const cookieParser = require('cookie-parser');
 const httpErrors = require('http-errors');
 const path = require('path');
 const ejs = require('ejs');
@@ -17,25 +19,20 @@ module.exports = function main(options, cb) {
         },
         options
     );
-
     const logger = pino(stream);
-
     // Server state
     let server;
     let serverStarted = false;
     let serverClosing = false;
-
     // Setup error handling
     function unhandledError(err) {
         // Log the errors
         logger.error(err);
-
         // Only clean up once
         if (serverClosing) {
             return;
         }
         serverClosing = true;
-
         // If server has started, close it down
         if (serverStarted) {
             server.close(function () {
@@ -45,19 +42,16 @@ module.exports = function main(options, cb) {
     }
     process.on('uncaughtException', unhandledError);
     process.on('unhandledRejection', unhandledError);
-
     // Create the express app
     const app = express();
-
     // Template engine
-    app.engine('html', ejs.renderFile);
+    app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, 'views'));
-    app.set('view engine', 'html');
-
+    app.engine('html', ejs.renderFile);
     // Common middleware
     // app.use(/* ... */)
+    app.use(cookieParser());
     app.use(pinoHttp({ logger }));
-
     // Register routes
     // @NOTE: require here because this ensures that even syntax errors
     // or other startup related errors are caught logged and debuggable.
@@ -69,7 +63,6 @@ module.exports = function main(options, cb) {
     app.use(process.env.LOCATION, router);
     app.use(process.env.LOCATION, expressStaticGzip('public'));
     app.use(process.env.LOCATION, express.static('public'));
-
     // Common error handlers
     app.use(function fourOhFourHandler(req, res, next) {
         next(httpErrors(404, `Route not found: ${req.url}`));
@@ -78,22 +71,18 @@ module.exports = function main(options, cb) {
         if (err.status >= 500) {
             logger.error(err);
         }
-        res.locals.name = 'tmp';
         res.locals.error = err;
         res.status(err.status || 500).render('error');
     });
-
     // Start server
     server = app.listen(opts.port, opts.host, function (err) {
         if (err) {
             return ready(err, app, server);
         }
-
         // If some other error means we should close
         if (serverClosing) {
             return ready(new Error('Server was closed before it could start'));
         }
-
         serverStarted = true;
         const addr = server.address();
         logger.info(

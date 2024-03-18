@@ -1,4 +1,4 @@
-#! /usr/bin/env -S node --watch
+#! /usr/bin/env -S node --watch --inspect
 'use strict';
 require('dotenv').config();
 // Pass configuration to application
