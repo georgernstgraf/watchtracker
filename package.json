@@ -2,10 +2,10 @@
     "name": "watchtracker",
     "version": "2.0.0",
     "description": "Tracker for wristwatch inaccuracies",
-    "main": "server.js",
+    "main": "index.js",
     "scripts": {
+        "install-htmx": "rsync -vt node_modules/htmx.org/dist/htmx*js* public/",
         "build": "npx webpack",
-        "custom": "node --inspect prisma/custom.js",
         "dev": "npx nodemon --inspect --env-file=.env server.js",
         "start": "node --env-file=.env server.js",
         "test": "npx nodemon --env-file=.env server.js"
@@ -17,7 +17,8 @@
     "keywords": [
         "html",
         "css",
-        "javascript"
+        "javascript",
+        "htmx"
     ],
     "author": "Georg Graf (SPG)",
     "license": "ISC",
@@ -29,17 +30,24 @@
         "@prisma/client": "^5.10.2",
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
+        "dotenv": "^16.4.5",
+        "ejs": "^3.1.9",
         "express": "^4.18.2",
         "express-jwt": "^8.4.1",
-        "htmx.org": "^1.9.10",
+        "express-static": "^1.2.6",
+        "express-static-gzip": "^2.1.7",
+        "htmx.org": "^1.9.11",
         "jsonwebtoken": "^9.0.2",
-        "mongoose": "^7.4.1",
+        "pino": "^8.19.0",
+        "pino-http": "^9.0.0",
+        "pino-pretty": "^10.3.1",
         "webpack": "^5.90.3",
         "webpack-cli": "^5.1.4"
     },
     "devDependencies": {
         "@faker-js/faker": "^8.4.1",
-        "prisma": "^5.10.2"
+        "prisma": "^5.10.2",
+        "tailwindcss": "^3.4.1"
     },
     "prisma": {
         "seed": "node prisma/seed.js"

@@ -1,0 +1,8 @@
+#! /usr/bin/env -S node --watch
+'use strict';
+require('dotenv').config();
+// Pass configuration to application
+require('../')({
+    port: process.env.PORT || 8000,
+    host: process.env.HOST || 'localhost',
+});

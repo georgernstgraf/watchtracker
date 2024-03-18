@@ -1,3 +1,17 @@
+:root {
+    --background-color: #002b36; /* darkblue, backgroundColor */
+    --dirty-color: #ff9055; /* orange, dirtycolor */
+    --header-h2-color: #d33682; /* magenta, headerColorMagenta */
+    --header-h1-color: #859900; /* green, headerColorGreen*/
+    --input-color: #f3d283; /* yellow, inputColor */
+    --invalid-color: #ff5555; /* red, invalidColor */
+}
+body {
+    background-color: var(--background-color);
+    color: var(--header-h1-color);
+    text-align: center;
+}
+
 #github,
 #watchSelector,
 #watchTable {
@@ -15,14 +29,6 @@
 #github {
     margin-top: 1em;
 }
-.mycolors {
-    color: #d33682; /* magenta, headerColorMagenta */
-    color: #f3d283; /* yellow, inputColor */
-    color: #859900; /* green, headerColorGreen*/
-    color: #ff9055; /* orange, dirtycolor */
-    color: #ff5555; /* red, invalidColor */
-    color: #002b36; /* darkblue, backgroundColor */
-}
 nav {
     display: flex;
     flex-direction: row-reverse;
@@ -39,8 +45,8 @@ label {
 dialog {
     margin-top: 15vh;
     border-radius: 2em;
-    color: #ff9055;
-    background: #002b36;
+    color: var(--input-color);
+    background: var(--background-color);
 }
 #loginFormResult {
     display: contents;
@@ -58,7 +64,7 @@ button,
 select,
 input {
     margin: 0 1em;
-    background-color: #f3d283;
+    background-color: var(--background-color);
 }
 input[type='number'] {
     width: 4em;
@@ -73,7 +79,7 @@ tfoot {
     text-align: center;
 }
 caption {
-    color: #859900;
+    color: var(--header-h2-color);
     font-size: large;
     font-weight: bold;
     margin: 1em 0;
@@ -88,6 +94,6 @@ tfoot::before {
     font-size: large;
     /* font-weight: bold; */
     /* color: #d33682; */
-    color: #859900;
+    color: var(--header-h2-color);
     text-align: left;
 }

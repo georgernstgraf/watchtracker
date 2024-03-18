@@ -1,4 +1,3 @@
-/*
 router.get('/liste', async (req, res) => {
     const userName = req.auth.user;
     try {
@@ -88,4 +87,3 @@ async function getUhr(req, res, next) {
     res.uhr = uhr;
     next();
 }
-*/

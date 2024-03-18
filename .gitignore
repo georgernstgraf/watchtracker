@@ -8,3 +8,4 @@ playground.mongodb.js
 static/*.js
 dev.db
 *.rest
+tmp
