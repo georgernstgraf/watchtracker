@@ -1,10 +1,7 @@
 'use strict';
 module.exports = function (app, opts) {
+    // wird beim requiredn gecalled
     // Setup routes, middleware, and handlers
-    app.get('/', (req, res) => {
-        if (req.auth?.user) {
-            return res.render('index');
-        }
-        return res.render('login');
-    });
+    app.use('/', require('./routes/slash'));
+    app.use('/login', require('./routes/login'));
 };
