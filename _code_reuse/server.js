@@ -46,11 +46,11 @@ app.use(
 );
 */
 app.use(process.env.LOCATION, express.static('static'));
-app.use(`${process.env.LOCATION}/login`, require('./routes/login'));
-app.use(`${process.env.LOCATION}/logout`, require('./routes/logout'));
-app.use(`${process.env.LOCATION}/profile`, require('./routes/profile'));
-app.use(`${process.env.LOCATION}/watches`, require('./routes/watches'));
-app.use(`${process.env.LOCATION}/whoami`, require('./routes/whoami'));
+app.use(`${process.env.LOCATION}/login`, require('../routes/login'));
+app.use(`${process.env.LOCATION}/logout`, require('../routes/logout'));
+app.use(`${process.env.LOCATION}/profile`, require('../routes/profile'));
+app.use(`${process.env.LOCATION}/watches`, require('../routes/watches'));
+app.use(`${process.env.LOCATION}/whoami`, require('../routes/whoami'));
 
 app.use(function (err, req, res, next) {
     res.set('Content-Type', 'text/plain');
