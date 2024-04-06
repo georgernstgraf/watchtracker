@@ -6,3 +6,7 @@ playground.mongodb.js
 .vscode
 .vercel
 bundle.js
+secrets.rest
+prisma/dev.db
+tmp/custom.js
+tmp/fetch.php
