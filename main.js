@@ -1,17 +1,19 @@
 'use strict';
+const ms = require('ms');
+// defining express constants
 const express = require('express');
-const expressJwt = require('express-jwt').expressjwt;
+const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const httpErrors = require('http-errors');
 const path = require('path');
 const ejs = require('ejs');
 const pino = require('pino');
-const pinoHttp = require('pino-http');
 const pinoPretty = require('pino-pretty');
-const expressStaticGzip = require('express-static-gzip');
+const pinoHttp = require('pino-http');
 const stream = pinoPretty({ colorize: true });
-const sessionCookieName =
-    'session-' + process.env.LOCATION.replace(/[^a-z0-9]/gi, '').toLowerCase();
+const expressStaticGzip = require('express-static-gzip');
+const bodyParser = require('body-parser');
+
 module.exports = function main(options, cb) {
     // Set default options
     const ready = cb || function () {};
@@ -37,7 +39,7 @@ module.exports = function main(options, cb) {
         serverClosing = true;
         // If server has started, close it down
         if (serverStarted) {
-            server.close(function () {
+            server.close(() => {
                 process.exit(1);
             });
         }
@@ -52,15 +54,12 @@ module.exports = function main(options, cb) {
     app.engine('html', ejs.renderFile);
     // Common middleware
     // app.use(/* ... */)
-    app.use(cookieParser());
+    app.use(expressSession(session));
+    app.use(flash());
     app.use(pinoHttp({ logger }));
     // Register routes
-    // @NOTE: require here because this ensures that even syntax errors
-    // or other startup related errors are caught logged and debuggable.
-    // Alternativly, you could setup external log handling for startup
-    // errors and handle them outside the node process.  I find this is
-    // better because it works out of the box even in local development.
     const router = express.Router();
+    router.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
     app.use(process.env.LOCATION, router);
     require('./routes')(router, opts);
     app.use(process.env.LOCATION, expressStaticGzip('public'));
