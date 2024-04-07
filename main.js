@@ -2,7 +2,6 @@
 const ms = require('ms');
 // defining express constants
 const express = require('express');
-const jwt = require('jsonwebtoken');
 const cookieParser = require('cookie-parser');
 const httpErrors = require('http-errors');
 const path = require('path');
@@ -54,16 +53,17 @@ module.exports = function main(options, cb) {
     app.engine('html', ejs.renderFile);
     // Common middleware
     // app.use(/* ... */)
-    app.use(expressSession(session));
-    app.use(flash());
-    app.use(pinoHttp({ logger }));
+    //app.use(pinoHttp({ logger }));
     // Register routes
+
+    app.use(cookieParser());
     const router = express.Router();
     router.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-    app.use(process.env.LOCATION, router);
+    app.use(process.env.APP_PATH, router);
     require('./routes')(router, opts);
-    app.use(process.env.LOCATION, expressStaticGzip('public'));
-    app.use(process.env.LOCATION, express.static('public'));
+    // Static files as fallbacks
+    app.use(process.env.APP_PATH, expressStaticGzip('public'));
+    app.use(process.env.APP_PATH, express.static('public'));
     // Common error handlers
     app.use(function fourOhFourHandler(req, res, next) {
         next(httpErrors(404, `Route not found: ${req.url}`));
@@ -89,7 +89,7 @@ module.exports = function main(options, cb) {
         logger.info(
             `Started at http://${opts.host || addr.host || 'localhost'}:${
                 addr.port
-            }${process.env.LOCATION}`
+            }${process.env.APP_PATH}`
         );
         ready(err, app, server);
     });

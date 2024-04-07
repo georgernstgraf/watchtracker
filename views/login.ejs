@@ -1,5 +1,6 @@
 <%- include('head') %>
-    <form action="<%= process.env.LOCATION %>/" method="post">
+    <h1>Watchtracker</h1>
+    <form action="<%= process.env.APP_PATH %>/" method="post">
         <input type="text" name="user" id="username" placeholder="Username">
         <input type="password" name="passwd" id="password" placeholder="Password">
         <input type="submit" value="Login">

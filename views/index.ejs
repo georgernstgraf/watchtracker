@@ -1,9 +1,17 @@
 <%- include('head') %>
 
-    <!-- Login - Button / Profile -->
-    <nav id="profile" hx-get="profile" hx-trigger="load refresh">
+    <nav id="profile">
+        <!-- TODO: logout über hx -->
+        <button id="profileLogoutButton" class="logout">logout</button>
+        <span id="profileUsername">
+            <%= user %>
+        </span>
     </nav>
-    <!-- TODO for grafg
+    <h1>Watchtracker</h1>
+    <!-- Login - Button / Profile
+        <nav id="profile" hx-get="profile" hx-trigger="load refresh">
+        </nav>
+        TODO for grafg
     <div id="watchSelector">
         <select id="watchSelect" size="2">
             <option value="Elgin">Elgin</option>
@@ -59,20 +67,4 @@
     </div>
     <a id="github" href="https://github.com/georgernstgraf/watchtracker/issues">Create an Issue on Github</a>
         -->
-    <dialog id="loginForm">
-        <div class="flex-container">
-            <p>Bitte einloggen!</p>
-            <label>Username:
-                <input type="text" id="loginFormUsername" name="user">
-            </label><br>
-            <label>Password:
-                <input type="password" id="loginFormPassword" name="passwd">
-            </label><br>
-            <button type="submit" id="loginFormSubmit" hx-post="login"
-                hx-vars="{'user': document.getElementById('loginFormUsername').value, 'passwd': document.getElementById('loginFormPassword').value}"
-                hx-trigger="click">Login</button>
-            <pre id="loginFormResult"></pre>
-        </div>
-    </dialog>
-
     <%- include('foot') %>

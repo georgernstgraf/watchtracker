@@ -98,3 +98,7 @@ tfoot::before {
     color: var(--header-h2-color);
     text-align: left;
 }
+p.error {
+    color: var(--invalid-color);
+    font-size: 0.7em;
+}

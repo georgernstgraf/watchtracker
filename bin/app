@@ -3,6 +3,6 @@
 require('dotenv').config();
 // the following require loads and executes the default export from the modules' main config in package.json
 require('../')({
-    port: process.env.PORT || 8000,
-    host: process.env.HOST || 'localhost',
+    host: process.env.APP_HOST || 'localhost',
+    port: process.env.APP_PORT || 8000,
 });
