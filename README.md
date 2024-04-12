@@ -1,6 +1,41 @@
 # Watch Deviation Tracker
 
-Consumes a REST API Uses Vanilla Javascript
+## Route Definitions
+
+#### GET %/
+
+-   session: render site with watchselector
+-   unauth: render login form
+
+#### POST %/login
+
+-   valid: render site, set session token
+-   invalid: render login form
+
+#### GET %/watch/:id
+
+-   valid: render site including details
+-   invalid: 401 unauth or 403 forbidden or 404 not found
+
+#### PUT %/watch/
+
+-   create a new watch, with comments
+-   valid: render details, update selector
+-   invalid: 401 unauth or 403 forbidden or 404 not found
+
+#### PATCH %/watch/:id
+
+-   valid: render details
+-   invalid: 401 unauth or 403 forbidden or 404 not found
+
+#### DELETE %/watch/:id
+
+-   valid: render details,
+-   invalid: 401 unauth or 403 forbidden or 404 not found
+
+#### ALL %/watch/:watchId/measure/:measID
+
+-   manipulate measurements, always return them
 
 ## Changelog
 

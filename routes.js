@@ -4,4 +4,5 @@ module.exports = function (app, opts) {
     // Setup routes, middleware, and handlers
     app.use('/', require('./routes/slash'));
     app.use('/login', require('./routes/login'));
+    app.use('/logout', require('./routes/logout'));
 };

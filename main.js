@@ -2,7 +2,9 @@
 const ms = require('ms');
 // defining express constants
 const express = require('express');
+const expressJwt = require('express-jwt').expressjwt;
 const cookieParser = require('cookie-parser');
+const cookies = require('./lib/cookies');
 const httpErrors = require('http-errors');
 const path = require('path');
 const ejs = require('ejs');
@@ -57,8 +59,17 @@ module.exports = function main(options, cb) {
     // Register routes
 
     app.use(cookieParser());
+    app.use(
+        expressJwt({
+            secret: process.env.JWT_SECRET,
+            algorithms: ['HS256', 'RS256'],
+            getToken: cookies.getToken,
+            credentialsRequired: false,
+        })
+    );
     const router = express.Router();
     router.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
+    // use the router on /watchtracker:
     app.use(process.env.APP_PATH, router);
     require('./routes')(router, opts);
     // Static files as fallbacks
