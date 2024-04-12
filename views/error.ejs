@@ -1,0 +1,17 @@
+<%- include('head') %>
+  <p>
+    <em>Path: </em>
+    <%=error.path %>
+  </p>
+  <p>
+    <em>Message</em>
+    <%=error.message%>
+  </p>
+  <p>
+    <em>Stack</em>
+    <%=error.stack%>
+  </p>
+  <p><em>JSON:</em>
+    <%= JSON.stringify(error.message) %>
+  </p>
+  <%- include('foot') %>

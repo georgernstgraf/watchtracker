@@ -8,24 +8,24 @@ generator client {
 }
 
 model User {
-    id    String  @id @default(uuid())
-    name  String  @unique
-    Watch Watch[]
+    id      String  @id @default(cuid())
+    name    String  @unique
+    watches Watch[]
 }
 
 model Watch {
-    id          String        @id @default(uuid())
-    name        String
-    user        User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-    userId      String
-    Measurement Measurement[]
-    comment     String?
+    id           String        @id @default(cuid())
+    name         String
+    user         User          @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    userId       String
+    measurements Measurement[]
+    comment      String?
 
     @@unique([name, userId])
 }
 
 model Measurement {
-    id        String   @id @default(uuid())
+    id        String   @id @default(cuid())
     createdAt DateTime @default(now())
     value     Int
     isStart   Boolean

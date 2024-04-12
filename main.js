@@ -22,7 +22,7 @@ module.exports = function main(options, cb) {
         {
             // Default options
         },
-        options
+        options,
     );
     const logger = pino(stream);
     // Server state
@@ -65,7 +65,7 @@ module.exports = function main(options, cb) {
             algorithms: ['HS256', 'RS256'],
             getToken: cookies.getToken,
             credentialsRequired: false,
-        })
+        }),
     );
     const router = express.Router();
     router.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
@@ -73,8 +73,8 @@ module.exports = function main(options, cb) {
     app.use(process.env.APP_PATH, router);
     require('./routes')(router, opts);
     // Static files as fallbacks
-    app.use(process.env.APP_PATH, expressStaticGzip('public'));
-    app.use(process.env.APP_PATH, express.static('public'));
+    app.use(process.env.APP_PATH, expressStaticGzip('static'));
+    app.use(process.env.APP_PATH, express.static('static'));
     // Common error handlers
     app.use(function fourOhFourHandler(req, res, next) {
         next(httpErrors(404, `Route not found: ${req.url}`));
@@ -84,7 +84,7 @@ module.exports = function main(options, cb) {
             logger.error(err);
         }
         res.locals.error = err;
-        res.status(err.status || 500).render('error');
+        res.status(err.status || 500).send(err.message);
     });
     // Start server
     server = app.listen(opts.port, opts.host, function (err) {
@@ -100,7 +100,7 @@ module.exports = function main(options, cb) {
         logger.info(
             `Started at http://${opts.host || addr.host || 'localhost'}:${
                 addr.port
-            }${process.env.APP_PATH}`
+            }${process.env.APP_PATH}`,
         );
         ready(err, app, server);
     });

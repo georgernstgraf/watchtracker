@@ -1,0 +1,35 @@
+<table>
+    <caption>Aktuell: <%= watch.name %>
+            <% if (watch.comment) { %>
+                (<%= watch.comment %>)
+                    <% } %>
+    </caption>
+    <thead>
+        <tr>
+            <th scope="rowgroup" style="width: 5%;"><button>＋</button></th>
+            <th scope="col" style="width: 30%;">Messzeitpunkt</th>
+            <th scope="col" style="width: 10%;">Abweichung</th>
+            <th scope="col" style="width: 15em; text-align: center;">Drift</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% measurements.forEach(e=> { %>
+            <tr>
+                <th scope="row"><button>－</button></th>
+                <td><input type="datetime-local" value="<%= e.createdAt.toISOString().substring(0, 16) %>"></td>
+                <td><input type="number" value="<%= e.value %>">
+                </td>
+                <td class="sekPerDay">start</td>
+                <td hidden=""><button>Speichern</button></td>
+            </tr>
+            <% }) %>
+    </tbody>
+    <tfoot>
+        <tr>
+            <td class="sekPerDay" colspan="4"
+                style="text-align: center; color: rgb(211, 54, 130); font-size: larger; font-weight: bold; --darkreader-inline-color: #c67586;"
+                data-darkreader-inline-color="">(Dauer: 1.9 Tage, Drift: 13 Sek =&gt; 6.8 s/d schnell)</td>
+        </tr>
+    </tfoot>
+</table>
+</div>
