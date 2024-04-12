@@ -4,6 +4,6 @@ const cookies = require('../lib/cookies');
 router.post('/', async (req, res) => {
     const jwt = cookies.createLogoutJWT({});
     res.cookie(cookies.cookieName, jwt, cookies.cookieLogoutOpts);
-    return res.render('login');
+    return res.redirect(process.env.APP_PATH);
 });
 module.exports = router;
