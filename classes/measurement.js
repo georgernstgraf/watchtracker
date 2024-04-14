@@ -1,64 +1,75 @@
-const { prisma } = require('./lib/db');
-
+const { prisma } = require('../lib/db');
 class Measurement {
+    #data;
     constructor(data) {
-        this.data = data;
+        this.#data = data;
         this.keys = new Set(Object.keys(data));
         this.updates = {};
     }
-
-    update(field, value) {
+    updateField(field, value) {
         if (!this.keys.has(field)) {
             throw new Error(`unknown field in Measurement: ${field}`);
         }
         this.updates[field] = value;
     }
-
+    getField(field) {
+        return this.#data[field];
+    }
+    setField(field, value) {
+        this.#data[field] = value;
+    }
+    getData() {
+        return { ...this.#data };
+    }
     getChangedFields() {
         return Object.keys(this.updates).reduce((changes, key) => {
-            if (this.updates[key] !== this.updates[key]) {
+            if (this.updates[key] !== this.#data[key]) {
                 changes[key] = this.updates[key];
             }
             return changes;
         }, {});
     }
-
     isDirty() {
         const changes = this.getChangedFields();
         return Object.keys(changes).length > 0;
     }
-}
-
-class MeasurementRepository {
-    async findFirst() {
-        const data = await prisma.measurement.findFirst();
-        return new Measurement(data);
+    updateAfterSave(data) {
+        this.#data = data;
+        this.updates = {};
     }
-
-    async save(measurement) {
+    static async save(measurement) {
         if (!measurement.isDirty()) {
-            console.log('No changes detected');
+            console.info(`save measurement: not dirty`);
             return;
         }
-
         const changes = measurement.getChangedFields();
         const updatedMeasurement = await prisma.measurement.update({
             where: { id: measurement.data.id },
-            data: changes,
+            data: changes
         });
-
-        measurement.originalData = { ...measurement.data };
-        return updatedMeasurement;
+        measurement.updateAfterSave(updatedMeasurement);
     }
 }
-
-async function main() {
-    const repo = new MeasurementRepository();
-    const m = await repo.findFirst();
-
-    m.update('value', 123);
-
-    await repo.save(m);
+function calculateDrifts(modelList) {
+    if (modelList.length == 0) return;
+    modelList[0].updateField('isStart', true);
+    for (let i = 1; i < modelList.length; i++) {
+        if (modelList[i].getField('isStart')) continue;
+        const measureTime =
+            modelList[i].getField('createdAt') -
+            modelList[i - 1].getField('createdAt');
+        const measureDrift =
+            modelList[i].getField('value') - modelList[i - 1].getField('value');
+        const durationInDays = measureTime / 86400000;
+        const durationInHours = (measureTime / 3600000).toFixed(0);
+        const diffSecs = measureDrift;
+        const diffSekPerDay = diffSecs / durationInDays;
+        const speedType = diffSekPerDay > 0 ? 'schnell' : 'langsam';
+        const diffSekPerDayFixed = Math.abs(diffSekPerDay).toFixed(1);
+        modelList[i].setField(
+            'drift',
+            `${diffSekPerDayFixed} s/d (${durationInHours}h) ${speedType}`
+        );
+    }
 }
-
-main().then(() => prisma.$disconnect());
+module.exports = { Measurement, calculateDrifts };

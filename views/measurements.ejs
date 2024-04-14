@@ -9,6 +9,7 @@
             <th scope="rowgroup" style="width: 5%;"><button>＋</button></th>
             <th scope="col" style="width: 30%;">Messzeitpunkt</th>
             <th scope="col" style="width: 10%;">Abweichung</th>
+            <th scope="col" style="width: 10%;">Typ</th>
             <th scope="col" style="width: 15em; text-align: center;">Drift</th>
         </tr>
     </thead>
@@ -19,8 +20,19 @@
                 <td><input type="datetime-local" value="<%= e.createdAt.toISOString().substring(0, 16) %>"></td>
                 <td><input type="number" value="<%= e.value %>">
                 </td>
-                <td class="sekPerDay">start</td>
-                <td hidden=""><button>Speichern</button></td>
+                <td>
+                    <% if (e.isStart) { %>
+                        ➟ ➠
+                        <% } else { %>
+                            ⭲
+                            <% } %>
+                </td>
+                <td class="sekPerDay">
+                    <%= e.drift %>
+                </td>
+                <td>
+                    <%= e.comment ? e.comment : "comment" %>
+                </td>
             </tr>
             <% }) %>
     </tbody>

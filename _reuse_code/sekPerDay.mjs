@@ -1,4 +1,4 @@
-import { Component } from "./component.mjs";
+import { Component } from './component.mjs';
 class SekPerDay extends Component {
     durationInDays;
     diffSecs;
@@ -7,8 +7,8 @@ class SekPerDay extends Component {
     diffSekPerDayFixed;
     constructor(parent, anchor) {
         super(parent, anchor);
-        this.domElement = document.createElement("td");
-        this.domElement.classList.add("sekPerDay");
+        this.domElement = document.createElement('td');
+        this.domElement.classList.add('sekPerDay');
         this.anchor.appendChild(this.domElement);
         this.domElement.obj = this;
     }
@@ -20,16 +20,7 @@ class SekPerDay extends Component {
             mine.offsetSecs - prev.offsetSecs
         );
     }
-    calculateFromVals(periodLen, drift) {
-        this.durationInDays = periodLen / 86400000;
-        this.durationInHours = (periodLen / 3600000).toFixed(0);
-        this.dauer = this.durationInDays.toFixed(1);
-        this.diffSecs = drift;
-        this.diffSekPerDay = this.diffSecs / this.durationInDays;
-        this.speedType = this.diffSekPerDay > 0 ? "schnell" : "langsam";
-        this.diffSekPerDay = Math.abs(this.diffSekPerDay);
-        this.diffSekPerDayFixed = this.diffSekPerDay.toFixed(1);
-    }
+    calculateFromVals(periodLen, drift) {}
     setContent(text) {
         this.domElement.innerHTML = text;
     }
@@ -41,10 +32,10 @@ class SekPerDay extends Component {
     }
     makeBold() {
         this.domElement.colSpan = 4;
-        this.domElement.style.textAlign = "center";
+        this.domElement.style.textAlign = 'center';
         this.domElement.style.color = this.constructor.headerColorMagenta;
-        this.domElement.style.fontSize = "larger";
-        this.domElement.style.fontWeight = "bold";
+        this.domElement.style.fontSize = 'larger';
+        this.domElement.style.fontWeight = 'bold';
     }
     fullFill(periodLen, drift) {
         this.calculateFromVals(periodLen, drift);
