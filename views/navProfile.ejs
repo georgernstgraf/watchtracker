@@ -1,0 +1,9 @@
+   <nav id="profile">
+       <!-- TODO: logout über hx -->
+       <form hx-post="<%= process.env.APP_PATH %>/logout" hx-target="body">
+           <button id="profileLogoutButton" class="logout">logout</button>
+       </form>
+       <span id="profileUsername">
+           <%= user %>
+       </span>
+   </nav>

@@ -1,17 +1,22 @@
-<%- include('head') %>
   <p>
-    <em>Path: </em>
-    <%=error.path %>
+      <em>Path: </em>
+      <%=error.path %>
   </p>
   <p>
-    <em>Message</em>
-    <%=error.message%>
+      <em>Message</em>
+      <%=error.message%>
   </p>
   <p>
-    <em>Stack</em>
-    <%=error.stack%>
+      <em>Stack</em>
+      <%=error.stack%>
   </p>
   <p><em>JSON:</em>
-    <%= JSON.stringify(error.message) %>
+      <%= JSON.stringify(error.message) %>
   </p>
-  <%- include('foot') %>
+  <% if ("undefined" !=typeof errors ) { %>
+  <% for( let i=0; i < errors.length; i++ ) { %>
+  <p class="error">
+      <%= errors[i] %>
+  </p>
+  <% } %>
+  <% } %>

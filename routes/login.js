@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const cookies = require('../lib/session');
+const session = require('../lib/session');
 const { userWatches } = require('../lib/db');
 // this gets the login form req.body.passwd, req.body.user
 // renders the index page on success
@@ -24,11 +24,10 @@ router.post('/', async (req, res) => {
             const authJson = await authResp.json();
             // auth (bool) und user (string)
             if (authJson.auth) {
-                const jwt = cookies.createJWT({ user: authJson.user });
-                res.cookie(cookies.cookieName, jwt, cookies.cookieOpts);
+                req.session.user = authJson.user;
                 res.locals.user = authJson.user;
                 res.locals.userWatches = await userWatches(res.locals.user);
-                return res.redirect(process.env.APP_PATH);
+                return res.render('body');
             }
             errors.push('invalid credentials');
         } catch (err) {

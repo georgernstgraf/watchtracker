@@ -2,7 +2,7 @@ const router = require('express').Router();
 const { userWatches, belongsToUser, measurements } = require('../lib/db');
 const { Measurement, calculateDrifts } = require('../classes/measurement');
 router.get('/:id', async (req, res) => {
-    const user = req.auth?.user;
+    const user = req.session.user;
     if (!user) {
         return res.status(401).send('Not Authenticated');
     }

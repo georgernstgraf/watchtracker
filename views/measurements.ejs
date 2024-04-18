@@ -1,8 +1,8 @@
 <table>
     <caption>Aktuell: <%= watch.name %>
-            <% if (watch.comment) { %>
-                (<%= watch.comment %>)
-                    <% } %>
+        <% if (watch.comment) { %>
+        (<%= watch.comment %>)
+        <% } %>
     </caption>
     <thead>
         <tr>
@@ -15,32 +15,30 @@
     </thead>
     <tbody>
         <% measurements.forEach(e=> { %>
-            <tr>
-                <th scope="row"><button>－</button></th>
-                <td><input type="datetime-local" value="<%= e.createdAt.toISOString().substring(0, 16) %>"></td>
-                <td><input type="number" value="<%= e.value %>">
-                </td>
-                <td>
-                    <% if (e.isStart) { %>
-                        ➟ ➠
-                        <% } else { %>
-                            ⭲
-                            <% } %>
-                </td>
-                <td class="sekPerDay">
-                    <%= e.drift %>
-                </td>
-                <td>
-                    <%= e.comment ? e.comment : "comment" %>
-                </td>
-            </tr>
-            <% }) %>
+        <tr>
+            <th scope="row"><button>－</button></th>
+            <td><input type="datetime-local" value="<%= e.createdAt.toISOString().substring(0, 16) %>"></td>
+            <td><input type="number" value="<%= e.value %>">
+            </td>
+            <td>
+                <% if (e.isStart) { %>
+                S
+                <% } else { %>
+                M
+                <% } %>
+            </td>
+            <td class="sekPerDay">
+                <%= e.drift %>
+            </td>
+            <td>
+                <%= e.comment ? e.comment : "comment" %>
+            </td>
+        </tr>
+        <% }) %>
     </tbody>
     <tfoot>
         <tr>
-            <td class="sekPerDay" colspan="4"
-                style="text-align: center; color: rgb(211, 54, 130); font-size: larger; font-weight: bold; --darkreader-inline-color: #c67586;"
-                data-darkreader-inline-color="">(Dauer: 1.9 Tage, Drift: 13 Sek =&gt; 6.8 s/d schnell)</td>
+            <td class="sekPerDay" colspan="4" style="text-align: center; color: rgb(211, 54, 130); font-size: larger; font-weight: bold; --darkreader-inline-color: #c67586;" data-darkreader-inline-color="">(Dauer: 1.9 Tage, Drift: 13 Sek =&gt; 6.8 s/d schnell)</td>
         </tr>
     </tfoot>
 </table>
