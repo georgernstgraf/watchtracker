@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const cookies = require('../lib/cookies');
+const cookies = require('../lib/session');
 const { userWatches } = require('../lib/db');
 // this gets the login form req.body.passwd, req.body.user
 // renders the index page on success
@@ -17,9 +17,9 @@ router.post('/', async (req, res) => {
                 method: 'POST',
                 body: JSON.stringify({
                     user: req.body.user,
-                    passwd: req.body.passwd,
+                    passwd: req.body.passwd
                 }),
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 'Content-Type': 'application/json' }
             });
             const authJson = await authResp.json();
             // auth (bool) und user (string)

@@ -1,17 +1,9 @@
 'use strict';
-const ms = require('ms');
-// defining express constants
 const express = require('express');
-const expressJwt = require('express-jwt').expressjwt;
-const cookieParser = require('cookie-parser');
-const cookies = require('./lib/cookies');
-const httpErrors = require('http-errors');
+const { session } = require('./lib/session');
+const httpErrors = require('http-errors'); // middleware for error handlers
 const path = require('path');
 const ejs = require('ejs');
-const pino = require('pino');
-const pinoPretty = require('pino-pretty');
-const pinoHttp = require('pino-http');
-const stream = pinoPretty({ colorize: true });
 const expressStaticGzip = require('express-static-gzip');
 const bodyParser = require('body-parser');
 
@@ -22,9 +14,8 @@ module.exports = function main(options, cb) {
         {
             // Default options
         },
-        options,
+        options
     );
-    const logger = pino(stream);
     // Server state
     let server;
     let serverStarted = false;
@@ -32,7 +23,7 @@ module.exports = function main(options, cb) {
     // Setup error handling
     function unhandledError(err) {
         // Log the errors
-        logger.error(err);
+        console.error(err);
         // Only clean up once
         if (serverClosing) {
             return;
@@ -52,27 +43,16 @@ module.exports = function main(options, cb) {
     // Template engine
     app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, 'views'));
-    app.engine('html', ejs.renderFile);
-    // Common middleware
-    // app.use(/* ... */)
-    //app.use(pinoHttp({ logger }));
-    // Register routes
+    app.engine('ejs', ejs.renderFile);
 
-    app.use(cookieParser());
-    app.use(
-        expressJwt({
-            secret: process.env.JWT_SECRET,
-            algorithms: ['HS256', 'RS256'],
-            getToken: cookies.getToken,
-            credentialsRequired: false,
-        }),
-    );
-    const router = express.Router();
-    router.use(bodyParser.urlencoded({ extended: true })); // for parsing application/x-www-form-urlencoded
-    // use the router on /watchtracker:
-    app.use(process.env.APP_PATH, router);
-    require('./routes')(router, opts);
-    // Static files as fallbacks
+    // setting up the authRouter
+    const authRouter = express.Router();
+    authRouter.use(bodyParser.urlencoded({ extended: true }));
+    authRouter.use(session);
+    require('./routes')(authRouter, opts); // calls .use() several times on the authRouter
+    app.use(process.env.APP_PATH, authRouter);
+
+    // serve static files as fallbacks
     app.use(process.env.APP_PATH, expressStaticGzip('static'));
     app.use(process.env.APP_PATH, express.static('static'));
     // Common error handlers
@@ -81,7 +61,7 @@ module.exports = function main(options, cb) {
     });
     app.use(function fiveHundredHandler(err, req, res, next) {
         if (err.status >= 500) {
-            logger.error(err);
+            console.error(err);
         }
         res.locals.error = err;
         res.status(err.status || 500).send(err.message);
@@ -97,10 +77,10 @@ module.exports = function main(options, cb) {
         }
         serverStarted = true;
         const addr = server.address();
-        logger.info(
+        console.info(
             `Started at http://${opts.host || addr.host || 'localhost'}:${
                 addr.port
-            }${process.env.APP_PATH}`,
+            }${process.env.APP_PATH}`
         );
         ready(err, app, server);
     });
