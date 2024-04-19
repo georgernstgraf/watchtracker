@@ -10,6 +10,7 @@ body {
     background-color: var(--background-color);
     color: var(--header-h1-color);
     text-align: center;
+    width: auto;
 }
 
 #github,
@@ -84,7 +85,7 @@ caption {
     font-size: large;
     font-weight: bold;
     margin: 1em 0;
-    width: fit-content;
+    width: auto;
 }
 tfoot::before {
     content: '';
@@ -92,7 +93,6 @@ tfoot::before {
     height: 15px;
 }
 .sekPerDay {
-    font-size: large;
     /* font-weight: bold; */
     /* color: #d33682; */
     color: var(--header-h2-color);

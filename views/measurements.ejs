@@ -1,5 +1,5 @@
 <table>
-    <caption>Aktuell: <%= watch.name %>
+    <caption colspan="6">Aktuell: <%= watch.name %>
         <% if (watch.comment) { %>
         (<%= watch.comment %>)
         <% } %>
@@ -38,7 +38,7 @@
     </tbody>
     <tfoot>
         <tr>
-            <td class="sekPerDay" colspan="4" style="text-align: center; color: rgb(211, 54, 130); font-size: larger; font-weight: bold; --darkreader-inline-color: #c67586;" data-darkreader-inline-color="">(Dauer: 1.9 Tage, Drift: 13 Sek =&gt; 6.8 s/d schnell)</td>
+            <td class="sekPerDay" colspan="7" style="text-align: center; color: rgb(211, 54, 130); font-size: larger; font-weight: bold; --darkreader-inline-color: #c67586;" data-darkreader-inline-color="">(Dauer: 1.9 Tage, Drift: 13 Sek =&gt; 6.8 s/d schnell)</td>
         </tr>
     </tfoot>
 </table>

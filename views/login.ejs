@@ -1,8 +1,8 @@
-<body>
+    <%- include('body-tag') %>
     <h1>Watchtracker</h1>
     <form hx-post="<%= process.env.APP_PATH %>/login" hx-target="body">
         <input type="text" name="user" id="username" placeholder="Username">
         <input type="password" name="passwd" id="password" placeholder="Password">
         <input type="submit" value="Login">
     </form>
-</body>
+    </body>

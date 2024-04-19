@@ -5,7 +5,7 @@ debug.js
 playground.mongodb.js
 .vscode
 .vercel
-static/*.js
+static/htmx.*
 dev.db
 *.rest
 tmp

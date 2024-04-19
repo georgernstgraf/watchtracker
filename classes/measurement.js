@@ -1,4 +1,5 @@
 const { prisma } = require('../lib/db');
+const ms = require('ms');
 class Measurement {
     #data;
     constructor(data) {
@@ -50,25 +51,24 @@ class Measurement {
         measurement.updateAfterSave(updatedMeasurement);
     }
 }
-function calculateDrifts(modelList) {
-    if (modelList.length == 0) return;
-    modelList[0].updateField('isStart', true);
-    for (let i = 1; i < modelList.length; i++) {
-        if (modelList[i].getField('isStart')) continue;
-        const measureTime =
-            modelList[i].getField('createdAt') -
-            modelList[i - 1].getField('createdAt');
-        const measureDrift =
-            modelList[i].getField('value') - modelList[i - 1].getField('value');
-        const durationInDays = measureTime / 86400000;
-        const durationInHours = (measureTime / 3600000).toFixed(0);
-        const diffSecs = measureDrift;
-        const diffSekPerDay = diffSecs / durationInDays;
-        const speedType = diffSekPerDay > 0 ? 'schnell' : 'langsam';
-        const diffSekPerDayFixed = Math.abs(diffSekPerDay).toFixed(1);
-        modelList[i].setField(
+function calculateDrifts(measurements) {
+    if (measurements.length == 0) return;
+    measurements[0].updateField('isStart', true);
+    for (let i = 1; i < measurements.length; i++) {
+        // compare with predecessors
+        if (measurements[i].getField('isStart')) continue;
+        const measureSpanMS =
+            measurements[i].getField('createdAt') -
+            measurements[i - 1].getField('createdAt');
+        const measureDriftSecs =
+            measurements[i].getField('value') -
+            measurements[i - 1].getField('value');
+        const durationInDays = measureSpanMS / ms('1 day');
+        const durationInHours = (measureSpanMS / ms('1 hour')).toFixed(0);
+        const diffSekPerDay = (measureDriftSecs / durationInDays).toFixed(1);
+        measurements[i].setField(
             'drift',
-            `${diffSekPerDayFixed} s/d (${durationInHours}h) ${speedType}`
+            `${diffSekPerDay} s/d (${durationInHours}h)`
         );
     }
 }
