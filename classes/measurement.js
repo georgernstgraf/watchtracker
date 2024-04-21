@@ -2,73 +2,110 @@ const { prisma } = require('../lib/db');
 const ms = require('ms');
 class Measurement {
     #data;
+    #updates;
+    #volatiles;
     constructor(data) {
         this.#data = data;
         this.keys = new Set(Object.keys(data));
-        this.updates = {};
+        this.#updates = {};
+        this.#volatiles = {};
+        if (data.isStart) {
+            this.#volatiles['drift'] = 'start';
+        }
     }
     updateField(field, value) {
-        if (!this.keys.has(field)) {
-            throw new Error(`unknown field in Measurement: ${field}`);
+        if (!this.keys.has(field) || ['id', 'watchId'].includes(field)) {
+            throw new Error(
+                `unknown or forbidden field in Measurement: ${field}`
+            );
         }
-        this.updates[field] = value;
+        this.#updates[field] = value;
+        if (field == 'isStart' && value) {
+            this.#volatiles['drift'] = 'start';
+        }
+    }
+    setVolatile(field, value) {
+        this.#volatiles[field] = value;
     }
     getField(field) {
+        //
+        if (this.#updates.hasOwnProperty(field)) {
+            return this.#data[field];
+        }
         return this.#data[field];
     }
-    setField(field, value) {
-        this.#data[field] = value;
-    }
-    getData() {
+
+    getPersistedData() {
         return { ...this.#data };
     }
-    getChangedFields() {
-        return Object.keys(this.updates).reduce((changes, key) => {
-            if (this.updates[key] !== this.#data[key]) {
-                changes[key] = this.updates[key];
+    getUpdatedOnly() {
+        // look in #updates whether the same key in #data has a different _value_
+        // return the object with the updates
+        return Object.keys(this.#updates).reduce((changes, key) => {
+            if (this.#updates[key] !== this.#data[key]) {
+                changes[key] = this.#updates[key];
             }
             return changes;
         }, {});
     }
+    getUpdatedData() {
+        const data = { ...this.#data };
+        const updated = this.getUpdatedOnly();
+        Object.keys(updated).forEach((k) => {
+            data[k] = updated[k];
+        });
+        return data;
+    }
+    getDisplayData() {
+        const data = this.getUpdatedData();
+        Object.keys(this.#volatiles).forEach(
+            (k) => (data[k] = this.#volatiles[k])
+        );
+        return data;
+    }
     isDirty() {
-        const changes = this.getChangedFields();
-        return Object.keys(changes).length > 0;
+        return Object.keys(this.getUpdatedData()).length > 0;
     }
     updateAfterSave(data) {
         this.#data = data;
-        this.updates = {};
+        this.#updates = {};
     }
     static async save(measurement) {
         if (!measurement.isDirty()) {
             console.info(`save measurement: not dirty`);
             return;
         }
-        const changes = measurement.getChangedFields();
+        const changes = measurement.getUpdatedOnly();
         const updatedMeasurement = await prisma.measurement.update({
             where: { id: measurement.data.id },
             data: changes
         });
         measurement.updateAfterSave(updatedMeasurement);
     }
-}
+} // end class
 function calculateDrifts(measurements) {
     if (measurements.length == 0) return;
-    measurements[0].updateField('isStart', true);
-    for (let i = 1; i < measurements.length; i++) {
+    // die letzten werden die ersten sein
+    measurements.at(-1).updateField('isStart', true);
+    for (let i = measurements.length - 2; i >= 0; i--) {
         // compare with predecessors
-        if (measurements[i].getField('isStart')) continue;
+        if (measurements[i].getField('isStart')) {
+            continue;
+        }
         const measureSpanMS =
-            measurements[i].getField('createdAt') -
-            measurements[i - 1].getField('createdAt');
+            measurements[i + 1].getField('createdAt') -
+            measurements[i].getField('createdAt');
         const measureDriftSecs =
-            measurements[i].getField('value') -
-            measurements[i - 1].getField('value');
+            measurements[i + 1].getField('value') -
+            measurements[i].getField('value');
         const durationInDays = measureSpanMS / ms('1 day');
         const durationInHours = (measureSpanMS / ms('1 hour')).toFixed(0);
         const diffSekPerDay = (measureDriftSecs / durationInDays).toFixed(1);
-        measurements[i].setField(
+        const diffSekPerDayDisplay =
+            diffSekPerDay > 0 ? `+${diffSekPerDay}` : `${diffSekPerDay}`;
+        measurements[i].setVolatile(
             'drift',
-            `${diffSekPerDay} s/d (${durationInHours}h)`
+            `${diffSekPerDayDisplay} s/d (${durationInHours}h)`
         );
     }
 }

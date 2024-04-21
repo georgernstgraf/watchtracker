@@ -1,7 +1,8 @@
-const router = require('express').Router();
-const { measurements } = require('../lib/db');
+const router = require('express').Router(); // new Router
+const { userWatches, belongsToUser, measurements } = require('../lib/db');
 const { Measurement, calculateDrifts } = require('../classes/measurement');
 router.get('/:id', async (req, res) => {
+    // measurement ID
     const user = req.session.user;
     if (!user) {
         return res.status(401).send('Not Authenticated');
@@ -15,7 +16,7 @@ router.get('/:id', async (req, res) => {
     res.locals.watch = watch;
     const measureModels = watch.measurements.map((e) => new Measurement(e));
     calculateDrifts(measureModels);
-    res.locals.measurements = measureModels.map((e) => e.getDisplayData());
+    res.locals.measurements = measureModels.map((e) => e.getData());
     return res.render('measurements');
 });
 module.exports = router;
