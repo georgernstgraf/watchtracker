@@ -6,7 +6,7 @@
     </caption>
     <thead>
         <tr>
-            <th scope="rowgroup" style="width: 5%;"><button>＋</button></th>
+            <th scope="rowgroup" style="width: 5%;"><button hx-post="<%= process.env.APP_PATH %>/measure/<%= watch.id %>" hx-target="closest table">＋</button></th>
             <th scope="col" style="width: 30%;">Messzeitpunkt</th>
             <th scope="col" style="width: 10%;">Abweichung</th>
             <th scope="col" style="width: 10%;">Typ</th>
@@ -15,8 +15,8 @@
     </thead>
     <tbody>
         <% measurements.forEach(e=> { %>
-        <tr>
-            <th scope="row"><button>－</button></th>
+        <tr data-id="<%= e.id %>">
+            <th scope="row"><button hx-delete="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table">－</button></th>
             <td><input type="datetime-local" value="<%= e.createdAt.toISOString().substring(0, 16) %>"></td>
             <td><input type="number" value="<%= e.value %>">
             </td>

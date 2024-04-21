@@ -96,6 +96,23 @@ class Measurement {
             );
         }
     }
+    static async watchIdForMeasureOfUser(measureId, user) {
+        const data = await prisma.measurement.findUnique({
+            where: { id: measureId },
+            select: {
+                watch: {
+                    select: {
+                        user: { select: { name: true } },
+                        id: true
+                    }
+                }
+            }
+        });
+        return data.watch.user.name === user ? data.watch.id : null;
+    }
+    static async delete(id) {
+        return await prisma.measurement.delete({ where: { id: id } });
+    }
 } // end class
 function calculateDrifts(measurements) {
     if (measurements.length == 0) return;
