@@ -4,9 +4,10 @@ class Measurement {
     #data;
     #updates;
     #volatiles;
+    #keys;
     constructor(data) {
         this.#data = data;
-        this.keys = new Set(Object.keys(data));
+        this.#keys = new Set(Object.keys(data));
         this.#updates = {};
         this.#volatiles = {};
         if (data.isStart) {
@@ -14,7 +15,7 @@ class Measurement {
         }
     }
     updateField(field, value) {
-        if (!this.keys.has(field) || ['id', 'watchId'].includes(field)) {
+        if (!this.#keys.has(field) || ['id', 'watchId'].includes(field)) {
             throw new Error(
                 `unknown or forbidden field in Measurement: ${field}`
             );
@@ -64,23 +65,36 @@ class Measurement {
         return data;
     }
     isDirty() {
-        return Object.keys(this.getUpdatedData()).length > 0;
+        return (
+            Object.keys(this.getUpdatedData()).length > 0 || !this.#data['id']
+        );
     }
     updateAfterSave(data) {
         this.#data = data;
         this.#updates = {};
     }
-    static async save(measurement) {
-        if (!measurement.isDirty()) {
+    toString() {
+        console.log(JSON.stringify(this.getDisplayData(), null, 3));
+    }
+    async save() {
+        if (!this.isDirty()) {
             console.info(`save measurement: not dirty`);
             return;
         }
-        const changes = measurement.getUpdatedOnly();
-        const updatedMeasurement = await prisma.measurement.update({
-            where: { id: measurement.data.id },
-            data: changes
-        });
-        measurement.updateAfterSave(updatedMeasurement);
+        if (this.#data.id) {
+            this.updateAfterSave(
+                await prisma.measurement.update({
+                    where: { id: measurement.data.id },
+                    data: this.getUpdatedOnly()
+                })
+            );
+        } else {
+            this.updateAfterSave(
+                await prisma.measurement.create({
+                    data: this.getUpdatedData()
+                })
+            );
+        }
     }
 } // end class
 function calculateDrifts(measurements) {
