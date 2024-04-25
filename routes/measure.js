@@ -28,7 +28,9 @@ router.post('/:id', async (req, res) => {
     res.locals.watch = watch;
     const measureModels = watch.measurements.map((e) => new Measurement(e));
     calculateDrifts(measureModels);
-    res.locals.measurements = measureModels.map((e) => e.getDisplayData());
+    res.locals.measurements = measureModels.map((e) =>
+        e.getDisplayData(watch.user.tzOffset)
+    );
     return res.render('measurements');
 });
 router.delete('/:id', async (req, res) => {
@@ -50,7 +52,9 @@ router.delete('/:id', async (req, res) => {
     res.locals.watch = watch;
     const measureModels = watch.measurements.map((e) => new Measurement(e));
     calculateDrifts(measureModels);
-    res.locals.measurements = measureModels.map((e) => e.getDisplayData());
+    res.locals.measurements = measureModels.map((e) =>
+        e.getDisplayData(watch.user.tzOffset)
+    );
     return res.render('measurements');
 });
 module.exports = router;

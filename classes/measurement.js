@@ -57,11 +57,18 @@ class Measurement {
         });
         return data;
     }
-    getDisplayData() {
+    getDisplayData(tzOffssetMinutes = 0) {
+        // TODO configure this per-user
         const data = this.getUpdatedData();
         Object.keys(this.#volatiles).forEach(
             (k) => (data[k] = this.#volatiles[k])
         );
+        const createdUTC = data.createdAt;
+        if (createdUTC) {
+            data.createdAt = new Date(
+                createdUTC - ms(`${tzOffssetMinutes} minutes`)
+            );
+        }
         return data;
     }
     isDirty() {
