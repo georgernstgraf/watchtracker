@@ -20,13 +20,13 @@ class Measurement {
                 `unknown or forbidden field in Measurement: ${field}`
             );
         }
+        switch (field) {
+            case 'isStart': value = JSON.parse(value);
+        }
         this.#updates[field] = value;
         if (field == 'isStart' && value) {
             this.#volatilesNoPersist['drift'] = 'start';
         }
-    }
-    setVolatile(field, value) {
-        this.#volatilesNoPersist[field] = value;
     }
     getField(field, original = false) {
         //
@@ -35,11 +35,19 @@ class Measurement {
         }
         return this.#data[field];
     }
+    patch(data) {
+        for (let key in data) {
+            this.updateField(key, data[key]);
+        }
+    }
+    setVolatile(field, value) {
+        this.#volatilesNoPersist[field] = value;
+    }
 
     getPersistedData() {
         return { ...this.#data };
     }
-    getUpdatedOnly() {
+    getOnlyUpdatedData() {
         // look in #updates whether the same key in #data has a different _value_
         // return the object with the updates
         return Object.keys(this.#updates).reduce((changes, key) => {
@@ -51,7 +59,7 @@ class Measurement {
     }
     getUpdatedData() {
         const data = { ...this.#data };
-        const updated = this.getUpdatedOnly();
+        const updated = this.getOnlyUpdatedData();
         Object.keys(updated).forEach((k) => {
             data[k] = updated[k];
         });
@@ -83,22 +91,22 @@ class Measurement {
     toString() {
         console.log(JSON.stringify(this.getDisplayData(), null, 3));
     }
-    async save() {
-        if (!this.isDirty()) {
+    static async save(measure) {
+        if (!measure.isDirty()) {
             console.info(`save measurement: not dirty`);
             return;
         }
-        if (this.#data.id) {
-            this.updateAfterSave(
+        if (measure.#data.id) {
+            measure.updateAfterSave(
                 await prisma.measurement.update({
-                    where: { id: measurement.data.id },
-                    data: this.getUpdatedOnly()
+                    where: { id: measure.#data.id },
+                    data: measure.getOnlyUpdatedData()
                 })
             );
         } else {
-            this.updateAfterSave(
+            measure.updateAfterSave(
                 await prisma.measurement.create({
-                    data: this.getUpdatedData()
+                    data: measure.getUpdatedData()
                 })
             );
         }
@@ -117,15 +125,21 @@ class Measurement {
         });
         return data.watch.user.name === user ? data.watch.id : null;
     }
-    static async setType(measureID, isStart) {
-        await prisma.measurement.update({
-            where: {
-                id: measureID
-            },
-            data: {
-                isStart: isStart
+    static async getUserMeasurement(user, measureId) {
+        const measure = await prisma.measurement.findUnique({
+            where: { id: measureId },
+            include: {
+                watch: {
+                    select: {
+                        user: { select: { name: true } },
+                    }
+                }
             }
         });
+        if (!measure || measure.watch.user.name !== user) {
+            return;
+        }
+        return new Measurement(measure);
     }
     static async delete(id) {
         return await prisma.measurement.delete({ where: { id: id } });

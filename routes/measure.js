@@ -21,7 +21,7 @@ router.post('/:id', async (req, res) => {
         isStart: true,
         value: 0
     });
-    await m.save();
+    await Measurement.save(m);
     const watch = await measurements(watchId, user);
     if (!watch) {
         return res.status(403).send('This is not your watch');
@@ -58,23 +58,25 @@ router.delete('/:id', async (req, res) => {
     );
     return res.render('measurements');
 });
-router.patch('/:id', async (req, res) => {
-    const measureId = req.params.id;
-    const user = req.session.user;
-    if (!user) {
-        return res.status(401).send('Not Authenticated');
-    }
-    res.locals.user = user;
-    const measure = await Measurement.getUserMeasurement(user, measureId);
-    measure.;
+router.patch('/:id', async (req, res, next) => {
+    try {
+        const measureId = req.params.id;
+        const user = req.session.user;
+        if (!user) {
+            return res.status(401).send('Not Authenticated');
+        }
+        res.locals.user = user;
+        const measure = await Measurement.getUserMeasurement(user, measureId);
+        if (!measure) {
+            return res.status(403).send('Not your watch');
+        }
+        measure.patch(req.body);
+        await Measurement.save(measure);
 
-
-    const watchId = await Measurement.watchIdForMeasureOfUser(measureId, user);
-    if (!watchId) {
-        return res.status(403).send('Not your watch');
+        return res.render('measurements');
+    } catch (err) {
+        next(err);
     }
-    await Measurement.setType(measureId, !req.body.isStart);
-    return res.send('ok');
 });
 
 module.exports = router;
