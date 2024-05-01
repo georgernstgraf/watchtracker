@@ -4,9 +4,10 @@
     "description": "Tracker for wristwatch inaccuracies",
     "main": "main.js",
     "scripts": {
-        "start": "bin/app",
+        "start": "node bin/app.js",
         "install-htmx": "rsync -vt node_modules/htmx.org/dist/htmx*js* static/",
-        "bastel": "node --inspect bastel.js"
+        "bastel": "node --inspect bastel.js",
+        "dev": "node --env-file=.env --watch --inspect bin/app.js"
     },
     "repository": {
         "type": "git",

@@ -20,7 +20,7 @@
             <td><input type="datetime-local" value="<%= e.createdAt.toISOString().substring(0, 16) %>"></td>
             <td><input type="number" value="<%= e.value %>">
             </td>
-            <td>
+            <td hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-vals='{"isStart": <%= e.isStart %>}''>
                 <% if (e.isStart) { %>
                 S
                 <% } else { %>

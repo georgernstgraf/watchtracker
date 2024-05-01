@@ -4,8 +4,9 @@ const {
     watchBelongsToUser,
     measurements
 } = require('../lib/db');
-const { Measurement, calculateDrifts } = require('../classes/measurement');
+const Measurement = require('../classes/measurement');
 router.post('/:id', async (req, res) => {
+    // this is a watchId here!!
     const watchId = req.params.id;
     const user = req.session.user;
     if (!user) {
@@ -27,7 +28,7 @@ router.post('/:id', async (req, res) => {
     }
     res.locals.watch = watch;
     const measureModels = watch.measurements.map((e) => new Measurement(e));
-    calculateDrifts(measureModels);
+    Measurement.calculateDrifts(measureModels);
     res.locals.measurements = measureModels.map((e) =>
         e.getDisplayData(watch.user.tzOffset)
     );
@@ -51,10 +52,29 @@ router.delete('/:id', async (req, res) => {
     }
     res.locals.watch = watch;
     const measureModels = watch.measurements.map((e) => new Measurement(e));
-    calculateDrifts(measureModels);
+    Measurement.calculateDrifts(measureModels);
     res.locals.measurements = measureModels.map((e) =>
         e.getDisplayData(watch.user.tzOffset)
     );
     return res.render('measurements');
 });
+router.patch('/:id', async (req, res) => {
+    const measureId = req.params.id;
+    const user = req.session.user;
+    if (!user) {
+        return res.status(401).send('Not Authenticated');
+    }
+    res.locals.user = user;
+    const measure = await Measurement.getUserMeasurement(user, measureId);
+    measure.;
+
+
+    const watchId = await Measurement.watchIdForMeasureOfUser(measureId, user);
+    if (!watchId) {
+        return res.status(403).send('Not your watch');
+    }
+    await Measurement.setType(measureId, !req.body.isStart);
+    return res.send('ok');
+});
+
 module.exports = router;

@@ -3,15 +3,15 @@ const ms = require('ms');
 class Measurement {
     #data;
     #updates;
-    #volatiles;
+    #volatilesNoPersist;
     #keys;
     constructor(data) {
         this.#data = data;
         this.#keys = new Set(Object.keys(data));
         this.#updates = {};
-        this.#volatiles = {};
+        this.#volatilesNoPersist = {};
         if (data.isStart) {
-            this.#volatiles['drift'] = 'start';
+            this.#volatilesNoPersist['drift'] = 'start';
         }
     }
     updateField(field, value) {
@@ -22,16 +22,16 @@ class Measurement {
         }
         this.#updates[field] = value;
         if (field == 'isStart' && value) {
-            this.#volatiles['drift'] = 'start';
+            this.#volatilesNoPersist['drift'] = 'start';
         }
     }
     setVolatile(field, value) {
-        this.#volatiles[field] = value;
+        this.#volatilesNoPersist[field] = value;
     }
-    getField(field) {
+    getField(field, original = false) {
         //
-        if (this.#updates.hasOwnProperty(field)) {
-            return this.#data[field];
+        if (this.#updates.hasOwnProperty(field) && !original) {
+            return this.#updates[field];
         }
         return this.#data[field];
     }
@@ -60,8 +60,8 @@ class Measurement {
     getDisplayData(tzOffssetMinutes = 0) {
         // TODO configure this per-user
         const data = this.getUpdatedData();
-        Object.keys(this.#volatiles).forEach(
-            (k) => (data[k] = this.#volatiles[k])
+        Object.keys(this.#volatilesNoPersist).forEach(
+            (k) => (data[k] = this.#volatilesNoPersist[k])
         );
         const createdUTC = data.createdAt;
         if (createdUTC) {
@@ -117,34 +117,44 @@ class Measurement {
         });
         return data.watch.user.name === user ? data.watch.id : null;
     }
+    static async setType(measureID, isStart) {
+        await prisma.measurement.update({
+            where: {
+                id: measureID
+            },
+            data: {
+                isStart: isStart
+            }
+        });
+    }
     static async delete(id) {
         return await prisma.measurement.delete({ where: { id: id } });
     }
-} // end class
-function calculateDrifts(measurements) {
-    if (measurements.length == 0) return;
-    // die letzten werden die ersten sein
-    measurements.at(-1).updateField('isStart', true);
-    for (let i = measurements.length - 2; i >= 0; i--) {
-        // compare with predecessors
-        if (measurements[i].getField('isStart')) {
-            continue;
+    static calculateDrifts(measurements) {
+        if (measurements.length == 0) return;
+        // die letzten werden die ersten sein
+        measurements.at(-1).updateField('isStart', true);
+        for (let i = measurements.length - 2; i >= 0; i--) {
+            // compare with predecessors
+            if (measurements[i].getField('isStart')) {
+                continue;
+            }
+            const measureSpanMS =
+                measurements[i + 1].getField('createdAt') -
+                measurements[i].getField('createdAt');
+            const measureDriftSecs =
+                measurements[i + 1].getField('value') -
+                measurements[i].getField('value');
+            const durationInDays = measureSpanMS / ms('1 day');
+            const durationInHours = (measureSpanMS / ms('1 hour')).toFixed(0);
+            const diffSekPerDay = (measureDriftSecs / durationInDays).toFixed(1);
+            const diffSekPerDayDisplay =
+                diffSekPerDay > 0 ? `+${diffSekPerDay}` : `${diffSekPerDay}`;
+            measurements[i].setVolatile(
+                'drift',
+                `${diffSekPerDayDisplay} s/d (${durationInHours}h)`
+            );
         }
-        const measureSpanMS =
-            measurements[i + 1].getField('createdAt') -
-            measurements[i].getField('createdAt');
-        const measureDriftSecs =
-            measurements[i + 1].getField('value') -
-            measurements[i].getField('value');
-        const durationInDays = measureSpanMS / ms('1 day');
-        const durationInHours = (measureSpanMS / ms('1 hour')).toFixed(0);
-        const diffSekPerDay = (measureDriftSecs / durationInDays).toFixed(1);
-        const diffSekPerDayDisplay =
-            diffSekPerDay > 0 ? `+${diffSekPerDay}` : `${diffSekPerDay}`;
-        measurements[i].setVolatile(
-            'drift',
-            `${diffSekPerDayDisplay} s/d (${durationInHours}h)`
-        );
     }
 }
-module.exports = { Measurement, calculateDrifts };
+module.exports = Measurement;

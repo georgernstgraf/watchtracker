@@ -1,6 +1,6 @@
 const router = require('express').Router();
 const { measurements } = require('../lib/db');
-const { Measurement, calculateDrifts } = require('../classes/measurement');
+const Measurement = require('../classes/measurement');
 router.get('/:id', async (req, res) => {
     const user = req.session.user;
     if (!user) {
@@ -14,7 +14,7 @@ router.get('/:id', async (req, res) => {
     }
     res.locals.watch = watch;
     const measureModels = watch.measurements.map((e) => new Measurement(e));
-    calculateDrifts(measureModels);
+    Measurement.calculateDrifts(measureModels);
     res.locals.measurements = measureModels.map((e) =>
         e.getDisplayData(watch.user.tzOffset)
     );
