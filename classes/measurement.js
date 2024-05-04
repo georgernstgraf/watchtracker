@@ -21,7 +21,8 @@ class Measurement {
             );
         }
         switch (field) {
-            case 'isStart': value = JSON.parse(value);
+            case 'isStart':
+                value = JSON.parse(value);
         }
         this.#updates[field] = value;
         if (field == 'isStart' && value) {
@@ -71,10 +72,9 @@ class Measurement {
         Object.keys(this.#volatilesNoPersist).forEach(
             (k) => (data[k] = this.#volatilesNoPersist[k])
         );
-        const createdUTC = data.createdAt;
-        if (createdUTC) {
-            data.createdAt = new Date(
-                createdUTC - ms(`${tzOffssetMinutes} minutes`)
+        if (data.createdAt) {
+            data.createdAt.setMinutes(
+                data.createdAt.getMinutes() + tzOffssetMinutes
             );
         }
         return data;
@@ -131,7 +131,7 @@ class Measurement {
             include: {
                 watch: {
                     select: {
-                        user: { select: { name: true } },
+                        user: { select: { name: true } }
                     }
                 }
             }
@@ -161,7 +161,9 @@ class Measurement {
                 measurements[i].getField('value');
             const durationInDays = measureSpanMS / ms('1 day');
             const durationInHours = (measureSpanMS / ms('1 hour')).toFixed(0);
-            const diffSekPerDay = (measureDriftSecs / durationInDays).toFixed(1);
+            const diffSekPerDay = (measureDriftSecs / durationInDays).toFixed(
+                1
+            );
             const diffSekPerDayDisplay =
                 diffSekPerDay > 0 ? `+${diffSekPerDay}` : `${diffSekPerDay}`;
             measurements[i].setVolatile(
@@ -169,6 +171,19 @@ class Measurement {
                 `${diffSekPerDayDisplay} s/d (${durationInHours}h)`
             );
         }
+    }
+    static async measurements(watchId, user) {
+        return await prisma.watch.findUnique({
+            where: { id: watchId, user: { name: user } },
+            include: {
+                measurements: {
+                    orderBy: {
+                        createdAt: 'desc'
+                    }
+                },
+                user: { select: { tzOffset: true } }
+            }
+        });
     }
 }
 module.exports = Measurement;

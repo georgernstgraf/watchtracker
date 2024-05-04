@@ -1,9 +1,5 @@
 const router = require('express').Router(); // new Router
-const {
-    measureBelongsToUser,
-    watchBelongsToUser,
-    measurements
-} = require('../lib/db');
+const { measureBelongsToUser, watchBelongsToUser } = require('../lib/db');
 const Measurement = require('../classes/measurement');
 router.post('/:id', async (req, res) => {
     // this is a watchId here!!
@@ -22,7 +18,7 @@ router.post('/:id', async (req, res) => {
         value: 0
     });
     await Measurement.save(m);
-    const watch = await measurements(watchId, user);
+    const watch = await Measurement.measurements(watchId, user);
     if (!watch) {
         return res.status(403).send('This is not your watch');
     }
@@ -46,7 +42,7 @@ router.delete('/:id', async (req, res) => {
         return res.status(403).send('Not your watch');
     }
     await Measurement.delete(measureId);
-    const watch = await measurements(watchId, user);
+    const watch = await Measurement.measurements(watchId, user);
     if (!watch) {
         return res.status(403).send('This is not your watch');
     }

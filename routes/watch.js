@@ -1,5 +1,4 @@
 const router = require('express').Router();
-const { measurements } = require('../lib/db');
 const Measurement = require('../classes/measurement');
 router.get('/:id', async (req, res) => {
     const user = req.session.user;
@@ -8,7 +7,7 @@ router.get('/:id', async (req, res) => {
     }
     res.locals.user = user;
 
-    const watch = await measurements(req.params.id, user);
+    const watch = await Measurement.measurements(req.params.id, user);
     if (!watch) {
         return res.status(403).send('This is not your watch');
     }
