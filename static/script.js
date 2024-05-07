@@ -1,3 +1,5 @@
+htmx.config.logAll = true;
+// login if a 401 occurs
 document
     .querySelector('body')
     .addEventListener('htmx:responseError', (event) => {

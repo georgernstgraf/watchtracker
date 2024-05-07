@@ -22,7 +22,12 @@ class Measurement {
         }
         switch (field) {
             case 'isStart':
+            case 'value':
                 value = JSON.parse(value);
+                break;
+            case 'createdAt':
+                value = new Date(value);
+                break;
         }
         this.#updates[field] = value;
         if (field == 'isStart' && value) {

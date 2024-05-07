@@ -1,3 +1,4 @@
+<%# Needs watch and measurements[] %>
 <table>
     <caption colspan="6">Aktuell: <%= watch.name %>
         <% if (watch.comment) { %>
@@ -6,7 +7,9 @@
     </caption>
     <thead>
         <tr>
-            <th scope="rowgroup" style="width: 5%;"><button hx-post="<%= process.env.APP_PATH %>/measure/<%= watch.id %>" hx-target="closest table">＋</button></th>
+            <th scope="rowgroup" style="width: 5%;"><button
+                    hx-post="<%= process.env.APP_PATH %>/measure/<%= watch.id %>" hx-target="closest table">＋</button>
+            </th>
             <th scope="col" style="width: 30%;">Messzeitpunkt</th>
             <th scope="col" style="width: 10%;">Abweichung</th>
             <th scope="col" style="width: 10%;">Typ</th>
@@ -16,29 +19,45 @@
     <tbody>
         <% measurements.forEach(e=> { %>
         <tr data-id="<%= e.id %>">
-            <th scope="row"><button hx-delete="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table">－</button></th>
-            <td><input type="datetime-local" value="<%= e.createdAt.toISOString().substring(0, 16) %>"></td>
-            <td><input type="number" value="<%= e.value %>">
+            <th scope="row">
+                <button hx-delete="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
+                    hx-swap="outerHTML">－</button>
+            </th>
+            <td>
+                <input type="datetime-local" name="createdAt" value="<%= e.createdAt.toISOString().substring(0, 16) %>"
+                    hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
+                    hx-swap="outerHTML" hx-trigger="input changed delay:500ms">
             </td>
-            <td hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-vals='{"isStart": <%= e.isStart %>}''>
+            <td>
+                <input type="number" name="value" value="<%= e.value %>"
+                    hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
+                    hx-swap="outerHTML" hx-trigger="input changed delay:500ms">
+            </td>
+            <td hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-vals='{"isStart": <%= !e.isStart %>}'
+                hx-target="closest table" hx-swap="outerHTML">
                 <% if (e.isStart) { %>
-                S
+                <button class="startStop">🎬</button>
                 <% } else { %>
-                M
+                <button class="startStop">⌛</button>
                 <% } %>
             </td>
             <td class="sekPerDay">
                 <%= e.drift %>
             </td>
             <td>
-                <%= e.comment ? e.comment : "comment" %>
+                <input type="text" name="comment" id="measureComment" <% if (e.comment) { %> value="<%= e.comment %>"
+                    <% } else { %> placeholder="enter comment" <% } %>
+                    hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
+                    hx-swap="outerHTML" hx-trigger='keyup[key=="Enter"]'>
             </td>
         </tr>
         <% }) %>
     </tbody>
     <tfoot>
         <tr>
-            <td class="sekPerDay" colspan="7" style="text-align: center; color: rgb(211, 54, 130); font-size: larger; font-weight: bold; --darkreader-inline-color: #c67586;" data-darkreader-inline-color="">(Dauer: 1.9 Tage, Drift: 13 Sek =&gt; 6.8 s/d schnell)</td>
+            <td class="sekPerDay" colspan="7"
+                style="text-align: center; color: rgb(211, 54, 130); font-size: larger; font-weight: bold; --darkreader-inline-color: #c67586;"
+                data-darkreader-inline-color="">(Dauer: 1.9 Tage, Drift: 13 Sek =&gt; 6.8 s/d schnell)</td>
         </tr>
     </tfoot>
 </table>

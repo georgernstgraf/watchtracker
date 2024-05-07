@@ -80,7 +80,7 @@ module.exports = function main(options, cb) {
         console.info(
             `Started at http://${opts.host || addr.host || 'localhost'}:${
                 addr.port
-            }${process.env.APP_PATH}`
+            }${process.env.APP_PATH} ${new Date().toLocaleTimeString()}`
         );
         ready(err, app, server);
     });

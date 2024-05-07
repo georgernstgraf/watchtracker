@@ -66,9 +66,16 @@ router.patch('/:id', async (req, res, next) => {
         if (!measure) {
             return res.status(403).send('Not your watch');
         }
+        const watchId = measure.getField('watchId');
         measure.patch(req.body);
         await Measurement.save(measure);
-
+        const watch = await Measurement.measurements(watchId, user);
+        res.locals.watch = watch;
+        const measureModels = watch.measurements.map((e) => new Measurement(e));
+        Measurement.calculateDrifts(measureModels);
+        res.locals.measurements = measureModels.map((e) =>
+            e.getDisplayData(watch.user.tzOffset)
+        );
         return res.render('measurements');
     } catch (err) {
         next(err);
