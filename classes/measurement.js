@@ -1,76 +1,46 @@
 const { prisma } = require('../lib/db');
 const ms = require('ms');
-class Measurement {
-    #data;
-    #updates;
+const dbEntity = require('./dbEntity');
+class Measurement extends dbEntity {
     #volatilesNoPersist;
-    #keys;
     constructor(data) {
-        this.#data = data;
-        this.#keys = new Set(Object.keys(data));
-        this.#updates = {};
+        super(data);
         this.#volatilesNoPersist = {};
         if (data.isStart) {
             this.#volatilesNoPersist['drift'] = 'start';
         }
     }
+    //@override
     updateField(field, value) {
-        if (!this.#keys.has(field) || ['id', 'watchId'].includes(field)) {
+        if (!this.keys.has(field) || ['id', 'watchId'].includes(field)) {
             throw new Error(
                 `unknown or forbidden field in Measurement: ${field}`
             );
         }
         switch (field) {
             case 'isStart':
-            case 'value':
                 value = JSON.parse(value);
+                break;
+            case 'value':
+                value = Number.parseInt(value);
                 break;
             case 'createdAt':
                 value = new Date(value);
                 break;
         }
-        this.#updates[field] = value;
+        this.updates[field] = value;
         if (field == 'isStart' && value) {
             this.#volatilesNoPersist['drift'] = 'start';
         }
     }
-    getField(field, original = false) {
-        //
-        if (this.#updates.hasOwnProperty(field) && !original) {
-            return this.#updates[field];
-        }
-        return this.#data[field];
-    }
-    patch(data) {
-        for (let key in data) {
-            this.updateField(key, data[key]);
-        }
-    }
+
     setVolatile(field, value) {
         this.#volatilesNoPersist[field] = value;
     }
+    getVolatile(field) {
+        return this.#volatilesNoPersist[field];
+    }
 
-    getPersistedData() {
-        return { ...this.#data };
-    }
-    getOnlyUpdatedData() {
-        // look in #updates whether the same key in #data has a different _value_
-        // return the object with the updates
-        return Object.keys(this.#updates).reduce((changes, key) => {
-            if (this.#updates[key] !== this.#data[key]) {
-                changes[key] = this.#updates[key];
-            }
-            return changes;
-        }, {});
-    }
-    getUpdatedData() {
-        const data = { ...this.#data };
-        const updated = this.getOnlyUpdatedData();
-        Object.keys(updated).forEach((k) => {
-            data[k] = updated[k];
-        });
-        return data;
-    }
     getDisplayData(tzOffssetMinutes = 0) {
         // TODO configure this per-user
         const data = this.getUpdatedData();
@@ -84,27 +54,16 @@ class Measurement {
         }
         return data;
     }
-    isDirty() {
-        return (
-            Object.keys(this.getUpdatedData()).length > 0 || !this.#data['id']
-        );
-    }
-    updateAfterSave(data) {
-        this.#data = data;
-        this.#updates = {};
-    }
-    toString() {
-        console.log(JSON.stringify(this.getDisplayData(), null, 3));
-    }
+
     static async save(measure) {
         if (!measure.isDirty()) {
             console.info(`save measurement: not dirty`);
             return;
         }
-        if (measure.#data.id) {
+        if (measure.data.id) {
             measure.updateAfterSave(
                 await prisma.measurement.update({
-                    where: { id: measure.#data.id },
+                    where: { id: measure.data.id },
                     data: measure.getOnlyUpdatedData()
                 })
             );
@@ -151,44 +110,52 @@ class Measurement {
     }
     static calculateDrifts(measurements) {
         if (measurements.length == 0) return;
-        // die letzten werden die ersten sein
+        // das letzte ist das älteste kleinste (sort desc) und immer START
         measurements.at(-1).updateField('isStart', true);
         for (let i = measurements.length - 2; i >= 0; i--) {
             // compare with predecessors
             if (measurements[i].getField('isStart')) {
                 continue;
             }
-            const measureSpanMS =
-                measurements[i + 1].getField('createdAt') -
-                measurements[i].getField('createdAt');
-            const measureDriftSecs =
-                measurements[i + 1].getField('value') -
-                measurements[i].getField('value');
-            const durationInDays = measureSpanMS / ms('1 day');
-            const durationInHours = (measureSpanMS / ms('1 hour')).toFixed(0);
-            const diffSekPerDay = (measureDriftSecs / durationInDays).toFixed(
-                1
-            );
-            const diffSekPerDayDisplay =
-                diffSekPerDay > 0 ? `+${diffSekPerDay}` : `${diffSekPerDay}`;
+            const durationMS =
+                measurements[i].getField('createdAt') -
+                measurements[i + 1].getField('createdAt');
+            const driftSeks =
+                measurements[i].getField('value') -
+                measurements[i + 1].getField('value');
+            const durationDays = durationMS / ms('1 day');
+            const durationHours = (durationMS / ms('1 hour')).toFixed(0);
+            const driftSeksPerDay = (driftSeks / durationDays).toFixed(1);
+            const driftSeksPerDayDisplay =
+                driftSeksPerDay > 0
+                    ? `+${driftSeksPerDay}`
+                    : `${driftSeksPerDay}`;
             measurements[i].setVolatile(
-                'drift',
-                `${diffSekPerDayDisplay} s/d (${durationInHours}h)`
+                'driftDisplay',
+                `${driftSeksPerDayDisplay} s/d (${durationHours}h)`
             );
+            measurements[i].setVolatile('driftMath', {
+                durationDays: durationDays,
+                driftSeks: driftSeks
+            });
         }
-    }
-    static async measurements(watchId, user) {
-        return await prisma.watch.findUnique({
-            where: { id: watchId, user: { name: user } },
-            include: {
-                measurements: {
-                    orderBy: {
-                        createdAt: 'desc'
-                    }
-                },
-                user: { select: { tzOffset: true } }
-            }
+        const onlyMaths = measurements
+            .map((_) => _.getVolatile('driftMath'))
+            .filter((_) => !!_);
+        const overallMeasure = onlyMaths.reduce((akku, m) => {
+            return {
+                durationDays: akku.durationDays + m.durationDays,
+                driftSeks: akku.driftSeks + m.driftSeks
+            };
         });
+        const driftSeksPerDay =
+            overallMeasure.driftSeks / overallMeasure.durationDays;
+        overallMeasure.niceDisplay =
+            driftSeksPerDay > 0
+                ? `${driftSeksPerDay.toFixed(1)} s/d schnell`
+                : `${(-driftSeksPerDay).toFixed(1)} s/d langsam`;
+        overallMeasure.durationDays = overallMeasure.durationDays.toFixed(0);
+        return overallMeasure;
     }
 }
 module.exports = Measurement;

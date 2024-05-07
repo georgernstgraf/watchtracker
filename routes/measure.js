@@ -1,6 +1,7 @@
 const router = require('express').Router(); // new Router
 const { measureBelongsToUser, watchBelongsToUser } = require('../lib/db');
 const Measurement = require('../classes/measurement');
+const Watch = require('../classes/watch');
 router.post('/:id', async (req, res) => {
     // this is a watchId here!!
     const watchId = req.params.id;
@@ -18,13 +19,13 @@ router.post('/:id', async (req, res) => {
         value: 0
     });
     await Measurement.save(m);
-    const watch = await Measurement.measurements(watchId, user);
+    const watch = await Watch.userWatchWithMeasurements(user, watchId);
     if (!watch) {
         return res.status(403).send('This is not your watch');
     }
     res.locals.watch = watch;
     const measureModels = watch.measurements.map((e) => new Measurement(e));
-    Measurement.calculateDrifts(measureModels);
+    res.locals.overallMeasure = Measurement.calculateDrifts(measureModels);
     res.locals.measurements = measureModels.map((e) =>
         e.getDisplayData(watch.user.tzOffset)
     );
@@ -42,13 +43,13 @@ router.delete('/:id', async (req, res) => {
         return res.status(403).send('Not your watch');
     }
     await Measurement.delete(measureId);
-    const watch = await Measurement.measurements(watchId, user);
+    const watch = await Watch.userWatchWithMeasurements(user, watchId);
     if (!watch) {
         return res.status(403).send('This is not your watch');
     }
     res.locals.watch = watch;
     const measureModels = watch.measurements.map((e) => new Measurement(e));
-    Measurement.calculateDrifts(measureModels);
+    res.locals.overallMeasure = Measurement.calculateDrifts(measureModels);
     res.locals.measurements = measureModels.map((e) =>
         e.getDisplayData(watch.user.tzOffset)
     );
@@ -69,10 +70,10 @@ router.patch('/:id', async (req, res, next) => {
         const watchId = measure.getField('watchId');
         measure.patch(req.body);
         await Measurement.save(measure);
-        const watch = await Measurement.measurements(watchId, user);
+        const watch = await Watch.userWatchWithMeasurements(user, watchId);
         res.locals.watch = watch;
         const measureModels = watch.measurements.map((e) => new Measurement(e));
-        Measurement.calculateDrifts(measureModels);
+        res.locals.overallMeasure = Measurement.calculateDrifts(measureModels);
         res.locals.measurements = measureModels.map((e) =>
             e.getDisplayData(watch.user.tzOffset)
         );

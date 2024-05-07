@@ -20,6 +20,9 @@ body {
     align-items: center;
     justify-content: center;
 }
+#github {
+    color: var(--header-h2-color);
+}
 #watchSelect {
     min-width: 5em;
 }
@@ -68,6 +71,9 @@ input {
     background-color: var(--input-color);
     color: var(--background-color);
 }
+select option:checked {
+    background: var(--dirty-color);
+}
 input[type='number'] {
     width: 4em;
 }
@@ -85,7 +91,7 @@ tfoot {
 }
 caption {
     color: var(--header-h2-color);
-    font-size: large;
+    font-size: x-large;
     font-weight: bold;
     margin: 1em 0;
     width: auto;
@@ -100,6 +106,9 @@ tfoot::before {
     /* color: #d33682; */
     color: var(--header-h2-color);
     text-align: left;
+}
+.driftSummary {
+    font-weight: bold;
 }
 p.error {
     color: var(--invalid-color);

@@ -1,9 +1,7 @@
-<%# Needs watch and measurements[] %>
+<%# Needs watch, measurements[] and overallMeasure %>
 <table>
-    <caption colspan="6">Aktuell: <%= watch.name %>
-        <% if (watch.comment) { %>
-        (<%= watch.comment %>)
-        <% } %>
+    <caption colspan="6"><%= watch.name %>
+        <%- include('watchCaption') %>
     </caption>
     <thead>
         <tr>
@@ -42,11 +40,11 @@
                 <% } %>
             </td>
             <td class="sekPerDay">
-                <%= e.drift %>
+                <%= e.driftDisplay %>
             </td>
             <td>
-                <input type="text" name="comment" id="measureComment" <% if (e.comment) { %> value="<%= e.comment %>"
-                    <% } else { %> placeholder="enter comment" <% } %>
+                <input type="text" name="comment" id="measureid_<%= e.id %>" <% if (e.comment) { %>
+                    value="<%= e.comment %>" <% } else { %> placeholder="enter comment" <% } %>
                     hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
                     hx-swap="outerHTML" hx-trigger='keyup[key=="Enter"]'>
             </td>
@@ -55,9 +53,8 @@
     </tbody>
     <tfoot>
         <tr>
-            <td class="sekPerDay" colspan="7"
-                style="text-align: center; color: rgb(211, 54, 130); font-size: larger; font-weight: bold; --darkreader-inline-color: #c67586;"
-                data-darkreader-inline-color="">(Dauer: 1.9 Tage, Drift: 13 Sek =&gt; 6.8 s/d schnell)</td>
+            <td class="driftSummary" colspan="7"> (Dauer: <%= overallMeasure.durationDays %> Tage, Drift:
+                <%= overallMeasure.driftSeks %> Sek=&gt; <%= overallMeasure.niceDisplay %>)</td>
         </tr>
     </tfoot>
 </table>
