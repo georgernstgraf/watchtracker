@@ -108,6 +108,28 @@ class Measurement extends dbEntity {
     static async delete(id) {
         return await prisma.measurement.delete({ where: { id: id } });
     }
+    static async lastForUserName(userName) {
+        return this.instances(
+            await prisma.measurement.findMany({
+                where: {
+                    watch: {
+                        lastUser: { name: userName }
+                    }
+                }
+            })
+        );
+    }
+    static instances(rawMeasurements) {
+        if (!rawMeasurements) return;
+        return rawMeasurements.map((m) => new Measurement(m));
+    }
+    static overallMeasureWithCalcDrift(measureModels) {
+        return Measurement.calculateDrifts(measureModels);
+    }
+    static getDisplayDatas(measureModels) {
+        return measureModels.map((e) => e.getDisplayData(watch.user.tzOffset));
+    }
+
     static calculateDrifts(measurements) {
         if (measurements.length == 0) return;
         // das letzte ist das älteste kleinste (sort desc) und immer START

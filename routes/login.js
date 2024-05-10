@@ -1,6 +1,7 @@
 const router = require('express').Router();
-const session = require('../lib/session');
-const { userWatches } = require('../lib/db');
+const Watch = require('../classes/watch');
+const Measurement = require('../classes/measurement');
+const User = require('../classes/user');
 // this gets the login form req.body.passwd, req.body.user
 // renders the index page on success
 router.post('/', async (req, res) => {
@@ -11,31 +12,39 @@ router.post('/', async (req, res) => {
     if (!req.body.passwd || req.body.passwd.trim() === '') {
         errors.push('Password is required');
     }
-    if (errors.length === 0) {
-        try {
-            const authResp = await fetch(process.env.AUTH_API_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    user: req.body.user,
-                    passwd: req.body.passwd
-                }),
-                headers: { 'Content-Type': 'application/json' }
-            });
-            const authJson = await authResp.json();
-            // auth (bool) und user (string)
-            if (authJson.auth) {
-                req.session.user = authJson.user;
-                res.locals.user = authJson.user;
-                res.locals.userWatches = await userWatches(res.locals.user);
-                return res.render('body');
-            }
-            errors.push('invalid credentials');
-        } catch (err) {
-            errors.push(`login failed: ${err.message}`);
-        }
+    if (errors.length !== 0) {
         return res.render('login');
     }
-    // Unterscheidungen:
-    return res.render('index');
+    const user = req.body.user;
+    const passwd = req.body.passwd;
+    try {
+        const authResp = await fetch(process.env.AUTH_API_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                user: user,
+                passwd: passwd
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        // auth (bool) und user (string)
+        if (!(await authResp.json()).auth) {
+            throw new Error('invalid credentials');
+        }
+    } catch (err) {
+        errors.push(`login failed: ${err.message}`);
+        return res.render('login');
+    }
+    req.session.user = user;
+    res.locals.user = user;
+    res.locals.userWatches = await Watch.userWatches(user);
+    const measureModels = await Measurement.lastForUserName(user); // dbEntities
+    if (measureModels) {
+        res.locals.overallMeasure = Measurement.calculateDrifts(measureModels);
+        const tzOffset = await User.tzOffsetForName(user);
+        res.locals.measurements = measureModels.map((e) =>
+            e.getDisplayData(tzOffset)
+        );
+    }
+    return res.render('body');
 });
 module.exports = router;

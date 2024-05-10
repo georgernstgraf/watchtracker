@@ -1,6 +1,8 @@
 const router = require('express').Router();
 const Measurement = require('../classes/measurement');
 const Watch = require('../classes/watch');
+const User = require('../classes/user');
+// This route renders the measurements table incl. headings
 router.get('/:id', async (req, res) => {
     const user = req.session.user;
     if (!user) {
@@ -11,6 +13,7 @@ router.get('/:id', async (req, res) => {
     if (!watch) {
         return res.status(403).send('This is not your watch');
     }
+    await User.setLastWatchIdForUserId(watch.id, watch.user.id);
     res.locals.watch = watch;
     const measureModels = watch.measurements.map((e) => new Measurement(e));
     res.locals.overallMeasure = Measurement.calculateDrifts(measureModels);
