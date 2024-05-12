@@ -2,6 +2,9 @@ const router = require('express').Router();
 const Measurement = require('../classes/measurement');
 const Watch = require('../classes/watch');
 const User = require('../classes/user');
+const {
+    UNABLE_TO_FIND_POSTINSTALL_TRIGGER_JSON_SCHEMA_ERROR
+} = require('@prisma/client/scripts/postinstall.js');
 // This route renders the measurements table incl. headings
 router.get('/:id', async (req, res) => {
     const user = req.session.user;
@@ -11,15 +14,10 @@ router.get('/:id', async (req, res) => {
     res.locals.user = user;
     const watch = await Watch.userWatchWithMeasurements(user, req.params.id);
     if (!watch) {
-        return res.status(403).send('This is not your watch');
+        return res.status(403).send('Wrong Watch ID');
     }
     await User.setLastWatchIdForUserId(watch.id, watch.user.id);
     res.locals.watch = watch;
-    const measureModels = watch.measurements.map((e) => new Measurement(e));
-    res.locals.overallMeasure = Measurement.calculateDrifts(measureModels);
-    res.locals.measurements = measureModels.map((e) =>
-        e.getDisplayData(watch.user.tzOffset)
-    );
     return res.render('measurements');
 });
 router.patch('/:id', async (req, res) => {

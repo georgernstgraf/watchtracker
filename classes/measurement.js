@@ -1,58 +1,60 @@
-const { prisma } = require('../lib/db');
+const prisma = require('../lib/db');
 const ms = require('ms');
 const dbEntity = require('./dbEntity');
 class Measurement extends dbEntity {
-    #volatilesNoPersist;
     constructor(data) {
         super(data);
-        this.#volatilesNoPersist = {};
         if (data.isStart) {
-            this.#volatilesNoPersist['drift'] = 'start';
+            this['drift'] = 'start';
         }
+        return new Proxy(this, {
+            set: function (target, property, value) {
+                // TODO move common code to dbEntity
+                if (['id', 'watchId'].includes(property)) {
+                    throw new Error(
+                        `unknown or forbidden field in Measurement: ${property}`
+                    );
+                }
+                switch (property) {
+                    case 'isStart':
+                        value = JSON.parse(value);
+                        break;
+                    case 'value':
+                        value = Number.parseInt(value);
+                        break;
+                    case 'createdAt':
+                        value = new Date(value);
+                        break;
+                }
+                target[property] = value;
+                if (property == 'isStart' && value) {
+                    target['drift'] = 'start';
+                }
+                return true;
+            },
+            get: function (target, property) {
+                if (typeof target[property] === 'function') {
+                    return target[property].bind(target);
+                }
+                if (property.startsWith('_')) {
+                    return target[property];
+                }
+                if (property in target._updates) {
+                    return target._updates[property];
+                }
+                if (property in target._data) {
+                    return target._data[property];
+                }
+                return undefined;
+            }
+        });
     }
     //@override
-    updateField(field, value) {
-        if (!this.keys.has(field) || ['id', 'watchId'].includes(field)) {
-            throw new Error(
-                `unknown or forbidden field in Measurement: ${field}`
-            );
-        }
-        switch (field) {
-            case 'isStart':
-                value = JSON.parse(value);
-                break;
-            case 'value':
-                value = Number.parseInt(value);
-                break;
-            case 'createdAt':
-                value = new Date(value);
-                break;
-        }
-        this.updates[field] = value;
-        if (field == 'isStart' && value) {
-            this.#volatilesNoPersist['drift'] = 'start';
-        }
-    }
 
-    setVolatile(field, value) {
-        this.#volatilesNoPersist[field] = value;
-    }
-    getVolatile(field) {
-        return this.#volatilesNoPersist[field];
-    }
-
-    getDisplayData(tzOffssetMinutes = 0) {
-        // TODO configure this per-user
-        const data = this.getUpdatedData();
-        Object.keys(this.#volatilesNoPersist).forEach(
-            (k) => (data[k] = this.#volatilesNoPersist[k])
+    setDisplayData(tzOffssetMinutes = 0) {
+        this.createdAt.setMinutes(
+            this.createdAt.getMinutes() + tzOffssetMinutes
         );
-        if (data.createdAt) {
-            data.createdAt.setMinutes(
-                data.createdAt.getMinutes() + tzOffssetMinutes
-            );
-        }
-        return data;
     }
 
     static async save(measure) {
@@ -126,25 +128,19 @@ class Measurement extends dbEntity {
     static overallMeasureWithCalcDrift(measureModels) {
         return Measurement.calculateDrifts(measureModels);
     }
-    static getDisplayDatas(measureModels) {
-        return measureModels.map((e) => e.getDisplayData(watch.user.tzOffset));
-    }
-
     static calculateDrifts(measurements) {
         if (measurements.length == 0) return;
         // das letzte ist das älteste kleinste (sort desc) und immer START
-        measurements.at(-1).updateField('isStart', true);
+        measurements.at(-1)['isStart'] = true;
         for (let i = measurements.length - 2; i >= 0; i--) {
             // compare with predecessors
-            if (measurements[i].getField('isStart')) {
+            if (measurements[i]['isStart']) {
                 continue;
             }
             const durationMS =
-                measurements[i].getField('createdAt') -
-                measurements[i + 1].getField('createdAt');
+                measurements[i]['createdAt'] - measurements[i + 1]['createdAt'];
             const driftSeks =
-                measurements[i].getField('value') -
-                measurements[i + 1].getField('value');
+                measurements[i]['value'] - measurements[i + 1]['value'];
             const durationDays = durationMS / ms('1 day');
             const durationHours = (durationMS / ms('1 hour')).toFixed(0);
             const driftSeksPerDay = (driftSeks / durationDays).toFixed(1);
@@ -152,17 +148,15 @@ class Measurement extends dbEntity {
                 driftSeksPerDay > 0
                     ? `+${driftSeksPerDay}`
                     : `${driftSeksPerDay}`;
-            measurements[i].setVolatile(
-                'driftDisplay',
-                `${driftSeksPerDayDisplay} s/d (${durationHours}h)`
-            );
-            measurements[i].setVolatile('driftMath', {
+            measurements[i]['driftDisplay'] =
+                `${driftSeksPerDayDisplay} s/d (${durationHours}h)`;
+            measurements[i]['driftMath'] = {
                 durationDays: durationDays,
                 driftSeks: driftSeks
-            });
+            };
         }
         const onlyMaths = measurements
-            .map((_) => _.getVolatile('driftMath'))
+            .map((_) => _['driftMath'])
             .filter((_) => !!_);
         const overallMeasure = onlyMaths.reduce((akku, m) => {
             return {
@@ -173,7 +167,7 @@ class Measurement extends dbEntity {
         const driftSeksPerDay =
             overallMeasure.driftSeks / overallMeasure.durationDays;
         overallMeasure.niceDisplay =
-            driftSeksPerDay > 0
+            driftSeksPerDay >= 0
                 ? `${driftSeksPerDay.toFixed(1)} s/d schnell`
                 : `${(-driftSeksPerDay).toFixed(1)} s/d langsam`;
         overallMeasure.durationDays = overallMeasure.durationDays.toFixed(0);

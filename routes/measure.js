@@ -11,7 +11,7 @@ router.post('/:id', async (req, res) => {
     }
     res.locals.user = user;
     if (!(await watchBelongsToUser(watchId, user))) {
-        return res.status(403).send('Not your watch');
+        return res.status(403).send('Wrong Watch ID');
     }
     const m = new Measurement({
         watchId: watchId,
@@ -20,15 +20,10 @@ router.post('/:id', async (req, res) => {
     });
     await Measurement.save(m);
     const watch = await Watch.userWatchWithMeasurements(user, watchId);
-    if (!watch) {
-        return res.status(403).send('This is not your watch');
-    }
+    /* if (!watch) {
+        return res.status(403).send('Wrong Watch ID');
+    } */
     res.locals.watch = watch;
-    const measureModels = watch.measurements.map((e) => new Measurement(e));
-    res.locals.overallMeasure = Measurement.calculateDrifts(measureModels);
-    res.locals.measurements = measureModels.map((e) =>
-        e.getDisplayData(watch.user.tzOffset)
-    );
     return res.render('measurements');
 });
 router.delete('/:id', async (req, res) => {
@@ -40,7 +35,7 @@ router.delete('/:id', async (req, res) => {
     res.locals.user = user;
     const watchId = await Measurement.watchIdForMeasureOfUser(measureId, user);
     if (!watchId) {
-        return res.status(403).send('Not your watch');
+        return res.status(403).send('Wrong Watch ID');
     }
     await Measurement.delete(measureId);
     const watch = await Watch.userWatchWithMeasurements(user, watchId);
@@ -48,11 +43,6 @@ router.delete('/:id', async (req, res) => {
         return res.status(403).send('This is not your watch');
     }
     res.locals.watch = watch;
-    const measureModels = watch.measurements.map((e) => new Measurement(e));
-    res.locals.overallMeasure = Measurement.calculateDrifts(measureModels);
-    res.locals.measurements = measureModels.map((e) =>
-        e.getDisplayData(watch.user.tzOffset)
-    );
     return res.render('measurements');
 });
 router.patch('/:id', async (req, res, next) => {
@@ -65,18 +55,12 @@ router.patch('/:id', async (req, res, next) => {
         res.locals.user = user;
         const measure = await Measurement.getUserMeasurement(user, measureId);
         if (!measure) {
-            return res.status(403).send('Not your watch');
+            return res.status(403).send('Wrong Watch ID');
         }
-        const watchId = measure.getField('watchId');
+        const watchId = measure['watchId'];
         measure.patch(req.body);
         await Measurement.save(measure);
         const watch = await Watch.userWatchWithMeasurements(user, watchId);
-        res.locals.watch = watch;
-        const measureModels = watch.measurements.map((e) => new Measurement(e));
-        res.locals.overallMeasure = Measurement.calculateDrifts(measureModels);
-        res.locals.measurements = measureModels.map((e) =>
-            e.getDisplayData(watch.user.tzOffset)
-        );
         return res.render('measurements');
     } catch (err) {
         next(err);

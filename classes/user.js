@@ -1,4 +1,4 @@
-const { prisma } = require('../lib/db');
+const prisma = require('../lib/db');
 const dbEntity = require('./dbEntity');
 class User extends dbEntity {
     static async setLastWatchIdForUserId(watchId, userId) {

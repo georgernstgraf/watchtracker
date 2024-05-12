@@ -18,9 +18,9 @@ model User {
 model Watch {
     id           String        @id @default(cuid())
     name         String
-    user         User          @relation("userWatches", fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    user         User          @relation("userWatches", fields: [userId], references: [id], onDelete: Cascade)
     userId       String
-    lastUser     User?         @relation("lastWatch", fields: [lastUserId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+    lastUser     User?         @relation("lastWatch", fields: [lastUserId], references: [id], onDelete: Cascade)
     lastUserId   String?       @unique
     measurements Measurement[]
     comment      String?

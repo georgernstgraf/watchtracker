@@ -4,10 +4,8 @@
 
     <%- include('userwatches') %>
     <div id="measurements"></div>
-    <!--
-        <div id="add-and-delete">
-            <button id="addWatch">Add new</button>
-        </div>
-        -->
+    <% if (typeof watch !== 'undefined' && watch != null) { %>
+    <%- include('measurements') %>
+    <% } %>
     <a id="github" href="https://github.com/georgernstgraf/watchtracker/issues">Create an Issue on Github</a>
     </body>

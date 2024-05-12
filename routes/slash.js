@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { userWatches } = require('../lib/db');
+const { userWatches } = require('../classes/watch');
 router.get('/', async (req, res) => {
     const user = req.session.user;
     const full = req.headers['hx-request'] ? '' : '-full';

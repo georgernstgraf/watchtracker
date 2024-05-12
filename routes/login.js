@@ -34,17 +34,13 @@ router.post('/', async (req, res) => {
         errors.push(`login failed: ${err.message}`);
         return res.render('login');
     }
-    req.session.user = user;
-    res.locals.user = user;
-    res.locals.userWatches = await Watch.userWatches(user);
-    const measureModels = await Measurement.lastForUserName(user); // dbEntities
-    if (measureModels) {
-        res.locals.overallMeasure = Measurement.calculateDrifts(measureModels);
-        const tzOffset = await User.tzOffsetForName(user);
-        res.locals.measurements = measureModels.map((e) =>
-            e.getDisplayData(tzOffset)
-        );
-    }
-    return res.render('body');
+    req.session.user = user; // register the session here
+    const userWatches = await Watch.userWatches(user);
+    const watch = await Watch.userWatchWithMeasurements(user);
+    return res.render('body', {
+        user: user,
+        userWatches: userWatches,
+        watch: watch
+    });
 });
 module.exports = router;
