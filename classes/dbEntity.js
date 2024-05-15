@@ -1,54 +1,76 @@
 class dbEntity {
-    _data;
-    _updates;
-    constructor(data) {
-        this._data = data;
-        this._keys = new Set(Object.keys(this._data));
+    constructor(data, prismaModel) {
+        if ((!data) instanceof Object)
+            throw new TypeError('data must be Object');
+        this._constrData = data;
+        this._isDirty = !('id' in data);
         this._updates = {};
-        this._volatilesDisplay = {};
+        this._extra = {};
+        const modelActions = new Set(Object.keys(prismaModel));
+        if (
+            !['create', 'findMany', 'update', 'delete'].every((x) =>
+                modelActions.has(x)
+            )
+        )
+            throw new TypeError('prismaModel must be supplied');
+        this._prismaModel = prismaModel;
+        this._dbFields = new Set(Object.keys(prismaModel.fields));
         return new Proxy(this, {
-            get: function (target, property) {
-                if (typeof target[property] === 'function') {
-                    return target[property].bind(target);
-                }
-                if (property.startsWith('_')) {
-                    return target[property];
-                }
-                if (property in target._updates) {
+            get: (target, property) => {
+                if (property in target._extra) return target._extra[property];
+                if (property in target._updates)
                     return target._updates[property];
-                }
-                if (property in target._data) {
-                    return target._data[property];
-                }
-                return undefined;
+                if (property in target._constrData)
+                    return target._constrData[property];
+                return Reflect.get(target, property);
             },
             set: function (target, property, value) {
-                target._updates[property] = value;
-                return true;
+                if (property.startsWith('_'))
+                    return Reflect.set(target, property, value);
+                if (property === 'id')
+                    throw new Error(`unwilling to set a new ${property}`);
+                if (target._constrData[property] === value) return true; // nothing changed
+                let success = true;
+                if (target._dbFields.has(property)) {
+                    success &&= Reflect.set(target._updates, property, value);
+                    target._isDirty = true;
+                } else {
+                    success &&= Reflect.set(target._extra, property, value);
+                }
+                return success;
             }
         });
     }
     patch(data) {
-        for (let key in data) {
-            this[key] = data;
-        }
+        Object.keys(data).forEach((k) => (this[k] = data[k]));
     }
     updateAfterSave(data) {
-        this._data = data;
+        this._constrData = data;
         this._updates = {};
     }
     getOnlyUpdatedData() {
-        // look in #updates whether the same key in #data has a different _value_
-        // return the object with the updates
-        return Object.keys(this._updates).reduce((changes, key) => {
-            if (this._updates[key] !== this._data[key]) {
-                changes[key] = this._updates[key];
-            }
-            return changes;
-        }, {});
+        return this._updates;
     }
-    getUpdatedData() {
-        const data = { ...this._data };
+    async save() {
+        if (!this.isDirty()) return;
+        if (this.id) {
+            this.updateAfterSave(
+                await this._prismaModel.update({
+                    where: { id: this.id },
+                    data: this.getOnlyUpdatedData()
+                })
+            );
+        } else {
+            this.updateAfterSave(
+                await this._prismaModel.create({
+                    data: this.getCurrentData()
+                })
+            );
+        }
+    }
+
+    getCurrentData() {
+        const data = { ...this._constrData };
         const updated = this.getOnlyUpdatedData();
         Object.keys(updated).forEach((k) => {
             data[k] = updated[k];
@@ -56,9 +78,7 @@ class dbEntity {
         return data;
     }
     isDirty() {
-        return (
-            Object.keys(this.getUpdatedData()).length > 0 || !this._data['id']
-        );
+        return this._isDirty;
     }
     toString() {
         console.log(JSON.stringify(this, null, 3));

@@ -1,7 +1,7 @@
 :root {
     --background-color: #002b36; /* darkblue, backgroundColor */
     --dirty-color: #ff9055; /* orange, dirtycolor */
-    --header-h2-color: #c6004a; /* magenta, headerColorMagenta */
+    --header-h2-color: #d8437a; /* magenta, headerColorMagenta */
     --header-h1-color: #859900; /* green, headerColorGreen*/
     --input-color: #f3d283; /* yellow, inputColor */
     --invalid-color: #ff5555; /* red, invalidColor */

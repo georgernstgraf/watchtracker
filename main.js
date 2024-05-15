@@ -24,7 +24,9 @@ module.exports = function main(options, cb) {
     function unhandledError(err) {
         // Log the errors
         console.error(err);
-        // Only clean up once
+        /* console.error('NOT RESTARTING!');
+        return;
+         */ // Only clean up once
         if (serverClosing) {
             return;
         }
@@ -63,6 +65,7 @@ module.exports = function main(options, cb) {
         if (err.status >= 500) {
             console.error(err);
         }
+        console.error(`fiveHundred activated: ${err}`);
         res.locals.error = err;
         res.status(err.status || 500).send(err.message);
     });

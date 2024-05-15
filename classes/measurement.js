@@ -3,18 +3,12 @@ const ms = require('ms');
 const dbEntity = require('./dbEntity');
 class Measurement extends dbEntity {
     constructor(data) {
-        super(data);
+        super(data, prisma.measurement);
         if (data.isStart) {
             this['drift'] = 'start';
         }
         return new Proxy(this, {
             set: function (target, property, value) {
-                // TODO move common code to dbEntity
-                if (['id', 'watchId'].includes(property)) {
-                    throw new Error(
-                        `unknown or forbidden field in Measurement: ${property}`
-                    );
-                }
                 switch (property) {
                     case 'isStart':
                         value = JSON.parse(value);
@@ -26,26 +20,12 @@ class Measurement extends dbEntity {
                         value = new Date(value);
                         break;
                 }
-                target[property] = value;
+                let success = true;
+                success &&= Reflect.set(target, property, value);
                 if (property == 'isStart' && value) {
-                    target['drift'] = 'start';
+                    success &&= Reflect.set(target, 'drift', 'start');
                 }
-                return true;
-            },
-            get: function (target, property) {
-                if (typeof target[property] === 'function') {
-                    return target[property].bind(target);
-                }
-                if (property.startsWith('_')) {
-                    return target[property];
-                }
-                if (property in target._updates) {
-                    return target._updates[property];
-                }
-                if (property in target._data) {
-                    return target._data[property];
-                }
-                return undefined;
+                return success;
             }
         });
     }
@@ -57,26 +37,6 @@ class Measurement extends dbEntity {
         );
     }
 
-    static async save(measure) {
-        if (!measure.isDirty()) {
-            console.info(`save measurement: not dirty`);
-            return;
-        }
-        if (measure.data.id) {
-            measure.updateAfterSave(
-                await prisma.measurement.update({
-                    where: { id: measure.data.id },
-                    data: measure.getOnlyUpdatedData()
-                })
-            );
-        } else {
-            measure.updateAfterSave(
-                await prisma.measurement.create({
-                    data: measure.getUpdatedData()
-                })
-            );
-        }
-    }
     static async watchIdForMeasureOfUser(measureId, user) {
         const data = await prisma.measurement.findUnique({
             where: { id: measureId },
@@ -132,9 +92,11 @@ class Measurement extends dbEntity {
         if (measurements.length == 0) return;
         // das letzte ist das älteste kleinste (sort desc) und immer START
         measurements.at(-1)['isStart'] = true;
+        measurements.at(-1)['driftDisplay'] = 'n/a';
         for (let i = measurements.length - 2; i >= 0; i--) {
             // compare with predecessors
             if (measurements[i]['isStart']) {
+                measurements[i]['driftDisplay'] = 'n/a';
                 continue;
             }
             const durationMS =
@@ -158,12 +120,15 @@ class Measurement extends dbEntity {
         const onlyMaths = measurements
             .map((_) => _['driftMath'])
             .filter((_) => !!_);
-        const overallMeasure = onlyMaths.reduce((akku, m) => {
-            return {
-                durationDays: akku.durationDays + m.durationDays,
-                driftSeks: akku.driftSeks + m.driftSeks
-            };
-        });
+        const overallMeasure = onlyMaths.reduce(
+            (akku, m) => {
+                return {
+                    durationDays: akku.durationDays + m.durationDays,
+                    driftSeks: akku.driftSeks + m.driftSeks
+                };
+            },
+            { durationDays: 0, driftSeks: 0 }
+        );
         const driftSeksPerDay =
             overallMeasure.driftSeks / overallMeasure.durationDays;
         overallMeasure.niceDisplay =

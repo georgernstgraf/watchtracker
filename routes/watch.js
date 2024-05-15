@@ -31,7 +31,7 @@ router.patch('/:id', async (req, res) => {
         return res.status(403).send('This is not your watch');
     }
     watch.patch(req.body);
-    await Watch.save(watch);
+    await watch.save();
 
     res.locals.watch = watch;
     return res.render('watchCaption');

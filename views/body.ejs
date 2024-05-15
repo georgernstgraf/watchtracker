@@ -3,9 +3,10 @@
     <h1>Watchtracker</h1>
 
     <%- include('userwatches') %>
-    <div id="measurements"></div>
-    <% if (typeof watch !== 'undefined' && watch != null) { %>
-    <%- include('measurements') %>
-    <% } %>
+    <div id="measurements">
+        <% if (typeof watch !== 'undefined' && watch != null) { %>
+        <%- include('measurements') %>
+        <% } %>
+    </div>
     <a id="github" href="https://github.com/georgernstgraf/watchtracker/issues">Create an Issue on Github</a>
     </body>

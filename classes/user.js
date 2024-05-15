@@ -1,6 +1,9 @@
 const prisma = require('../lib/db');
 const dbEntity = require('./dbEntity');
 class User extends dbEntity {
+    constructor(data) {
+        super(data, prisma.user);
+    }
     static async setLastWatchIdForUserId(watchId, userId) {
         await prisma.user.update({
             where: {

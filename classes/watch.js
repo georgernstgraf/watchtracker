@@ -2,6 +2,9 @@ const prisma = require('../lib/db');
 const dbEntity = require('./dbEntity');
 const Measurement = require('./measurement');
 class Watch extends dbEntity {
+    constructor(data) {
+        super(data, prisma.watch);
+    }
     static async userWatchWithMeasurements(userName, watchId) {
         let whereClause;
         if (watchId) {

@@ -18,7 +18,7 @@ router.post('/:id', async (req, res) => {
         isStart: true,
         value: 0
     });
-    await Measurement.save(m);
+    await m.save();
     const watch = await Watch.userWatchWithMeasurements(user, watchId);
     /* if (!watch) {
         return res.status(403).send('Wrong Watch ID');
@@ -59,9 +59,9 @@ router.patch('/:id', async (req, res, next) => {
         }
         const watchId = measure['watchId'];
         measure.patch(req.body);
-        await Measurement.save(measure);
+        await measure.save();
         const watch = await Watch.userWatchWithMeasurements(user, watchId);
-        return res.render('measurements');
+        return res.render('measurements', { watch });
     } catch (err) {
         next(err);
     }
