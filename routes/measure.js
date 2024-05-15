@@ -1,5 +1,4 @@
 const router = require('express').Router(); // new Router
-const { measureBelongsToUser, watchBelongsToUser } = require('../lib/db');
 const Measurement = require('../classes/measurement');
 const Watch = require('../classes/watch');
 router.post('/:id', async (req, res) => {
@@ -10,7 +9,7 @@ router.post('/:id', async (req, res) => {
         return res.status(401).send('Not Authenticated');
     }
     res.locals.user = user;
-    if (!(await watchBelongsToUser(watchId, user))) {
+    if (!(await Watch.belongsToUser(watchId, user))) {
         return res.status(403).send('Wrong Watch ID');
     }
     const m = new Measurement({

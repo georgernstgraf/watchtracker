@@ -104,14 +104,18 @@ class Measurement extends dbEntity {
             const driftSeks =
                 measurements[i]['value'] - measurements[i + 1]['value'];
             const durationDays = durationMS / ms('1 day');
-            const durationHours = (durationMS / ms('1 hour')).toFixed(0);
+            const durationHours = Math.round(durationMS / ms('1 hour'));
+            const durationDisplay =
+                durationHours < 100
+                    ? `${durationHours}h`
+                    : `${Math.round(durationHours / 24)}d`;
             const driftSeksPerDay = (driftSeks / durationDays).toFixed(1);
             const driftSeksPerDayDisplay =
                 driftSeksPerDay > 0
                     ? `+${driftSeksPerDay}`
                     : `${driftSeksPerDay}`;
             measurements[i]['driftDisplay'] =
-                `${driftSeksPerDayDisplay} s/d (${durationHours}h)`;
+                `<strong>${driftSeksPerDayDisplay} s/d</strong> (${durationDisplay})`;
             measurements[i]['driftMath'] = {
                 durationDays: durationDays,
                 driftSeks: driftSeks

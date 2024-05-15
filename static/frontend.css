@@ -1,7 +1,7 @@
 :root {
     --background-color: #002b36; /* darkblue, backgroundColor */
     --dirty-color: #ff9055; /* orange, dirtycolor */
-    --header-h2-color: #d8437a; /* magenta, headerColorMagenta */
+    --header-h2-color: #ff84b1; /* magenta, headerColorMagenta */
     --header-h1-color: #859900; /* green, headerColorGreen*/
     --input-color: #f3d283; /* yellow, inputColor */
     --invalid-color: #ff5555; /* red, invalidColor */
@@ -72,7 +72,7 @@ input {
     color: var(--background-color);
 }
 select option:checked {
-    background: var(--dirty-color);
+    background: var(--header-h2-color);
 }
 input[type='number'] {
     width: 4em;

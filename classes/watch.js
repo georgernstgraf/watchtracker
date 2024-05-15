@@ -48,7 +48,7 @@ class Watch extends dbEntity {
             })
         )?.map((w) => new Watch(w));
     }
-    static async watchBelongsToUser(watchId, userName) {
+    static async belongsToUser(watchId, userName) {
         const ownedIds = (
             await prisma.watch.findMany({
                 where: { user: { name: userName } },
