@@ -1,10 +1,6 @@
 const router = require('express').Router();
-const Measurement = require('../classes/measurement');
 const Watch = require('../classes/watch');
 const User = require('../classes/user');
-const {
-    UNABLE_TO_FIND_POSTINSTALL_TRIGGER_JSON_SCHEMA_ERROR
-} = require('@prisma/client/scripts/postinstall.js');
 // This route renders the measurements table incl. headings
 router.get('/:id', async (req, res) => {
     const user = req.session.user;

@@ -1,12 +1,11 @@
 'use strict';
 const express = require('express');
-const { session } = require('./lib/session');
+const session = require('./lib/session');
 const httpErrors = require('http-errors'); // middleware for error handlers
 const path = require('path');
 const ejs = require('ejs');
 const expressStaticGzip = require('express-static-gzip');
 const bodyParser = require('body-parser');
-
 module.exports = function main(options, cb) {
     // Set default options
     const ready = cb || function () {};
@@ -26,7 +25,7 @@ module.exports = function main(options, cb) {
         console.error(err);
         /* console.error('NOT RESTARTING!');
         return;
-         */ // Only clean up once
+        */ // Only clean up once
         if (serverClosing) {
             return;
         }
@@ -65,7 +64,7 @@ module.exports = function main(options, cb) {
         if (err.status >= 500) {
             console.error(err);
         }
-        console.error(`fiveHundred activated: ${err}`);
+        console.error(`fiveHundred activated: ${err} (${err.status})`);
         res.locals.error = err;
         res.status(err.status || 500).send(err.message);
     });

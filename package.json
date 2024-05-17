@@ -26,8 +26,9 @@
     },
     "homepage": "https://github.com/georgernstgraf/Uhrentracker#readme",
     "dependencies": {
-        "@prisma/client": "^5.13.0",
+        "@prisma/client": "^5.14.0",
         "connect-flash": "^0.1.1",
+        "connect-memcached": "^2.0.0",
         "cookie-parser": "^1.4.6",
         "cors": "^2.8.5",
         "dotenv": "^16.4.5",
@@ -51,7 +52,7 @@
         "@faker-js/faker": "^8.4.1",
         "prettier": "^3.2.5",
         "prettier-plugin-ejs": "^1.0.3",
-        "prisma": "^5.13.0",
+        "prisma": "^5.14.0",
         "tailwindcss": "^3.4.1"
     },
     "prisma": {
