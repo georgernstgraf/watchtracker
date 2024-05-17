@@ -1,0 +1,31 @@
+<caption colspan="6">
+    <% if (typeof edit == 'undefined') { %>
+    <!-- Normal Display -->
+    <button title="Add a new Watch to track" hx-get="<%= process.env.APP_PATH %>/caption/"
+        hx-target="closest table">＋</button>
+    <%= watch.name %>
+    <% if (watch.comment && watch.comment.length > 0) { %>
+    <p class="smaller">
+        (<%= watch.comment %>)
+    </p>
+    <% } %>
+    <button title="Edit Name and Comment" class="startStop" hx-get="<%= process.env.APP_PATH %>/caption/<%= watch.id %>"
+        hx-target="closest caption" hx-swap="outerHTML">✏️</button>
+    <% } else { %>
+    <!-- edit -->
+    <% if (typeof watch != 'undefined') { %>
+    <form hx-patch="<%= process.env.APP_PATH %>/watch/<%= watch.id %>" hx-trigger='keyup[key=="Enter"]'
+        hx-target="#allButHeadAndFoot" hx-swap="outerHTML">
+        <input type="text" name="name" value="<%= watch.name %>">
+        <input type="text" name="comment" <% if (watch.comment) { %> value="<%= watch.comment %>" <% } else { %>
+            placeholder="enter comment" <% } %>>
+    </form>
+    <% } else { %>
+    <form hx-post="<%= process.env.APP_PATH %>/watch/" hx-trigger='keyup[key=="Enter"]' hx-target="#allButHeadAndFoot"
+        hx-swap="outerHTML">
+        <input type="text" name="name" value="" placeholder="enter Name">
+        <input type="text" name="comment" value="" placeholder="enter Comment">
+    </form>
+    <% } %>
+    <% } %>
+</caption>

@@ -2,26 +2,25 @@
 <% let measurements = watch.measurements %>
 <% let overallMeasure = watch.overallMeasure %>
 <table>
-    <caption colspan="6"><%= watch.name %>
-        <%- include('watchCaption') %>
-    </caption>
+    <%- include('caption') %>
     <thead>
         <tr>
-            <th scope="rowgroup" style="width: 5%;"><button
+            <th scope="rowgroup"><button title="new record"
                     hx-post="<%= process.env.APP_PATH %>/measure/<%= watch.id %>" hx-target="closest table">＋</button>
             </th>
-            <th scope="col" style="width: 30%;">Messzeitpunkt</th>
-            <th scope="col" style="width: 10%;">Abweichung</th>
-            <th scope="col" style="width: 10%;">Typ</th>
-            <th scope="col" style="width: 15em; text-align: center;">Drift</th>
+            <th scope="col">Entry Date</th>
+            <th scope="col">Deviation</th>
+            <th scope="col">Type</th>
+            <th scope="col">Drift</th>
+            <th scope="col">Comment</th>
         </tr>
     </thead>
     <tbody>
         <% measurements.forEach(e=> { %>
         <tr data-id="<%= e.id %>">
             <th scope="row">
-                <button hx-delete="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
-                    hx-swap="outerHTML">－</button>
+                <button title="delete" hx-delete="<%= process.env.APP_PATH %>/measure/<%= e.id %>"
+                    hx-target="closest table" hx-swap="outerHTML">－</button>
             </th>
             <td>
                 <input type="datetime-local" name="createdAt" value="<%= e.createdAt.toISOString().substring(0, 16) %>"
@@ -31,7 +30,7 @@
             <td>
                 <input type="number" name="value" value="<%= e.value %>"
                     hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
-                    hx-swap="outerHTML" hx-trigger="input changed delay:500ms">
+                    hx-swap="outerHTML" hx-trigger='keyup[key=="Enter"]'>
             </td>
             <td hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-vals='{"isStart": <%= !e.isStart %>}'
                 hx-target="closest table" hx-swap="outerHTML">
@@ -55,8 +54,12 @@
     </tbody>
     <tfoot>
         <tr>
-            <td class="driftSummary" colspan="7"> (Dauer: <%= overallMeasure.durationDays %> Tage, Drift:
-                <%= overallMeasure.driftSeks %> Sek=&gt; <%= overallMeasure.niceDisplay %>)</td>
+            <% if (typeof overallMeasure != 'undefined') { %>
+            <td class="driftSummary" colspan="7"> (Duration: <%= overallMeasure.durationDays %> Days, Drift:
+                <%= overallMeasure.driftSeks %> Sec=&gt; <%= overallMeasure.niceDisplay %>)</td>
+            <% } else { %>
+            <td class="driftSummary" colspan="7">No records yet</td>
+            <% } %>
         </tr>
     </tfoot>
 </table>

@@ -14,7 +14,13 @@ class dbEntity {
         )
             throw new TypeError('prismaModel must be supplied');
         this._prismaModel = prismaModel;
-        this._dbFields = new Set(Object.keys(prismaModel.fields));
+        this._dbFields = new Set();
+        Object.keys(prismaModel.fields).forEach((key) => {
+            this._dbFields.add(key);
+            if (key.endsWith('Id')) {
+                this._dbFields.add(key.slice(0, key.length - 2));
+            }
+        });
         return new Proxy(this, {
             get: (target, property) => {
                 if (property in target._extra) return target._extra[property];

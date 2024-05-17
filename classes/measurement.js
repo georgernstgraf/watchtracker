@@ -15,6 +15,9 @@ class Measurement extends dbEntity {
                         break;
                     case 'value':
                         value = Number.parseInt(value);
+                        if (isNaN(value)) {
+                            return false;
+                        }
                         break;
                     case 'createdAt':
                         value = new Date(value);
@@ -137,8 +140,8 @@ class Measurement extends dbEntity {
             overallMeasure.driftSeks / overallMeasure.durationDays;
         overallMeasure.niceDisplay =
             driftSeksPerDay >= 0
-                ? `${driftSeksPerDay.toFixed(1)} s/d schnell`
-                : `${(-driftSeksPerDay).toFixed(1)} s/d langsam`;
+                ? `${driftSeksPerDay.toFixed(1)} s/d fast`
+                : `${(-driftSeksPerDay).toFixed(1)} s/d slow`;
         overallMeasure.durationDays = overallMeasure.durationDays.toFixed(0);
         return overallMeasure;
     }

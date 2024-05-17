@@ -14,6 +14,16 @@ class User extends dbEntity {
             }
         });
     }
+    static async setLastWatchIdForUser(watchId, userName) {
+        await prisma.user.update({
+            where: {
+                name: userName
+            },
+            data: {
+                lastWatch: { connect: { id: watchId } }
+            }
+        });
+    }
     static async tzOffsetForName(userName) {
         return (
             await prisma.user.findUnique({

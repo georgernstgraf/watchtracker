@@ -1,12 +1,6 @@
     <%- include('bodyOpen') %>
     <%- include('navProfile') %>
     <h1>Watchtracker</h1>
-
-    <%- include('userwatches') %>
-    <div id="measurements">
-        <% if (typeof watch !== 'undefined' && watch != null) { %>
-        <%- include('measurements') %>
-        <% } %>
-    </div>
+    <%- include('allButHeadAndFoot') %>
     <%- include('footer') %>
     </body>

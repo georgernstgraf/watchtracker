@@ -7,4 +7,5 @@ module.exports = function (router, opts) {
     router.use('/logout', require('./routes/logout'));
     router.use('/watch', require('./routes/watch'));
     router.use('/measure', require('./routes/measure'));
+    router.use('/caption', require('./routes/caption'));
 };

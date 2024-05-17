@@ -31,6 +31,11 @@ footer img {
 footer a {
     color: var(--header-h2-color);
 }
+p.smaller {
+    display: inline;
+    font-size: 0.7em;
+    font-weight: initial;
+}
 #watchSelect {
     min-width: 5em;
     margin-top: 1em;
@@ -101,6 +106,10 @@ caption {
     font-weight: bold;
     margin: 1em 0;
     width: auto;
+}
+caption form {
+    width: max-content;
+    margin: auto;
 }
 tfoot::before {
     content: '';

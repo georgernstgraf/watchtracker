@@ -57,7 +57,11 @@ router.patch('/:id', async (req, res, next) => {
             return res.status(403).send('Wrong Watch ID');
         }
         const watchId = measure['watchId'];
-        measure.patch(req.body);
+        try {
+            measure.patch(req.body);
+        } catch (e) {
+            return res.status(422).send(e.message);
+        }
         await measure.save();
         const watch = await Watch.userWatchWithMeasurements(user, watchId);
         return res.render('measurements', { watch });
