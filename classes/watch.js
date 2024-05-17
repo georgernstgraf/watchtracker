@@ -57,5 +57,10 @@ class Watch extends dbEntity {
         ).map((e) => e.id);
         return ownedIds.includes(watchId);
     }
+    static async deleteIDForUserName(watchId, userName) {
+        await prisma.watch.delete({
+            where: { id: watchId, user: { name: userName } }
+        });
+    }
 }
 module.exports = Watch;

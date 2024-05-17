@@ -41,10 +41,24 @@ router.post('/', async (req, res) => {
     res.locals.user = user;
     let watch = new Watch(req.body);
     watch.user = { connect: { name: user } };
-    await watch.save();
+    try {
+        await watch.save();
+    } catch (e) {
+        return res.status(422).send(e.message);
+    }
     await User.setLastWatchIdForUser(watch.id, user);
     res.locals.userWatches = await Watch.userWatches(user);
     res.locals.watch = await Watch.userWatchWithMeasurements(user, watch.id);
+    return res.render('allButHeadAndFoot');
+});
+router.delete('/:id', async (req, res) => {
+    const user = req.session.user;
+    if (!user) {
+        return res.status(401).send('Not Authenticated');
+    }
+    res.locals.user = user;
+    await Watch.deleteIDForUserName(req.params.id, user);
+    res.locals.userWatches = await Watch.userWatches(user);
     return res.render('allButHeadAndFoot');
 });
 module.exports = router;

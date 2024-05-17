@@ -3,6 +3,9 @@
     <!-- Normal Display -->
     <button title="Add a new Watch to track" hx-get="<%= process.env.APP_PATH %>/caption/"
         hx-target="closest table">＋</button>
+    <button title="Remove Watch and all Records" hx-delete="<%= process.env.APP_PATH %>/watch/<%= watch.id%>"
+        hx-target="#allButHeadAndFoot" hx-swap="outerHTML">
+        ❌</button>
     <%= watch.name %>
     <% if (watch.comment && watch.comment.length > 0) { %>
     <p class="smaller">

@@ -6,7 +6,8 @@
     <thead>
         <tr>
             <th scope="rowgroup"><button title="new record"
-                    hx-post="<%= process.env.APP_PATH %>/measure/<%= watch.id %>" hx-target="closest table">＋</button>
+                    hx-post="<%= process.env.APP_PATH %>/measure/<%= watch.id %>" hx-target="closest table"
+                    hx-swap="outerHTML">＋</button>
             </th>
             <th scope="col">Entry Date</th>
             <th scope="col">Deviation</th>
