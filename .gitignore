@@ -5,8 +5,10 @@ debug.js
 playground.mongodb.js
 .vscode
 .vercel
+static/htmx.*
+dev.db
+*.rest
+tmp
+README.pdf
 bundle.js
 secrets.rest
-prisma/dev.db
-tmp/custom.js
-tmp/fetch.php

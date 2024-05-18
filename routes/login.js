@@ -1,34 +1,46 @@
-const express = require('express');
-const router = express.Router();
-const jwt = require('jsonwebtoken');
-
+const router = require('express').Router();
+const Watch = require('../classes/watch');
+const Measurement = require('../classes/measurement');
+const User = require('../classes/user');
+// this gets the login form req.body.passwd, req.body.user
+// renders the index page on success
 router.post('/', async (req, res) => {
-    const user = {
-        user: req.body.user,
-        passwd: req.body.passwd,
-    };
-    try {
-        if (!user.user || !user.passwd) {
-            throw new Error('missing user or passwd');
-        }
-        const auth = await fetch(process.env.AUTH_API_URL, {
-            method: 'POST',
-            body: JSON.stringify(user),
-            headers: { 'Content-Type': 'application/json' },
-        });
-        if (!auth.ok) {
-            const resp = await auth.json();
-            resp.status = auth.status;
-            throw resp;
-        }
-        const resp = await auth.json();
-        const token = jwt.sign({ user: user.user }, process.env.JWT_SECRET, {
-            expiresIn: '4w',
-        });
-        res.cookie('token', token, { httpOnly: true, sameSite: 'Strict' });
-        res.status(200).json(resp);
-    } catch (err) {
-        res.status(err.status).json(err);
+    const errors = (res.locals.errors = []);
+    if (!req.body.user || req.body.user.trim() === '') {
+        errors.push('Username is required');
     }
+    if (!req.body.passwd || req.body.passwd.trim() === '') {
+        errors.push('Password is required');
+    }
+    if (errors.length !== 0) {
+        return res.render('login');
+    }
+    const user = req.body.user;
+    const passwd = req.body.passwd;
+    try {
+        const authResp = await fetch(process.env.AUTH_API_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+                user: user,
+                passwd: passwd
+            }),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        // auth (bool) und user (string)
+        if (!(await authResp.json()).auth) {
+            throw new Error('invalid credentials');
+        }
+    } catch (err) {
+        errors.push(`login failed: ${err.message}`);
+        return res.render('login');
+    }
+    req.session.user = user; // register the session here
+    const userWatches = await Watch.userWatches(user);
+    const watch = await Watch.userWatchWithMeasurements(user);
+    return res.render('body', {
+        user: user,
+        userWatches: userWatches,
+        watch: watch
+    });
 });
 module.exports = router;

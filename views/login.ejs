@@ -1,0 +1,14 @@
+    <%- include('bodyOpen') %>
+    <h1>Watchtracker</h1>
+    <% if (typeof errors !== 'undefined') { %>
+    <% errors.forEach(element => { %>
+    <p><%= element %></p>
+    <% }) %>
+    <% } %>
+    <form hx-post="<%= process.env.APP_PATH %>/login" hx-target="body">
+        <input type="text" name="user" id="username" placeholder="Username">
+        <input type="password" name="passwd" id="password" placeholder="Password">
+        <input type="submit" value="Login">
+    </form>
+    <%- include('footer') %>
+    </body>
