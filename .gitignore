@@ -9,3 +9,4 @@ static/htmx.*
 dev.db
 *.rest
 tmp
+README.pdf

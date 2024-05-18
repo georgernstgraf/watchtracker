@@ -31,7 +31,9 @@ class Watch extends dbEntity {
         watch.overallMeasure = Measurement.calculateDrifts(
             watch['measurements']
         );
-        watch.measurements.forEach((m) => m.setDisplayData());
+        watch.measurements.forEach((m) =>
+            m.setDisplayData(watch.user.tzOffset)
+        );
         return watch;
     }
     static async userWatch(userName, watchId) {

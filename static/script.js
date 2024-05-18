@@ -8,3 +8,6 @@ document
             htmx.ajax('GET', '/watchtracker/'); // TODO FIXME
         }
     });
+document.querySelector('body').addEventListener('keyup', (event) => {
+    if (event.key == 'Escape') htmx.ajax('GET', '/watchtracker/'); // TODO FIXME
+});

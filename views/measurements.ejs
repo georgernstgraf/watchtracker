@@ -1,6 +1,6 @@
-<%# Needs watch, measurements[] and overallMeasure %>
-<% let measurements = watch.measurements %>
-<% let overallMeasure = watch.overallMeasure %>
+<%# Needs watch, measurements[] and overallMeasure _%>
+<% let measurements = watch.measurements _%>
+<% let overallMeasure = watch.overallMeasure _%>
 <table>
     <%- include('caption') %>
     <thead>
@@ -26,7 +26,7 @@
             <td>
                 <input type="datetime-local" name="createdAt" value="<%= e.createdAt.toISOString().substring(0, 16) %>"
                     hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
-                    hx-swap="outerHTML" hx-trigger="input changed delay:500ms">
+                    hx-swap="outerHTML" hx-trigger='keyup[key=="Enter"]'>
             </td>
             <td>
                 <input type="number" name="value" value="<%= e.value %>"

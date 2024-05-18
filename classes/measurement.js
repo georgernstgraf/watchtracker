@@ -20,7 +20,9 @@ class Measurement extends dbEntity {
                         }
                         break;
                     case 'createdAt':
-                        value = new Date(value);
+                        const newDate = new Date(value);
+                        if (isNaN(newDate)) throw new Error('invalid Date');
+                        value = newDate;
                         break;
                 }
                 let success = true;
