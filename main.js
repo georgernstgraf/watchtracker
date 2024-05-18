@@ -1,6 +1,6 @@
 'use strict';
 const express = require('express');
-const session = require('./lib/session');
+const { session } = require('./lib/session');
 const httpErrors = require('http-errors'); // middleware for error handlers
 const path = require('path');
 const ejs = require('ejs');
@@ -44,6 +44,9 @@ module.exports = function main(options, cb) {
     // Template engine
     app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, 'views'));
+    if (process.env.NODE_ENV === 'production') {
+        app.set('trust proxy', 1);
+    }
     app.engine('ejs', ejs.renderFile);
 
     // setting up the authRouter
