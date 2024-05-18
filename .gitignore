@@ -10,3 +10,5 @@ dev.db
 *.rest
 tmp
 README.pdf
+bundle.js
+secrets.rest
