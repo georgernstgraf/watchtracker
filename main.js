@@ -1,6 +1,6 @@
 'use strict';
 const express = require('express');
-const session = require('./lib/session');
+const { session } = require('./lib/session');
 const httpErrors = require('http-errors'); // middleware for error handlers
 const path = require('path');
 const ejs = require('ejs');
@@ -42,6 +42,9 @@ module.exports = function main(options, cb) {
     // Create the express app
     const app = express();
     // Template engine
+    if (process.env.NODE_ENV === 'production') {
+        app.set('trust proxy', 'loopback');
+    }
     app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, 'views'));
     app.engine('ejs', ejs.renderFile);
