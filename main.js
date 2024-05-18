@@ -42,11 +42,11 @@ module.exports = function main(options, cb) {
     // Create the express app
     const app = express();
     // Template engine
+    if (process.env.NODE_ENV === 'production') {
+        app.set('trust proxy', 'loopback');
+    }
     app.set('view engine', 'ejs');
     app.set('views', path.join(__dirname, 'views'));
-    if (process.env.NODE_ENV === 'production') {
-        app.set('trust proxy', 1);
-    }
     app.engine('ejs', ejs.renderFile);
 
     // setting up the authRouter
