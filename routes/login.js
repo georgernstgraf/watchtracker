@@ -1,6 +1,5 @@
 const router = require('express').Router();
 const Watch = require('../classes/watch');
-const Measurement = require('../classes/measurement');
 const User = require('../classes/user');
 // this gets the login form req.body.passwd, req.body.user
 // renders the index page on success
@@ -35,6 +34,7 @@ router.post('/', async (req, res) => {
         return res.render('login');
     }
     req.session.user = user; // register the session here
+    await User.enforceExists(user);
     const userWatches = await Watch.userWatches(user);
     const watch = await Watch.userWatchWithMeasurements(user);
     return res.render('body', {

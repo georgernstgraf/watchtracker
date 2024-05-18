@@ -32,5 +32,12 @@ class User extends dbEntity {
             })
         ).tzOffset;
     }
+    static async enforceExists(userName) {
+        await prisma.user.upsert({
+            where: { name: userName },
+            update: {},
+            create: { name: userName }
+        });
+    }
 }
 module.exports = User;
