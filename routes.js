@@ -8,4 +8,5 @@ module.exports = function (router, opts) {
     router.use('/watch', require('./routes/watch'));
     router.use('/measure', require('./routes/measure'));
     router.use('/caption', require('./routes/caption'));
+    router.use('/bastel', require('./routes/bastel'));
 };

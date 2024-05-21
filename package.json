@@ -28,6 +28,7 @@
     "dependencies": {
         "@prisma/client": "^5.14.0",
         "connect-memcached": "^2.0.0",
+        "dotenv": "^16.4.5",
         "ejs": "^3.1.9",
         "express": "^4.19.2",
         "express-session": "^1.18.0",

@@ -1,0 +1,14 @@
+<%# {zones} _%>
+<% if (zones.length == 1) { %>
+<p><%= zones.length %> Match</p>
+<% } else { %>
+<p><%= zones.length %> Matches</p>
+<% } %>
+<% if (zones.length <= 21 && zones.length> 0) { _%>
+<select name="timeZones" id="timeZones" size="<%= zones.length _%>" onclick="selectThis(event)"
+    onkeyup="selectThis(event)">
+    <% zones.forEach(zone => { _%>
+    <option value="<%= zone[1] %>"><%= zone[1] %></option>
+    <% }) _%>
+</select>
+<% } _%>
