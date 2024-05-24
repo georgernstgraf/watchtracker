@@ -21,7 +21,7 @@ class Watch extends dbEntity {
                         createdAt: 'desc'
                     }
                 },
-                user: { select: { tzOffset: true, id: true } }
+                user: true
             }
         });
         if (!rawWatch) return rawWatch;

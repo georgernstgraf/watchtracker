@@ -39,5 +39,8 @@ class User extends dbEntity {
             create: { name: userName }
         });
     }
+    static async byName(userName) {
+        return new User(await prisma.user.findUnique({ where: { name: userName } }));
+    }
 }
 module.exports = User;
