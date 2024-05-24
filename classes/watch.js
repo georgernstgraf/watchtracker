@@ -32,7 +32,7 @@ class Watch extends dbEntity {
             watch['measurements']
         );
         watch.measurements.forEach((m) =>
-            m.setDisplayData(watch.user.tzOffset)
+            m.setDisplayData(watch.user.timeZone)
         );
         return watch;
     }

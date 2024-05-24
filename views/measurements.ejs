@@ -24,7 +24,7 @@
                     hx-target="closest table" hx-swap="outerHTML">－</button>
             </th>
             <td>
-                <input type="datetime-local" name="createdAt" value="<%= e.createdAt.toISOString().substring(0, 16) %>"
+                <input type="datetime-local" name="createdAt" value="<%= e.createdAt16 %>"
                     hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
                     hx-swap="outerHTML" hx-trigger='keyup[key=="Enter"]'>
             </td>
