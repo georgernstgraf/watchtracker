@@ -58,7 +58,7 @@ router.patch('/:id', async (req, res, next) => {
         }
         const watchId = measure['watchId'];
         try {
-            measure.patch(req.body);
+            measure.patch(req.body);  // this is browser localtime
         } catch (e) {
             return res.status(422).send(e.message);
         }

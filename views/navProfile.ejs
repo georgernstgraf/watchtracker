@@ -1,8 +1,19 @@
+   <%# [user.name user.timeZone timeZones[] ] _%>
    <nav id="profile">
        <form hx-post="<%= process.env.APP_PATH %>/logout" hx-target="body">
            <button id="profileLogoutButton" class="logout">logout</button>
        </form>
        <span id="profileUsername">
-           <%= user %>
+           <%= user.name %>
        </span>
+       <form hx-patch="<%= process.env.APP_PATH %>/user" hx-target="#timeZoneSelector" hx-swap="outerHTML">
+           <label for="timeZoneSelector">My Timezone:
+               <%- include('timeZoneSelector') _%>
+               <datalist id="timeZoneList">
+                   <% timeZones.forEach(zone => { %>
+                   <option value="<%=zone%>"><%=zone%></option>
+                   <% }) %>
+               </datalist>
+           </label>
+       </form>
    </nav>

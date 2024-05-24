@@ -1,8 +1,7 @@
+const TimeZone = require('./classes/timeZone');
+const luxon = require('luxon');
 const repl = require('repl');
-const User = require('./classes/user');
-const prisma = require('./lib/db');
-const r = repl.start();
-const c = r.context;
-c.User = User;
-c.u = new User({ id: 7, name: 'georg' });
-c.p = prisma;
+const d = '2024-05-24T19:29';
+
+const replObj = repl.start();
+Object.assign(replObj.context, { luxon, TimeZone, d });

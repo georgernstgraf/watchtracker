@@ -1,5 +1,6 @@
 const prisma = require('../lib/db');
 const ms = require('ms');
+const TimeZone = require('./timeZone');
 const dbEntity = require('./dbEntity');
 class Measurement extends dbEntity {
     constructor(data) {
@@ -19,9 +20,9 @@ class Measurement extends dbEntity {
                             return false;
                         }
                         break;
-                    case 'createdAt':
-                        const newDate = new Date(value);
-                        if (isNaN(newDate)) throw new Error('invalid Date');
+                    case 'createdAt':  // I get a 16-char localtime thinggy here like "2024-05-24T19:29"
+                        const newDate = TimeZone.from16(value, target.watch.user.timeZone);
+                        if (newDate.invalid) { throw new Error('invalid Date'); }
                         value = newDate;
                         break;
                 }
@@ -36,10 +37,9 @@ class Measurement extends dbEntity {
     }
     //@override
 
-    setDisplayData(tzOffssetMinutes = 0) {
-        this.createdAt.setMinutes(
-            this.createdAt.getMinutes() + tzOffssetMinutes
-        );
+    setDisplayData(timeZone) {
+        if (!timeZone) { throw new Error('timeZone is required'); }
+        this.createdAt16 = TimeZone.get16(this.createdAt, timeZone);
     }
 
     static async watchIdForMeasureOfUser(measureId, user) {
@@ -62,7 +62,7 @@ class Measurement extends dbEntity {
             include: {
                 watch: {
                     select: {
-                        user: { select: { name: true } }
+                        user: true
                     }
                 }
             }

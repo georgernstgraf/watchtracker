@@ -24,20 +24,15 @@ class User extends dbEntity {
             }
         });
     }
-    static async tzOffsetForName(userName) {
-        return (
-            await prisma.user.findUnique({
-                where: { name: userName },
-                select: { tzOffset: true }
-            })
-        ).tzOffset;
-    }
     static async enforceExists(userName) {
         await prisma.user.upsert({
             where: { name: userName },
             update: {},
             create: { name: userName }
         });
+    }
+    static async byName(userName) {
+        return new User(await prisma.user.findUnique({ where: { name: userName } }));
     }
 }
 module.exports = User;
