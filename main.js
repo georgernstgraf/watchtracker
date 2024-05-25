@@ -64,7 +64,7 @@ module.exports = function main(options, cb) {
 
     // use all this routers in the app:
     app.use(process.env.APP_PATH, sessionRouter);
-    app.use(process.env.APP_PATH, authRouter);
+    app.use(`${process.env.APP_PATH}/auth`, authRouter);
 
     // serve static files as fallbacks
     app.use(process.env.APP_PATH, expressStaticGzip('static'));
@@ -98,4 +98,4 @@ module.exports = function main(options, cb) {
         );
         ready(err, app, server);
     });
-};
+};;;;

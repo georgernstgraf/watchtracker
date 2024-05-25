@@ -1,7 +1,7 @@
   <div id="allButHeadAndFoot">
       <% if ((typeof watch == 'undefined' || watch == null) && (typeof userWatches =='undefined' || userWatches == null || userWatches.length==0)) { %>
-      <form hx-post="<%= process.env.APP_PATH %>/watch/" hx-trigger='keyup[key=="Enter"]' hx-target="#allButHeadAndFoot"
-          hx-swap="outerHTML">
+      <form hx-post="<%= process.env.APP_PATH %>/auth/watch/" hx-trigger='keyup[key=="Enter"]'
+          hx-target="#allButHeadAndFoot" hx-swap="outerHTML">
           <input type="text" name="name" value="" placeholder="Name of your Watch to track">
           <input type="text" name="comment" value="" placeholder="enter a Comment">
       </form>

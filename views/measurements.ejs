@@ -6,49 +6,65 @@
     <thead>
         <tr>
             <th scope="rowgroup"><button title="new record"
-                    hx-post="<%= process.env.APP_PATH %>/measure/<%= watch.id %>" hx-target="closest table"
+                    hx-post="<%= process.env.APP_PATH %>/auth/measure/<%= watch.id %>" hx-target="closest table"
                     hx-swap="outerHTML">＋</button>
             </th>
             <th scope="col">Entry Date</th>
             <th scope="col">Deviation</th>
-            <th scope="col">Type</th>
+            <th scope="col">Start?</th>
             <th scope="col">Drift</th>
             <th scope="col">Comment</th>
         </tr>
     </thead>
     <tbody>
         <% measurements.forEach(e=> { %>
-        <tr data-id="<%= e.id %>">
+        <tr style="display:none" id="<%= e.id _%>-edit" data-id="<%= e.id %>">
             <th scope="row">
-                <button title="delete" hx-delete="<%= process.env.APP_PATH %>/measure/<%= e.id %>"
-                    hx-target="closest table" hx-swap="outerHTML">－</button>
+                <span>
+                    <button title="delete Record" hx-delete="<%= process.env.APP_PATH %>/auth/measure/<%= e.id %>"
+                        hx-target="closest table" hx-swap="outerHTML">🚮</button>
+                    <button title="cancel Edit" onclick="editMode('<%= e.id _%>', false)">❌</button>
+                    <button title="Save Record" onclick="htmx.trigger('#<%= e.id _%>-form', 'trigger')">💾</button>
+                </span>
+            </th>
+            <form id="<%= e.id _%>-form" hx-patch="<%= process.env.APP_PATH %>/auth/measure/<%= e.id %>"
+                hx-target="closest table" hx-swap="outerHTML" hx-trigger="trigger">
+                <td>
+                    <input type="datetime-local" name="createdAt" value="<%= e.createdAt16 %>">
+                </td>
+                <td>
+                    <input type="number" name="value" value="<%= e.value %>">
+                </td>
+                <td><input type="checkbox" name="isStart" value="true" <% if (e.isStart) { _%>checked<% } _%>></td>
+                <td class="sekPerDay">
+                    <%- e.driftDisplay %>
+                </td>
+                <td>
+                    <input type="text" name="comment" <% if (e.comment) { %> value="<%= e.comment %>" <% } else { %>
+                        placeholder="enter comment" <% } %>>
+                </td>
+            </form>
+        </tr>
+        <tr id="<%= e.id _%>-show" data-id="<%= e.id %>">
+            <th scope="row">
+                <button title="Edit Measurement" class="startStop" onclick="editMode('<%= e.id _%>', true)">✏️</button>
             </th>
             <td>
-                <input type="datetime-local" name="createdAt" value="<%= e.createdAt16 %>"
-                    hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
-                    hx-swap="outerHTML" hx-trigger='keyup[key=="Enter"]'>
+                <%= e.createdAt16.replace("T", " ") %>
             </td>
             <td>
-                <input type="number" name="value" value="<%= e.value %>"
-                    hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
-                    hx-swap="outerHTML" hx-trigger='keyup[key=="Enter"]'>
+                <%= e.value %>s
             </td>
-            <td hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-vals='{"isStart": <%= !e.isStart %>}'
-                hx-target="closest table" hx-swap="outerHTML">
-                <% if (e.isStart) { %>
-                <button class="startStop">🎬</button>
-                <% } else { %>
-                <button class="startStop">⌛</button>
+            <td>
+                <% if (e.isStart) { %> 🎬
+                <% } else { %> ⌛
                 <% } %>
             </td>
             <td class="sekPerDay">
                 <%- e.driftDisplay %>
             </td>
             <td>
-                <input type="text" name="comment" id="measureid_<%= e.id %>" <% if (e.comment) { %>
-                    value="<%= e.comment %>" <% } else { %> placeholder="enter comment" <% } %>
-                    hx-patch="<%= process.env.APP_PATH %>/measure/<%= e.id %>" hx-target="closest table"
-                    hx-swap="outerHTML" hx-trigger='keyup[key=="Enter"]'>
+                <%= e.comment %>
             </td>
         </tr>
         <% }) %>
@@ -56,10 +72,10 @@
     <tfoot>
         <tr>
             <% if (typeof overallMeasure != 'undefined') { %>
-            <td class="driftSummary" colspan="7"> (Duration: <%= overallMeasure.durationDays %> Days, Drift:
+            <td class="driftSummary" colspan="6"> (Duration: <%= overallMeasure.durationDays %> Days, Drift:
                 <%= overallMeasure.driftSeks %> Sec=&gt; <%= overallMeasure.niceDisplay %>)</td>
             <% } else { %>
-            <td class="driftSummary" colspan="7">No records yet</td>
+            <td class="driftSummary" colspan="6">No records yet</td>
             <% } %>
         </tr>
     </tfoot>

@@ -45,6 +45,9 @@ router.patch('/:id', async (req, res, next) => {
             return res.status(403).send('Wrong Watch ID');
         }
         const watchId = measure['watchId'];
+        if (!req.body.isStart) {
+            req.body.isStart = false;
+        }
         try {
             measure.patch(req.body);  // this is browser localtime
         } catch (e) {

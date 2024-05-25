@@ -8,8 +8,8 @@ router.get('/', async (req, res) => {
     if (user) {
         const userWatches = await Watch.userWatches(user);
         const watch = await Watch.userWatchWithMeasurements(user);
-        const userToPass = watch ? watch.user : await User.byName(user);
-        return res.render(`index${full}`, { user: userToPass, watch, userWatches, timeZones: TimeZone.timeZones });
+        const userObj = watch ? watch.user : await User.byName(user);
+        return res.render(`index${full}`, { userObj, watch, userWatches, timeZones: TimeZone.timeZones });
     }
     return res.render(`login${full}`);
 });

@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
     const userWatches = await Watch.userWatches(user);
     const watch = await Watch.userWatchWithMeasurements(user);
     return res.render('body', {
-        user: watch.user.name,
+        userObj: watch.user,
         userWatches: userWatches,
         watch: watch,
         timeZones: TimeZone.timeZones
