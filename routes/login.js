@@ -42,7 +42,7 @@ router.post('/', async (req, res) => {
         user: watch.user.name,
         userWatches: userWatches,
         watch: watch,
-        timeZones: TimeZone.timezones
+        timeZones: TimeZone.timeZones
     });
 });
 module.exports = router;
