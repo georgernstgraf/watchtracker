@@ -8,7 +8,7 @@ const expressStaticGzip = require('express-static-gzip');
 const bodyParser = require('body-parser');
 module.exports = function main(options, cb) {
     // Set default options
-    const ready = cb || function () {};
+    const ready = cb || function () { };
     const opts = Object.assign(
         {
             // Default options
@@ -49,11 +49,21 @@ module.exports = function main(options, cb) {
     app.set('views', path.join(__dirname, 'views'));
     app.engine('ejs', ejs.renderFile);
 
+    // router with sessions, no auth enforced:
+    const sessionRouter = express.Router();
+    sessionRouter.use(bodyParser.urlencoded({ extended: true }));
+    sessionRouter.use(session);
+    require('./lib/sessionRoutes')(sessionRouter, opts); // calls .use() several times on the sessionRouter
+
     // setting up the authRouter
     const authRouter = express.Router();
     authRouter.use(bodyParser.urlencoded({ extended: true }));
     authRouter.use(session);
-    require('./routes')(authRouter, opts); // calls .use() several times on the authRouter
+    authRouter.use(require('./lib/enforceUser'));
+    require('./lib/authRoutes')(authRouter, opts); // calls .use() several times on the authRouter
+
+    // use all this routers in the app:
+    app.use(process.env.APP_PATH, sessionRouter);
     app.use(process.env.APP_PATH, authRouter);
 
     // serve static files as fallbacks
@@ -83,8 +93,7 @@ module.exports = function main(options, cb) {
         serverStarted = true;
         const addr = server.address();
         console.info(
-            `Started at http://${opts.host || addr.host || 'localhost'}:${
-                addr.port
+            `Started at http://${opts.host || addr.host || 'localhost'}:${addr.port
             }${process.env.APP_PATH} ${new Date().toLocaleTimeString()}`
         );
         ready(err, app, server);

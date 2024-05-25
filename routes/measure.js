@@ -5,10 +5,6 @@ router.post('/:id', async (req, res) => {
     // this is a watchId here!!
     const watchId = req.params.id;
     const user = req.session.user;
-    if (!user) {
-        return res.status(401).send('Not Authenticated');
-    }
-    res.locals.user = user;
     if (!(await Watch.belongsToUser(watchId, user))) {
         return res.status(403).send('Wrong Watch ID');
     }
@@ -28,10 +24,6 @@ router.post('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     const measureId = req.params.id;
     const user = req.session.user;
-    if (!user) {
-        return res.status(401).send('Not Authenticated');
-    }
-    res.locals.user = user;
     const watchId = await Measurement.watchIdForMeasureOfUser(measureId, user);
     if (!watchId) {
         return res.status(403).send('Wrong Watch ID');
@@ -48,10 +40,6 @@ router.patch('/:id', async (req, res, next) => {
     try {
         const measureId = req.params.id;
         const user = req.session.user;
-        if (!user) {
-            return res.status(401).send('Not Authenticated');
-        }
-        res.locals.user = user;
         const measure = await Measurement.getUserMeasurement(user, measureId);
         if (!measure) {
             return res.status(403).send('Wrong Watch ID');
