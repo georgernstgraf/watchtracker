@@ -5,10 +5,6 @@ router.post('/:id', async (req, res) => {
     // this is a watchId here!!
     const watchId = req.params.id;
     const user = req.session.user;
-    if (!user) {
-        return res.status(401).send('Not Authenticated');
-    }
-    res.locals.user = user;
     if (!(await Watch.belongsToUser(watchId, user))) {
         return res.status(403).send('Wrong Watch ID');
     }
@@ -28,19 +24,13 @@ router.post('/:id', async (req, res) => {
 router.delete('/:id', async (req, res) => {
     const measureId = req.params.id;
     const user = req.session.user;
-    if (!user) {
-        return res.status(401).send('Not Authenticated');
-    }
-    res.locals.user = user;
     const watchId = await Measurement.watchIdForMeasureOfUser(measureId, user);
     if (!watchId) {
-        return res.status(403).send('Wrong Watch ID');
+        return res.status(403).send('Wrong Measurement ID');
     }
     await Measurement.delete(measureId);
     const watch = await Watch.userWatchWithMeasurements(user, watchId);
-    if (!watch) {
-        return res.status(403).send('This is not your watch');
-    }
+
     res.locals.watch = watch;
     return res.render('measurements');
 });
@@ -48,15 +38,14 @@ router.patch('/:id', async (req, res, next) => {
     try {
         const measureId = req.params.id;
         const user = req.session.user;
-        if (!user) {
-            return res.status(401).send('Not Authenticated');
-        }
-        res.locals.user = user;
         const measure = await Measurement.getUserMeasurement(user, measureId);
         if (!measure) {
-            return res.status(403).send('Wrong Watch ID');
+            return res.status(403).send('Wrong Measurement ID');
         }
         const watchId = measure['watchId'];
+        if (!req.body.isStart) {
+            req.body.isStart = false;
+        }
         try {
             measure.patch(req.body);  // this is browser localtime
         } catch (e) {

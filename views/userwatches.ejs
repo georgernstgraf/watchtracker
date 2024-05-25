@@ -1,10 +1,10 @@
 <div id="userWatches">
-  <select id="watchSelect" size="<%= userWatches.length %>">
-    <% userWatches.forEach(watch=> { %>
-      <option hx-get="<%= `${process.env.APP_PATH}/watch/${watch.id}` %>" hx-target="#measurements"
-        data-id="<%= watch.id %>" value="<%= watch.id %>">
-        <%= watch.name %>
-      </option>
-      <% }) %>
-  </select>
+    <select id="watchSelect" size="<%= userWatches.length %>">
+        <% userWatches.forEach(watch=> { %>
+        <option hx-get="<%= `${process.env.APP_PATH}/auth/watch/${watch.id}` %>" hx-target="#measurements"
+            data-id="<%= watch.id %>" value="<%= watch.id %>">
+            <%= watch.name %>
+        </option>
+        <% }) %>
+    </select>
 </div>

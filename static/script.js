@@ -11,3 +11,14 @@ document
 document.querySelector('body').addEventListener('keyup', (event) => {
     if (event.key == 'Escape') htmx.ajax('GET', '/watchtracker/'); // TODO FIXME
 });
+function editMode(eltId, on = false) {
+    const edit$ = document.getElementById(`${eltId}-edit`);
+    const show$ = document.getElementById(`${eltId}-show`);
+    if (on) {
+        edit$.style.display = "";
+        show$.style.display = "none";
+    } else {
+        edit$.style.display = "none";
+        show$.style.display = "";
+    }
+}

@@ -2,12 +2,7 @@ const router = require('express').Router();
 const Watch = require('../classes/watch');
 router.get('/:id', async (req, res) => {
     // caption for watchID
-    const user = req.session.user;
-    if (!user) {
-        return res.status(401).send('Not Authenticated');
-    }
-    res.locals.user = user;
-    const watch = await Watch.userWatch(user, req.params.id);
+    const watch = await Watch.userWatch(req.session.user, req.params.id);
     if (!watch) {
         return res.status(403).send('Wrong Watch ID');
     }
@@ -16,12 +11,7 @@ router.get('/:id', async (req, res) => {
     return res.render('caption');
 });
 router.get('/', async (req, res) => {
-    // caption for watchID
-    const user = req.session.user;
-    if (!user) {
-        return res.status(401).send('Not Authenticated');
-    }
-    res.locals.user = user;
+    // Das ist unschön, rendert das input feld für einen neue caption
     res.locals.edit = true;
     return res.render('caption');
 });

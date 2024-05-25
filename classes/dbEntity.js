@@ -48,7 +48,7 @@ class dbEntity {
         });
     }
     patch(data) {
-        Object.keys(data).forEach((k) => (this[k] = data[k]));
+        Object.assign(this, data);
     }
     updateAfterSave(data) {
         this._constrData = data;

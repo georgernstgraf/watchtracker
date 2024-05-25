@@ -3,12 +3,7 @@ const Watch = require('../classes/watch');
 const User = require('../classes/user');
 // This route renders the measurements table incl. headings
 router.get('/:id', async (req, res) => {
-    const user = req.session.user;
-    if (!user) {
-        return res.status(401).send('Not Authenticated');
-    }
-    res.locals.user = user;
-    const watch = await Watch.userWatchWithMeasurements(user, req.params.id);
+    const watch = await Watch.userWatchWithMeasurements(req.session.user, req.params.id);
     if (!watch) {
         return res.status(403).send('Wrong Watch ID');
     }
@@ -19,10 +14,6 @@ router.get('/:id', async (req, res) => {
 // This route only renders the caption (patching only name and comment)
 router.patch('/:id', async (req, res) => {
     const user = req.session.user;
-    if (!user) {
-        return res.status(401).send('Not Authenticated');
-    }
-    res.locals.user = user;
     const watch = await Watch.userWatchWithMeasurements(user, req.params.id);
     if (!watch) {
         return res.status(403).send('This is not your watch');
@@ -35,9 +26,6 @@ router.patch('/:id', async (req, res) => {
 });
 router.post('/', async (req, res) => {
     const user = req.session.user;
-    if (!user) {
-        return res.status(401).send('Not Authenticated');
-    }
     res.locals.user = user;
     let watch = new Watch(req.body);
     watch.user = { connect: { name: user } };
@@ -53,9 +41,6 @@ router.post('/', async (req, res) => {
 });
 router.delete('/:id', async (req, res) => {
     const user = req.session.user;
-    if (!user) {
-        return res.status(401).send('Not Authenticated');
-    }
     res.locals.user = user;
     await Watch.deleteIDForUserName(req.params.id, user);
     res.locals.userWatches = await Watch.userWatches(user);
