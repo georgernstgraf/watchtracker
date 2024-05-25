@@ -5,7 +5,7 @@
     <%- include('caption') %>
     <thead>
         <tr>
-            <th scope="rowgroup"><button title="new record"
+            <th scope="rowgroup"><button title="new record" id="newMeasurement"
                     hx-post="<%= process.env.APP_PATH %>/auth/measure/<%= watch.id %>" hx-target="closest table"
                     hx-swap="outerHTML">＋</button>
             </th>

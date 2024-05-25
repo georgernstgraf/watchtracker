@@ -39,6 +39,10 @@ footer img {
     justify-content: center;
 }
 
+button#newMeasurement {
+    margin: 0 3em;
+}
+
 footer a {
     color: var(--header-h2-color);
 }
@@ -106,7 +110,7 @@ input {
 }
 
 button {
-    margin: 0 .2em;
+    margin: 0 0.2em;
     /* scale: 1.5; */
 }
 
