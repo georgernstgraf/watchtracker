@@ -26,13 +26,11 @@ router.delete('/:id', async (req, res) => {
     const user = req.session.user;
     const watchId = await Measurement.watchIdForMeasureOfUser(measureId, user);
     if (!watchId) {
-        return res.status(403).send('Wrong Watch ID');
+        return res.status(403).send('Wrong Measurement ID');
     }
     await Measurement.delete(measureId);
     const watch = await Watch.userWatchWithMeasurements(user, watchId);
-    if (!watch) {
-        return res.status(403).send('This is not your watch');
-    }
+
     res.locals.watch = watch;
     return res.render('measurements');
 });
@@ -42,7 +40,7 @@ router.patch('/:id', async (req, res, next) => {
         const user = req.session.user;
         const measure = await Measurement.getUserMeasurement(user, measureId);
         if (!measure) {
-            return res.status(403).send('Wrong Watch ID');
+            return res.status(403).send('Wrong Measurement ID');
         }
         const watchId = measure['watchId'];
         if (!req.body.isStart) {
