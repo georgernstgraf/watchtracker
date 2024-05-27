@@ -15,6 +15,7 @@ class TimeZone {
         return idxes.map((i) => [i, TimeZone.timeZones[i]]);
     }
     static get16(date, tz) {
+        // tz not string or tz not in timeZones
         try {
             return luxon.DateTime.fromJSDate(date, { zone: tz }).toISO().substring(0, 16);
         }
