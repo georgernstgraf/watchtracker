@@ -47,6 +47,10 @@ footer a {
     color: var(--header-h2-color);
 }
 
+#caption-create>* {
+    display: inline;
+}
+
 p.smaller {
     display: inline;
     font-size: 0.7em;

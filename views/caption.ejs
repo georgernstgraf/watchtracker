@@ -5,12 +5,10 @@
         <%# Normal Display _%>
         <span id="caption-normal">
             <%# button: new _%>
-            <button title="Add a new Watch to track" onclick="htmx.trigger('todo#new')">＋</button>
+            <button title="Add a new Watch to track" onclick="captionStyle('create')">＋</button>
             <% if (typeof watch != 'undefined') { %>
             <%# button: edit _%>
-            <button title="Edit Name and Comment" class="startStop"
-                hx-get="<%= process.env.APP_PATH %>/auth/caption/<%= watch.id %>" hx-target="closest caption"
-                hx-swap="outerHTML">✏️</button>
+            <button title="Edit Name and Comment" class="startStop" onclick="captionStyle('edit')">✏️</button>
             <%= watch.name _%>
             <%_ if (watch.comment && watch.comment.length > 0) { _%>
             <p class="smaller"> <%= watch.comment _%> </p>
@@ -27,17 +25,17 @@
             <%# edit form _%>
             <form hx-patch="<%= process.env.APP_PATH %>/auth/watch/<%= watch.id %>" hx-trigger='keyup[key=="Enter"]'
                 hx-target="#allButHeadAndFoot" hx-swap="outerHTML">
-                <button title="Save" onclick="htmx.trigger('#<%= e.id _%>-form', 'trigger')">💾</button>
+                <button title="Save" type="submit">💾</button>
                 <input type="text" name="name" value="<%= watch.name %>">
                 <input type="text" name="comment" <% if (watch.comment) { %> value="<%= watch.comment %>" <% } else { %>
                     placeholder="enter comment" <% } %>>
             </form>
         </span>
-        <span id="caption-create">
-            <button title="cancel Edit" onclick="captionStyle('normal')">❌</button>
-            <form hx-post="<%= process.env.APP_PATH %>/auth/watch/" hx-trigger='keyup[key=="Enter"]'
+        <span id="caption-create" style="display:none">
+            <button title="cancel Edit" onclick="captionStyle('normal')" htmx.trigger="#newWatch">❌</button>
+            <form hx-post="<%= process.env.APP_PATH %>/auth/watch/" id="newWatch"'
                 hx-target="#allButHeadAndFoot" hx-swap="outerHTML">
-                <button title="Save" onclick="htmx.trigger('#<%= e.id _%>-form', 'trigger')">💾</button>
+                <button title="Save" type="submit">💾</button>
                 <input type="text" name="name" value="" placeholder="enter Name">
                 <input type="text" name="comment" value="" placeholder="enter Comment">
             </form>

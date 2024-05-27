@@ -23,17 +23,26 @@ function editMode(eltId, on = false) {
     }
 }
 function captionStyle(style) {
-    const normal = document.getElementById("caption-normal");
-    const create = document.getElementById("caption-create");
-    const edit = document.getElementById("caption-edit");
+    const normal$ = document.getElementById("caption-normal");
+    const create$ = document.getElementById("caption-create");
+    const edit$ = document.getElementById("caption-edit");
     switch (style) {
         case "normal": {
+            normal$.style.display = "";
+            create$.style.display = "none";
+            edit$.style.display = "none";
             break;
         }
         case "create": {
+            normal$.style.display = "none";
+            create$.style.display = "";
+            edit$.style.display = "none";
             break;
         }
         case "edit": {
+            normal$.style.display = "none";
+            create$.style.display = "none";
+            edit$.style.display = "";
             break;
         }
         default: {
