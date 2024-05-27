@@ -39,8 +39,16 @@ footer img {
     justify-content: center;
 }
 
+button#newMeasurement {
+    margin: 0 3em;
+}
+
 footer a {
     color: var(--header-h2-color);
+}
+
+#caption-create>* {
+    display: inline;
 }
 
 p.smaller {
@@ -54,11 +62,6 @@ p.smaller {
     margin-top: 1em;
 }
 
-#add-and-delete {
-    display: flex;
-    margin-top: 1em;
-}
-
 nav {
     display: flex;
     flex-direction: row-reverse;
@@ -68,13 +71,6 @@ label {
     margin: 0 2.5em;
 }
 
-.flex-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3em;
-}
-
 dialog {
     margin-top: 15vh;
     border-radius: 2em;
@@ -82,19 +78,8 @@ dialog {
     background: var(--background-color);
 }
 
-#loginFormResult {
-    display: contents;
-}
-
 dialog::backdrop {
     backdrop-filter: blur(0.5em);
-}
-
-div#addWatch {
-    margin: 1em auto;
-    display: flex;
-    margin-bottom: 0;
-    justify-content: space-evenly;
 }
 
 button,
@@ -106,7 +91,7 @@ input {
 }
 
 button {
-    margin: 0 .2em;
+    margin: 0 0.2em;
     /* scale: 1.5; */
 }
 

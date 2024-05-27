@@ -111,7 +111,7 @@ class Measurement extends dbEntity {
             const durationDays = durationMS / ms('1 day');
             const durationHours = Math.round(durationMS / ms('1 hour'));
             const durationDisplay =
-                durationHours < 100
+                durationHours < 72
                     ? `${durationHours}h`
                     : `${Math.round(durationHours / 24)}d`;
             const driftSeksPerDay = (driftSeks / durationDays).toFixed(1);
