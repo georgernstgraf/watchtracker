@@ -6,6 +6,7 @@ const path = require('path');
 const ejs = require('ejs');
 const expressStaticGzip = require('express-static-gzip');
 const bodyParser = require('body-parser');
+const prisma = require('./lib/db');
 module.exports = function main(options, cb) {
     // Set default options
     const ready = cb || function () { };
@@ -97,5 +98,11 @@ module.exports = function main(options, cb) {
             }${process.env.APP_PATH} ${new Date().toLocaleTimeString()}`
         );
         ready(err, app, server);
+    });
+    process.on('SIGTERM', async () => {
+        console.log("SIGTERM received");
+        await prisma.$disconnect();
+        console.log("disconnected prisma, exiting normally.");
+        process.exit();
     });
 };;;;
