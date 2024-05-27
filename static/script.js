@@ -22,3 +22,22 @@ function editMode(eltId, on = false) {
         show$.style.display = "";
     }
 }
+function captionStyle(style) {
+    const normal = document.getElementById("caption-normal");
+    const create = document.getElementById("caption-create");
+    const edit = document.getElementById("caption-edit");
+    switch (style) {
+        case "normal": {
+            break;
+        }
+        case "create": {
+            break;
+        }
+        case "edit": {
+            break;
+        }
+        default: {
+            throw new Error("this caption Style not implemented");
+        }
+    }
+}
