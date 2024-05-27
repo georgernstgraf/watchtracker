@@ -15,7 +15,12 @@ class TimeZone {
         return idxes.map((i) => [i, TimeZone.timeZones[i]]);
     }
     static get16(date, tz) {
-        return luxon.DateTime.fromJSDate(date, { zone: tz }).toISO().substring(0, 16);
+        try {
+            return luxon.DateTime.fromJSDate(date, { zone: tz }).toISO().substring(0, 16);
+        }
+        catch (e) {
+            return luxon.DateTime.fromJSDate(date, { zone: 'UTC' }).toISO().substring(0, 16);
+        }
     }
     static from16(str, tz) {
         return luxon.DateTime.fromISO(str, { zone: tz });
