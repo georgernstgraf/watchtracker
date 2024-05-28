@@ -1,7 +1,7 @@
 <div id="userWatches">
-    <select id="watchSelect" size="<%= userWatches.length %>">
-        <% userWatches.forEach(watch=> { %>
-        <option hx-get="<%= `${process.env.APP_PATH}/auth/watch/${watch.id}` %>" hx-target="#measurements"
+    <select id="watchSelect" size="<%= userWatches.length %>" hx-get="<%= `${process.env.APP_PATH}/auth/watch/`_%>"
+        hx-target="#measurements" hx-vals='js:{id: event.target.value}'>
+        <% userWatches.forEach(watch=> { %> <option ${watch.id}` %>"
             value="<%= watch.id %>"> <%= watch.name %>
         </option>
         <% }) %>

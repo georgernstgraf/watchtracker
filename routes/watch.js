@@ -2,14 +2,20 @@ const router = require('express').Router();
 const Watch = require('../classes/watch');
 const User = require('../classes/user');
 // This route renders the measurements table incl. headings
-router.get('/:id', async (req, res) => {
-    const watch = await Watch.userWatchWithMeasurements(req.session.user, req.params.id);
+async function handleGet(id, req, res) {
+    const watch = await Watch.userWatchWithMeasurements(req.session.user, id);
     if (!watch) {
         return res.status(403).send('Wrong Watch ID');
     }
     await User.setLastWatchIdForUserId(watch.id, watch.user.id);
     res.locals.watch = watch;
     return res.render('measurements');
+}
+router.get('/:id', async (req, res) => {
+    return await handleGet(req.params.id, req, res);
+});
+router.get('/', async (req, res) => {
+    return await handleGet(req.query.id, req, res);
 });
 // This route only renders the caption (patching only name and comment)
 router.patch('/:id', async (req, res) => {
