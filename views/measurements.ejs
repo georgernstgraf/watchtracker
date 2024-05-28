@@ -5,9 +5,10 @@
     <%- include('caption') %>
     <thead>
         <tr>
-            <th scope="rowgroup"><button title="new record" id="newMeasurement"
-                    hx-post="<%= process.env.APP_PATH %>/auth/measure/<%= watch.id %>" hx-target="closest table"
-                    hx-swap="outerHTML">＋</button>
+            <th scope="rowgroup">
+                <button title="new record" id="newMeasurement" onclick="showMeasurementCreate()">
+                    ＋
+                </button>
             </th>
             <th scope="col">Entry Date</th>
             <th scope="col">Deviation</th>
@@ -17,6 +18,30 @@
         </tr>
     </thead>
     <tbody>
+        <tr style="display:none" id="showMeasure">
+            <th scope="row">
+                <span>
+                    <button title="Cancel" onclick="hideMeasurementCreate()">❌</button>
+                    <button title="Save Record"
+                        onclick="htmx.trigger('#unsavedMeasurement-form', 'trigger')">💾</button>
+                </span>
+            </th>
+            <form id="unsavedMeasurement-form" hx-post="<%= process.env.APP_PATH %>/auth/measure/<%= watch.id %>"
+                hx-target="closest table" hx-swap="outerHTML" hx-trigger="trigger">
+                <td>
+                    <input type="datetime-local" name="createdAt" value="2024-05-28T00:50">
+                </td>
+                <td>
+                    <input type="number" name="value" value="0">
+                </td>
+                <td><input type="checkbox" name="isStart" value="true"></td>
+                <td class="sekPerDay">
+                </td>
+                <td>
+                    <input type="text" name="comment" placeholder="enter comment">
+                </td>
+            </form>
+        </tr>
         <% measurements.forEach(e=> { %>
         <tr style="display:none" id="<%= e.id _%>-edit" data-id="<%= e.id %>">
             <th scope="row">

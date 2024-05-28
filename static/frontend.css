@@ -47,7 +47,7 @@ footer a {
     color: var(--header-h2-color);
 }
 
-#caption-create>* {
+caption * {
     display: inline;
 }
 

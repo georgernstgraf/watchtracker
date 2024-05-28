@@ -10,9 +10,9 @@ router.post('/:id', async (req, res) => {
     }
     const m = new Measurement({
         watchId: watchId,
-        isStart: true,
-        value: 0
+
     });
+    m.patch(req.body);
     await m.save();
     const watch = await Watch.userWatchWithMeasurements(user, watchId);
     /* if (!watch) {

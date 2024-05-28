@@ -11,6 +11,14 @@ document
 document.querySelector('body').addEventListener('keyup', (event) => {
     if (event.key == 'Escape') htmx.ajax('GET', '/watchtracker/'); // TODO FIXME
 });
+function showMeasurementCreate() {
+    const create$ = document.getElementById('showMeasure');
+    create$.style.display = '';
+}
+function hideMeasurementCreate() {
+    const create$ = document.getElementById('showMeasure');
+    create$.style.display = 'none';
+}
 function editMode(eltId, on = false) {
     const edit$ = document.getElementById(`${eltId}-edit`);
     const show$ = document.getElementById(`${eltId}-show`);
