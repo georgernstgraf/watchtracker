@@ -5,20 +5,17 @@ router.post('/:id', async (req, res) => {
     // this is a watchId here!!
     const watchId = req.params.id;
     const user = req.session.user;
-    if (!(await Watch.belongsToUser(watchId, user))) {
+    const watch = await Watch.userWatch(user, watchId);
+    if (!watch) {
         return res.status(403).send('Wrong Watch ID');
     }
     const m = new Measurement({
-        watchId: watchId,
-
+        watchId, watch,
     });
     m.patch(req.body);
     await m.save();
-    const watch = await Watch.userWatchWithMeasurements(user, watchId);
-    /* if (!watch) {
-        return res.status(403).send('Wrong Watch ID');
-    } */
-    res.locals.watch = watch;
+    const watchFull = await Watch.userWatchWithMeasurements(user, watchId);
+    res.locals.watch = watchFull;
     return res.render('measurements');
 });
 router.delete('/:id', async (req, res) => {

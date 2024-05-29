@@ -2,9 +2,9 @@ class dbEntity {
     constructor(data, prismaModel) {
         if ((!data) instanceof Object)
             throw new TypeError('data must be Object');
-        this._constrData = data;
         this._isDirty = !('id' in data);
         this._updates = {};
+        this._constrData = {};
         this._extra = {};
         const modelActions = new Set(Object.keys(prismaModel));
         if (
@@ -21,6 +21,14 @@ class dbEntity {
                 this._dbFields.add(key.slice(0, key.length - 2));
             }
         });
+        for (let key in data) {
+            if (this._dbFields.has(key)) {
+                this._constrData[key] = data[key];
+            } else {
+                this._extra[key] = data[key];
+            }
+        }
+
         return new Proxy(this, {
             get: (target, property) => {
                 if (property in target._extra) return target._extra[property];
@@ -76,11 +84,9 @@ class dbEntity {
     }
 
     getCurrentData() {
-        const data = { ...this._constrData };
+        const data = { ...this._constrData };  // work on a copy
         const updated = this.getOnlyUpdatedData();
-        Object.keys(updated).forEach((k) => {
-            data[k] = updated[k];
-        });
+        Object.assign(data, updated);
         return data;
     }
     isDirty() {

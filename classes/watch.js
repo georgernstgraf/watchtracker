@@ -38,7 +38,8 @@ class Watch extends dbEntity {
     }
     static async userWatch(userName, watchId) {
         const watch = await prisma.watch.findUnique({
-            where: { id: watchId, user: { name: userName } }
+            where: { id: watchId, user: { name: userName } },
+            include: { user: true }
         });
         if (!watch) return;
         return new Watch(watch);

@@ -1,7 +1,7 @@
     <%# 3 Modi: Normal Display / Edit / New
     let's do edit: [new | id | undefined]
     _%>
-    <caption colspan="6">
+    <caption>
         <%# Normal Display _%>
         <span id="caption-normal">
             <%# button: new _%>
@@ -23,16 +23,16 @@
                 🚮</button>
             <button title="cancel Edit" onclick="captionStyle('normal')">❌</button>
             <%# edit form _%>
-            <form hx-patch="<%= process.env.APP_PATH %>/auth/watch/<%= watch.id %>" hx-trigger='keyup[key=="Enter"]'
+            <form id="patchWatch" hx-patch="<%= process.env.APP_PATH %>/auth/watch/<%= watch.id %>" hx-trigger='trigger'
                 hx-target="#allButHeadAndFoot" hx-swap="outerHTML">
-                <button title="Save" type="submit">💾</button>
+                <button title="Save" onclick="htmx.trigger('#patchWatch', 'trigger')">💾</button>
                 <input type="text" name="name" value="<%= watch.name %>">
                 <input type="text" name="comment" <% if (watch.comment) { %> value="<%= watch.comment %>" <% } else { %>
                     placeholder="enter comment" <% } %>>
             </form>
         </span>
         <span id="caption-create" style="display:none">
-            <button title="cancel Edit" onclick="captionStyle('normal')" htmx.trigger="#newWatch">❌</button>
+            <button title="cancel Edit" onclick="captionStyle('normal')">❌</button>
             <form hx-post="<%= process.env.APP_PATH %>/auth/watch/" id="newWatch"'
                 hx-target="#allButHeadAndFoot" hx-swap="outerHTML">
                 <button title="Save" type="submit">💾</button>
