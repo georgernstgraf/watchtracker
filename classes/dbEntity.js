@@ -17,9 +17,6 @@ class dbEntity {
         this._dbFields = new Set();
         Object.keys(prismaModel.fields).forEach((key) => {
             this._dbFields.add(key);
-            if (key.endsWith('Id')) {
-                this._dbFields.add(key.slice(0, key.length - 2));
-            }
         });
         for (let key in data) {
             if (this._dbFields.has(key)) {

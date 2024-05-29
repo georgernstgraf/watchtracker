@@ -34,10 +34,10 @@ router.post('/', async (req, res) => {
         errors.push(`login failed: ${err.message}`);
         return res.render('login');
     }
-    req.session.user = user; // registers the session and sends the cookie
-    await User.enforceExists(user);
-    const userWatches = await Watch.userWatches(user);
-    const watch = await Watch.userWatchWithMeasurements(user);
+    // registers the session and sends the cookie
+    req.session.user = (await User.enforceExists(user))._constrData;
+    const userWatches = await Watch.userWatches(user.name);
+    const watch = await Watch.userWatchWithMeasurements(user.name);
     return res.render('body', {
         userObj: watch.user,
         userWatches: userWatches,

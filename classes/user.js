@@ -25,11 +25,12 @@ class User extends dbEntity {
         });
     }
     static async enforceExists(userName) {
-        await prisma.user.upsert({
+        const user = await prisma.user.upsert({
             where: { name: userName },
             update: {},
             create: { name: userName }
         });
+        return new User(user);
     }
     static async byName(userName) {
         return new User(await prisma.user.findUnique({ where: { name: userName } }));
