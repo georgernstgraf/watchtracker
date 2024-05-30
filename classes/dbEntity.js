@@ -63,7 +63,7 @@ class dbEntity {
         return this._updates;
     }
     async save() {
-        if (!this.isDirty()) return;
+        if (!this.isDirty()) return this;
         if (this.id) {
             this.updateAfterSave(
                 await this._prismaModel.update({

@@ -77,3 +77,22 @@ function watchCreateDisplay(what) {
         }
     }
 }
+function editTimezone(really = true) {
+    const edit$ = document.getElementById('timeZoneEdit');
+    const disp$ = document.getElementById('timeZoneDisplay');
+    switch (really) {
+        case true: {
+            edit$.style.display = "";
+            disp$.style.display = "none";
+            break;
+        }
+        case false: {
+            edit$.style.display = "none";
+            disp$.style.display = "";
+            break;
+        }
+        default: {
+            throw new Error("not implemented");
+        }
+    }
+}
