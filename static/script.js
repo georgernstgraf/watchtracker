@@ -42,29 +42,38 @@ function editMode(eltId, on = false) {
 }
 function captionStyle(style) {
     const normal$ = document.getElementById("caption-normal");
-    const create$ = document.getElementById("caption-create");
     const edit$ = document.getElementById("caption-edit");
     switch (style) {
         case "normal": {
             normal$.style.display = "";
-            create$.style.display = "none";
-            edit$.style.display = "none";
-            break;
-        }
-        case "create": {
-            normal$.style.display = "none";
-            create$.style.display = "";
             edit$.style.display = "none";
             break;
         }
         case "edit": {
             normal$.style.display = "none";
-            create$.style.display = "none";
             edit$.style.display = "";
             break;
         }
         default: {
             throw new Error("this caption Style not implemented");
+        }
+    }
+}
+function watchCreateDisplay(what) {
+    const btn$ = document.getElementById('watchCreateBtn');
+    const form$ = document.getElementById('watchCreateForm');
+    switch (what) {
+        case "form": {
+            btn$.style.display = "none";
+            form$.style.display = "";
+            break;
+        }
+        case "btn": {
+            btn$.style.display = "";
+            form$.style.display = "none";
+        }
+        default: {
+            throw new Error("not implemented");
         }
     }
 }

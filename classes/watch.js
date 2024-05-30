@@ -22,7 +22,6 @@ class Watch extends dbEntity {
                         createdAt: 'desc'
                     }
                 },
-                user: true
             }
         });
         if (!rawWatch) return rawWatch;

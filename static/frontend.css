@@ -47,6 +47,7 @@ footer a {
     color: var(--header-h2-color);
 }
 
+span *,
 caption * {
     display: inline;
 }
