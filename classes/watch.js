@@ -5,13 +5,14 @@ class Watch extends dbEntity {
     constructor(data) {
         super(data, prisma.watch);
     }
-    static async userWatchWithMeasurements(userName, watchId) {
+    static async userWatchWithMeasurements(user, watchId) {
         let whereClause;
         if (watchId) {
-            whereClause = { id: watchId, user: { name: userName } };
+            // include user because it might not be his watch
+            whereClause = { id: watchId, user: { id: user.id } };
         } else {
-            whereClause = { lastUser: { name: userName } };
-        }
+            whereClause = { lastUserId: user.id };
+        };
         const rawWatch = await prisma.watch.findFirst({
             // TODO findUnique should work!!
             where: whereClause,
@@ -32,37 +33,37 @@ class Watch extends dbEntity {
             watch['measurements']
         );
         watch.measurements.forEach((m) =>
-            m.setDisplayData(watch.user.timeZone)
+            m.setDisplayData(user.timeZone)
         );
         return watch;
     }
-    static async userWatch(userName, watchId) {
+    static async userWatch(user, watchId) {
         const watch = await prisma.watch.findUnique({
-            where: { id: watchId, user: { name: userName } },
+            where: { id: watchId, user: { id: user.id } },
             include: { user: true }
         });
         if (!watch) return;
         return new Watch(watch);
     }
-    static async userWatches(userName) {
+    static async userWatches(user) {
         return (
             await prisma.watch.findMany({
-                where: { user: { name: userName } }
+                where: { user: { id: user.id } }
             })
         )?.map((w) => new Watch(w));
     }
-    static async belongsToUser(watchId, userName) {
+    static async belongsToUser(watchId, user) {
         const ownedIds = (
             await prisma.watch.findMany({
-                where: { user: { name: userName } },
+                where: { user: { id: user.id } },
                 select: { id: true }
             })
         ).map((e) => e.id);
         return ownedIds.includes(watchId);
     }
-    static async deleteIDForUserName(watchId, userName) {
+    static async deleteIDForUser(watchId, user) {
         await prisma.watch.delete({
-            where: { id: watchId, user: { name: userName } }
+            where: { id: watchId, user: { id: user.id } }
         });
     }
 }

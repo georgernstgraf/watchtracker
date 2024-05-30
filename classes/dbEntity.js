@@ -78,6 +78,7 @@ class dbEntity {
                 })
             );
         }
+        return this;
     }
 
     getCurrentData() {

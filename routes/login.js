@@ -13,15 +13,15 @@ router.post('/', async (req, res) => {
         errors.push('Password is required');
     }
     if (errors.length !== 0) {
-        return res.render('login');
+        return res.render('login-body');
     }
-    const user = req.body.user;
+    const userName = req.body.user;
     const passwd = req.body.passwd;
     try {
         const authResp = await fetch(process.env.AUTH_API_URL, {
             method: 'POST',
             body: JSON.stringify({
-                user: user,
+                user: userName,
                 passwd: passwd
             }),
             headers: { 'Content-Type': 'application/json' }
@@ -32,16 +32,17 @@ router.post('/', async (req, res) => {
         }
     } catch (err) {
         errors.push(`login failed: ${err.message}`);
-        return res.render('login');
+        return res.render('login-body');
     }
     // registers the session and sends the cookie
-    req.session.user = (await User.enforceExists(user))._constrData;
-    const userWatches = await Watch.userWatches(user.name);
-    const watch = await Watch.userWatchWithMeasurements(user.name);
+    const user = await User.enforceExists(userName);
+    req.session.user = user.getCurrentData();
+    const userWatches = await Watch.userWatches(user);
+    const watch = await Watch.userWatchWithMeasurements(user);
     return res.render('body', {
-        userObj: watch.user,
-        userWatches: userWatches,
-        watch: watch,
+        user: watch.user,
+        userWatches,
+        watch,
         timeZones: TimeZone.timeZones
     });
 });

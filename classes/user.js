@@ -14,10 +14,10 @@ class User extends dbEntity {
             }
         });
     }
-    static async setLastWatchIdForUser(watchId, userName) {
+    static async setLastWatchIdForUser(watchId, user) {
         await prisma.user.update({
             where: {
-                name: userName
+                id: user.id
             },
             data: {
                 lastWatch: { connect: { id: watchId } }
@@ -31,9 +31,6 @@ class User extends dbEntity {
             create: { name: userName }
         });
         return new User(user);
-    }
-    static async byName(userName) {
-        return new User(await prisma.user.findUnique({ where: { name: userName } }));
     }
 }
 module.exports = User;

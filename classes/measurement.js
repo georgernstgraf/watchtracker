@@ -54,7 +54,7 @@ class Measurement extends dbEntity {
                 }
             }
         });
-        return data.watch.user.name === user ? data.watch.id : null;
+        return data.watch.user.name === user.name ? data.watch.id : null;
     }
     static async getUserMeasurement(user, measureId) {
         const measure = await prisma.measurement.findUnique({
@@ -67,24 +67,13 @@ class Measurement extends dbEntity {
                 }
             }
         });
-        if (!measure || measure.watch.user.name !== user) {
+        if (!measure || measure.watch.user.name !== user.name) {
             return;
         }
         return new Measurement(measure);
     }
     static async delete(id) {
         return await prisma.measurement.delete({ where: { id: id } });
-    }
-    static async lastForUserName(userName) {
-        return this.instances(
-            await prisma.measurement.findMany({
-                where: {
-                    watch: {
-                        lastUser: { name: userName }
-                    }
-                }
-            })
-        );
     }
     static instances(rawMeasurements) {
         if (!rawMeasurements) return;
