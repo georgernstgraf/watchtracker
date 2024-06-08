@@ -1,14 +1,16 @@
 const router = require('express').Router();
 const Watch = require('../classes/watch');
 const TimeZone = require('../classes/timeZone');
-const User = require('../classes/user');
+const validSessionUser = require('../lib/validSessionUser');
 router.get('/', async (req, res) => {
-    const user = req.session.user;
-    const full = req.headers['hx-request'] ? '-body' : '-full';
-    if (user) {
+    try {
+        const user = validSessionUser(req.session);
+        const full = req.headers['hx-request'] ? '-body' : '-full';
         const userWatches = await Watch.userWatches(user);
         const watch = await Watch.userWatchWithMeasurements(user);
         return res.render(`index${full}`, { user, watch, userWatches, timeZones: TimeZone.timeZones });
+    } catch (e) {
+        console.log("Error in slash.js" + e.message);
     }
     return res.render(`login${full}`);
 });
