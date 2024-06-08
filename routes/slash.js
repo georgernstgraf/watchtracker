@@ -3,9 +3,9 @@ const Watch = require('../classes/watch');
 const TimeZone = require('../classes/timeZone');
 const validSessionUser = require('../lib/validSessionUser');
 router.get('/', async (req, res) => {
+    const full = req.headers['hx-request'] ? '-body' : '-full';
     try {
         const user = validSessionUser(req.session);
-        const full = req.headers['hx-request'] ? '-body' : '-full';
         const userWatches = await Watch.userWatches(user);
         const watch = await Watch.userWatchWithMeasurements(user);
         return res.render(`index${full}`, { user, watch, userWatches, timeZones: TimeZone.timeZones });
