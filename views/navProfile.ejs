@@ -1,27 +1,30 @@
-   <%# [user.name user.timeZone timeZones[] ] _%>
-   <nav id="profile">
-       <form action="" hx-post="<%= process.env.APP_PATH %>/logout" hx-target="body">
-           <button id="profileLogoutButton" class="logout">logout</button>
-       </form>
-       <span id="profileUsername">
-           <%= user.name %>
-       </span>
-       <span id="timeZoneDisplay">
-           <button title="Swith Timezone" class="startStop" onclick="editTimezone()">✏️</button>
-           Timezone: <%= user.timeZone _%>
-       </span>
-       <span id="timeZoneEdit" style="display: none;">
-           <button title="Done" class="startStop"
-                   onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)">💾</button>
-           <form onsubmit="return false;" hx-patch="<%- process.env.APP_PATH _%>/auth/user" hx-target="body"
-                 id="timeZoneSelectForm" hx-trigger="trigger" hx-swap="outerHTML">
-               <label for="timeZoneSelector">My Timezone: </label>
-               <input id="timeZoneSelector" list="timeZoneList" name="timeZone" placeholder="<%= user.timeZone %>">
-               <datalist id="timeZoneList" style="display: none;">
-                   <% timeZones.forEach(zone => { _%>
-                   <option value="<%=zone%>"><%=zone%></option>
-                   <% }) _%>
-               </datalist>
-           </form>
-       </span>
-   </nav>
+<%# [user.name user.timeZone timeZones[] ] _%>
+    <nav id="profile">
+        <form action="" hx-post="<%= process.env.APP_PATH %>/logout" hx-target="body">
+            <button id="profileLogoutButton" class="logout">logout</button>
+        </form>
+        <span id="profileUsername">
+            <%= user.name %>
+        </span>
+        <span id="timeZoneDisplay">
+            <button title="Swith Timezone" class="startStop" onclick="editTimezone()">✏️</button>
+            Timezone: <%= user.timeZone _%>
+        </span>
+        <span id="timeZoneEdit" style="display: none;">
+            <button title="Cancel" onclick="editTimezone(false)">❌</button>
+            <button title="Done" class="startStop"
+                onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)">💾</button>
+            <form onsubmit="return false;" hx-patch="<%- process.env.APP_PATH _%>/auth/user" hx-target="body"
+                id="timeZoneSelectForm" hx-trigger="trigger" hx-swap="outerHTML">
+                <label for="timeZoneSelector">My Timezone: </label>
+                <input id="timeZoneSelector" list="timeZoneList" name="timeZone" placeholder="<%= user.timeZone %>">
+                <datalist id="timeZoneList" style="display: none;">
+                    <% timeZones.forEach(zone=> { _%>
+                        <option value="<%=zone%>">
+                            <%=zone%>
+                        </option>
+                        <% }) _%>
+                </datalist>
+            </form>
+        </span>
+    </nav>
