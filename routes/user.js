@@ -4,7 +4,9 @@ const User = require('../classes/user');
 const Watch = require('../classes/watch');
 router.patch('', async (req, res) => {
     const userObj = new User(req.session.user);
-    userObj.patch(req.body);
+    if (req.body.timeZone && !TimeZone.timeZones.includes(req.body.timeZone)) {
+        return res.status(422).send(e.message);
+    }
     const user = await userObj.save();
     req.session.user = user.getCurrentData();  // not daring / willing to put a proxy object onto the session
     const userWatches = await Watch.userWatches(user);
