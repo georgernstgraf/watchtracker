@@ -1,4 +1,5 @@
 node_modules
+run
 .env
 yarn-error.log
 debug.js
