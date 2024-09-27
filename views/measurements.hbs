@@ -1,0 +1,40 @@
+<input type="text" name="comment" {{#if e.comment}} value="{{e.comment}}" {{else}}
+                        placeholder="enter comment" {{/if}}>
+                </td>
+            </form>
+        </tr>
+        <tr id="{{e.id}}-show" data-id="{{e.id}}">
+            <th scope="row">
+                <button title="Edit Measurement" class="startStop" onclick="editMode('{{e.id}}', true)">✏️</button>
+            </th>
+            <td>
+                {{e.createdAt16.replace "T" " "}}
+            </td>
+            <td>
+                {{e.value}}s
+            </td>
+            <td>
+                {{#if e.isStart}} 🎬
+                {{else}} ⌛
+                {{/if}}
+            </td>
+            <td class="sekPerDay">
+                {{{e.driftDisplay}}}
+            </td>
+            <td>
+                {{e.comment}}
+            </td>
+        </tr>
+        {{/each}}
+    </tbody>
+    <tfoot>
+        <tr>
+            {{#if overallMeasure}}
+            <td class="driftSummary" colspan="6"> (Duration: {{overallMeasure.durationDays}} Days, Drift:
+                {{overallMeasure.driftSeks}} Sec=&gt; {{overallMeasure.niceDisplay}})</td>
+            {{else}}
+            <td class="driftSummary" colspan="6">No records yet</td>
+            {{/if}}
+        </tr>
+    </tfoot>
+</table>

@@ -1,0 +1,22 @@
+<p>
+    <em>Path: </em>
+    {{error.path}}
+</p>
+<p>
+    <em>Message</em>
+    {{error.message}}
+</p>
+<p>
+    <em>Stack</em>
+    {{error.stack}}
+</p>
+<p><em>JSON:</em>
+    {{JSONstringify error.message}}
+</p>
+{{#if errors}}
+    {{#each errors}}
+        <p class='error'>
+            {{this}}
+        </p>
+    {{/each}}
+{{/if}}

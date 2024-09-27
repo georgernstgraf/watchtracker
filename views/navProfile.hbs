@@ -1,0 +1,48 @@
+<nav id='profile'>
+    <form action='' hx-post='{{process.env.APP_PATH}}/logout' hx-target='body'>
+        <button id='profileLogoutButton' class='logout'>logout</button>
+    </form>
+    <span id='profileUsername'>
+        {{user.name}}
+    </span>
+    <span id='timeZoneDisplay'>
+        <button
+            title='Switch Timezone'
+            class='startStop'
+            onclick='editTimezone()'
+        >✏️</button>
+        Timezone:
+        {{user.timeZone}}
+    </span>
+    <span id='timeZoneEdit' style='display: none;'>
+        <button title='Cancel' onclick='editTimezone(false)'>❌</button>
+        <button
+            title='Done'
+            class='startStop'
+            onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)"
+        >💾</button>
+        <form
+            onsubmit='return false;'
+            hx-patch='{{process.env.APP_PATH}}/auth/user'
+            hx-target='body'
+            id='timeZoneSelectForm'
+            hx-trigger='trigger'
+            hx-swap='outerHTML'
+        >
+            <label for='timeZoneSelector'>My Timezone: </label>
+            <input
+                id='timeZoneSelector'
+                list='timeZoneList'
+                name='timeZone'
+                placeholder='{{user.timeZone}}'
+            />
+            <datalist id='timeZoneList' style='display: none;'>
+                {{#each timeZones}}
+                    <option value='{{this}}'>
+                        {{this}}
+                    </option>
+                {{/each}}
+            </datalist>
+        </form>
+    </span>
+</nav>

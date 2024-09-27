@@ -1,9 +1,19 @@
 'use strict';
+
+// import express from "express";
+// import { engine } from "../../dist/index.js"; // "express-handlebars"
+//
+// import * as path from "path";
+// import { fileURLToPath } from "url";
+// const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+
+
 const express = require('express');
 const { session } = require('./lib/session');
 const httpErrors = require('http-errors'); // middleware for error handlers
 const path = require('path');
-const ejs = require('ejs');
+const { engine: exphbs } = require('express-handlebars');
 const expressStaticGzip = require('express-static-gzip');
 const bodyParser = require('body-parser');
 const prisma = require('./lib/db');
@@ -46,9 +56,10 @@ module.exports = function main(options, cb) {
     if (process.env.NODE_ENV === 'production') {
         app.set('trust proxy', 'loopback');
     }
-    app.set('view engine', 'ejs');
+
+    app.engine('hbs', exphbs({ extname: '.hbs', partialsDir: path.join(__dirname, 'views') }));
+    app.set('view engine', 'hbs');
     app.set('views', path.join(__dirname, 'views'));
-    app.engine('ejs', ejs.renderFile);
 
     // router with sessions, no auth enforced:
     const sessionRouter = express.Router();
@@ -80,6 +91,7 @@ module.exports = function main(options, cb) {
         }
         console.error(`fiveHundred activated: ${err} (${err.status})`);
         res.locals.error = err;
+        res.set('Content-Type', 'text/plain');
         res.status(err.status || 500).send(err.message);
     });
     // Start server
