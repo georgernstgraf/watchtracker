@@ -1,25 +1,45 @@
+<!-- #caption.hbs -->
 <caption>
     <span id="caption-normal">
         {{#if watch}}
-        <button title="Edit Name and Comment" class="startStop" onclick="captionStyle('edit')">✏️</button>
+        <button title="Edit Name and Comment"
+                class="startStop"
+                onclick="captionStyle('edit')">✏️</button>
         {{watch.name}}
         {{#if watch.comment}}
         <p class="smaller"> {{watch.comment}} </p>
         {{/if}}
         {{/if}}
     </span>
-    <span id="caption-edit" style="display: none;">
-        <button title="Remove Watch and all Records" class="startStop"
-            hx-delete="{{appPath}}/auth/watch/{{watch.id}}" hx-target="#allButHeadAndFoot"
-            hx-swap="outerHTML">
+    <span id="caption-edit"
+          style="display: none;">
+        <button title="Remove Watch and all Records"
+                class="startStop"
+                hx-delete="{{appPath}}/auth/watch/{{watch.id}}"
+                hx-target="#allButHeadAndFoot"
+                hx-swap="outerHTML">
             🚮</button>
-        <button title="cancel Edit" onclick="captionStyle('normal')">❌</button>
-        <button title="Save" onclick="htmx.trigger('#patchWatch', 'trigger')">💾</button>
-        <form id="patchWatch" hx-patch="{{appPath}}/auth/watch/{{watch.id}}" hx-trigger='trigger'
-            hx-target="#allButHeadAndFoot" hx-swap="outerHTML">
-            <input type="text" name="name" value="{{watch.name}}">
-            <input type="text" name="comment" {{#if watch.comment}} value="{{watch.comment}}" {{else}}
-                placeholder="enter comment" {{/if}}>
+        <button title="cancel Edit"
+                onclick="captionStyle('normal')">❌</button>
+        <button title="Save"
+                onclick="htmx.trigger('#patchWatch', 'trigger')">💾</button>
+        <form id="patchWatch"
+              hx-patch="{{appPath}}/auth/watch/{{watch.id}}"
+              hx-trigger='trigger'
+              hx-target="#allButHeadAndFoot"
+              hx-swap="outerHTML">
+            <input type="text"
+                   name="name"
+                   value="{{watch.name}}">
+            <input type="text"
+                   name="comment"
+                   {{#if
+                   watch.comment}}
+                   value="{{watch.comment}}"
+                   {{else}}
+                   placeholder="enter comment"
+                   {{/if}}>
         </form>
     </span>
 </caption>
+<!-- /caption.hbs -->

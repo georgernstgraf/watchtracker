@@ -1,14 +1,25 @@
+<!-- #login-body.hbs -->
+
 <body>
-<h1>Watchtracker</h1>
-{{#if errors}}
+    <h1>Watchtracker</h1>
+    {{#if errors}}
     {{#each errors}}
-        <p>{{this}}</p>
+    <p>{{this}}</p>
     {{/each}}
-{{/if}}
-<form hx-post="{{appPath}}/login" hx-target="body">
-    <input type="text" name="user" id="username" placeholder="Username">
-    <input type="password" name="passwd" id="password" placeholder="Password">
-    <input type="submit" value="Login">
-</form>
-{{> footer}}
+    {{/if}}
+    <form hx-post="{{appPath}}/login"
+          hx-target="body">
+        <input type="text"
+               name="user"
+               id="username"
+               placeholder="Username">
+        <input type="password"
+               name="passwd"
+               id="password"
+               placeholder="Password">
+        <input type="submit"
+               value="Login">
+    </form>
+    {{> footer}}
 </body>
+<!-- /login-body.hbs -->

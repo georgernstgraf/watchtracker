@@ -1,44 +1,38 @@
+<!-- #userwatches.hbs -->
 <div id='userWatches'>
-    <select
-        id='watchSelect'
-        size='{{userWatches.length}}'
-        hx-get='{{appPath}}/auth/watch/'
-        hx-target='#measurements'
-        hx-vals='js:{id: event.target.value}'
-    >
+    <select id='watchSelect'
+            size='{{userWatches.length}}'
+            hx-get='{{appPath}}/auth/watch/'
+            hx-target='#measurements'
+            hx-vals='js:{id: event.target.value}'>
         {{#each userWatches}}
-            <option value='{{id}}'>{{name}}</option>
+        <option value='{{id}}'>{{name}}</option>
         {{/each}}
     </select>
-    <button
-        title='Add a new Watch to track'
-        onclick="watchCreateDisplay('form')"
-        id='watchCreateBtn'
-    >＋</button>
-    <span id='watchCreateForm' style='display:none'>
-        <button
-            title='cancel Edit'
-            onclick="watchCreateDisplay('btn')"
-        >❌</button>
-        <button
-            title='Save'
-            type='button'
-            onclick="htmx.trigger('#newWatchSave', 'trigger')"
-        >💾</button>
-        <form
-            id='newWatchSave'
-            hx-post='{{appPath}}/auth/watch/'
-            hx-target='#allButHeadAndFoot'
-            hx-swap='outerHTML'
-            hx-trigger='trigger'
-        >
-            <input type='text' name='name' value='' placeholder='enter Name' />
-            <input
-                type='text'
-                name='comment'
-                value=''
-                placeholder='enter Comment'
-            />
+    <button title='Add a new Watch to track'
+            onclick="watchCreateDisplay('form')"
+            id='watchCreateBtn'>＋</button>
+    <span id='watchCreateForm'
+          style='display:none'>
+        <button title='cancel Edit'
+                onclick="watchCreateDisplay('btn')">❌</button>
+        <button title='Save'
+                type='button'
+                onclick="htmx.trigger('#newWatchSave', 'trigger')">💾</button>
+        <form id='newWatchSave'
+              hx-post='{{appPath}}/auth/watch/'
+              hx-target='#allButHeadAndFoot'
+              hx-swap='outerHTML'
+              hx-trigger='trigger'>
+            <input type='text'
+                   name='name'
+                   value=''
+                   placeholder='enter Name' />
+            <input type='text'
+                   name='comment'
+                   value=''
+                   placeholder='enter Comment' />
         </form>
     </span>
 </div>
+<!-- /userwatches.hbs -->
