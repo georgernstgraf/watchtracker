@@ -2,6 +2,7 @@ const prisma = require('../lib/db');
 const ms = require('ms');
 const TimeZone = require('./timeZone');
 const dbEntity = require('./dbEntity');
+const hb = require('handlebars');
 class Measurement extends dbEntity {
     constructor(data) {
         super(data, prisma.measurement);
@@ -109,7 +110,7 @@ class Measurement extends dbEntity {
                     ? `+${driftSeksPerDay}`
                     : `${driftSeksPerDay}`;
             measurements[i]['driftDisplay'] =
-                `<strong>${driftSeksPerDayDisplay} s/d</strong> (${durationDisplay})`;
+                new hb.SafeString(`<strong>${driftSeksPerDayDisplay} s/d</strong> (${durationDisplay})`);
             measurements[i]['driftMath'] = {
                 durationDays: durationDays,
                 driftSeks: driftSeks

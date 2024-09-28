@@ -45,50 +45,54 @@ t measurements=watch.measurements overallMeasure=watch.overallMeasure-->
         <tr style="display:none" id="{{id}}-edit" data-id="{{id}}">
             <th scope="row">
                 <span>
-                    <button title="delete Record" hx-delete="{{appPath}}/auth/measure/{{id}}"
+                    <button title="delete Record" hx-delete="{{../appPath}}/auth/measure/{{id}}"
                         hx-target="closest table" hx-swap="outerHTML">🚮</button>
-                    <button title="cancel Edit" onclick="editMode('<%= e.id _%>', false)">❌</button>
-                    <button title="Save Record" onclick="htmx.trigger('#<%= e.id _%>-form', 'trigger')">💾</button>
+                    <button title="cancel Edit" onclick="editMode('{{id}}', false)">❌</button>
+                    <button title="Save Record" onclick="htmx.trigger('#{{id}}-form', 'trigger')">💾</button>
                 </span>
             </th>
-                <form id="<%= e.id _%>-form" hx-patch="<%= process.env.APP_PATH %>/auth/measure/<%= e.id %>"
+                <form id="{{id}}-form" hx-patch="{{../appPath}}/auth/measure/{{id}}"
                 hx-target="closest table" hx-swap="outerHTML" hx-trigger="trigger">
                 <td>
-                    <input type="datetime-local" name="createdAt" value="<%= e.createdAt16 %>">
+                    <input type="datetime-local" name="createdAt" value="{{createdAt16}}">
                 </td>
                 <td>
-                    <input type="number" name="value" value="<%= e.value %>">
+                    <input type="number" name="value" value="{{value}}">
                 </td>
-                <td><input type="checkbox" name="isStart" value="true" <% if (e.isStart) { _%>checked<% } _%>></td>
+                <td><input type="checkbox" name="isStart" value="true" {{#if isStart}}checked{{/if}}></td>
                 <td class="sekPerDay">
-                    <%- e.driftDisplay %>
+                    {{driftDisplay}}
                 </td>
                 <td>
-                    <input type="text" name="comment" <% if (e.comment) { %> value="<%= e.comment %>" <% } else { %>
-                        placeholder="enter comment" <% } %>>
+                    <input type="text" name="comment" {{#if comment}}
+                       value="{{comment}}" {{else}}
+                        placeholder="enter comment"
+                    {{/if}}>
                 </td>
             </form>
         </tr>
-           <tr id="<%= e.id _%>-show" data-id="<%= e.id %>">
+           <tr id="{{id}}-show" data-id="{{id}}">
             <th scope="row">
-                <button title="Edit Measurement" class="startStop" onclick="editMode('<%= e.id _%>', true)">✏️</button>
+                <button title="Edit Measurement" class="startStop" onclick="editMode('{{id}}', true)">✏️</button>
             </th>
             <td>
-                <%= e.createdAt16.replace("T", " ") %>
+                {{createdAt16}} <!-- TODO helper.replace("T", " ") -->
             </td>
             <td>
-                <%= e.value %>s
+                {{value}}s
             </td>
             <td>
-                <% if (e.isStart) { %> 🎬
-                <% } else { %> ⌛
-                <% } %>
+                {{#if isStart}}
+                🎬
+                   {{else}}
+                ⌛
+                {{/if}}
             </td>
             <td class="sekPerDay">
-                <%- e.driftDisplay %>
+                {{driftDisplay}}
             </td>
             <td>
-                <%= e.comment %>
+                {{comment}}
             </td>
         </tr>
         {{/each}}

@@ -36,6 +36,7 @@
         "express-session": "^1.18.0",
         "express-static": "^1.2.6",
         "express-static-gzip": "^2.1.8",
+        "handlebars": "^4.7.8",
         "htmx.org": "^2.0.2",
         "luxon": "^3.5.0",
         "moment-timezone": "^0.5.45",

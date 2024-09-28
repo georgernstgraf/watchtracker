@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
     req.session.user = user.getCurrentData();
     const userWatches = await Watch.userWatches(user);
     const watch = await Watch.userWatchWithMeasurements(user);
-    return res.render('body', {
+    return res.render('auth-body', {
         user: req.session.user,
         userWatches,
         watch,

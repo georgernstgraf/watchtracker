@@ -12,6 +12,6 @@ router.patch('', async (req, res) => {
     req.session.user = user.getCurrentData();  // not daring / willing to put a proxy object onto the session
     const userWatches = await Watch.userWatches(user);
     const watch = await Watch.userWatchWithMeasurements(user);
-    return res.render('body', { user, timeZones: TimeZone.timeZones, userWatches, watch });
+    return res.render('auth-body', { user, timeZones: TimeZone.timeZones, userWatches, watch });
 });
 module.exports = router;
