@@ -82,13 +82,21 @@ function editTimezone(really = true) {
     const disp$ = document.getElementById('timeZoneDisplay');
     switch (really) {
         case true: {
+            // show edit
             edit$.style.display = "";
+            edit$.classList.add("d-flex");
+            // hide normal
+            disp$.classList.remove("d-flex");
             disp$.style.display = "none";
             break;
         }
         case false: {
-            edit$.style.display = "none";
+            // show normal
             disp$.style.display = "";
+            disp$.classList.add("d-flex");
+            // hide edit
+            edit$.classList.remove("d-flex");
+            edit$.style.display = "none";
             break;
         }
         default: {

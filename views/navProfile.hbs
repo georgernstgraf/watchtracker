@@ -1,28 +1,29 @@
 <!-- #navProfile.hbs -->
-<nav id='profile'>
-    <form action=''
-          hx-post='{{appPath}}/logout'
-          hx-target='body'>
-        <button id='profileLogoutButton'
-                class='logout'>logout</button>
-    </form>
-    <span id='profileUsername'>
-        {{user.name}}
-    </span>
-    <span id='timeZoneDisplay'>
+<nav id='profile'
+     class="ms-auto w-50">
+    <div class="d-flex justify-content-end align-items-baseline gap-2 mb-2">
+
+        <span id='profileUsername'>
+            User: {{user.name}}
+        </span>
+        <form hx-post='{{appPath}}/logout'
+              hx-target='body'>
+            <button id='profileLogoutButton'
+                    class='logout'>logout</button>
+        </form>
+    </div>
+    <div id='timeZoneDisplay'
+         class="d-flex justify-content-end align-items-baseline gap-2">
+        <p>
+            Timezone: {{user.timeZone}}
+        </p>
         <button title='Switch Timezone'
-                class='startStop'
+                class='startStop '
                 onclick='editTimezone()'>✏️</button>
-        Timezone:
-        {{user.timeZone}}
-    </span>
-    <span id='timeZoneEdit'
-          style='display: none;'>
-        <button title='Cancel'
-                onclick='editTimezone(false)'>❌</button>
-        <button title='Done'
-                class='startStop'
-                onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)">💾</button>
+    </div>
+    <div id='timeZoneEdit'
+         class="justify-content-end align-items-baseline gap-2"
+         style="display: none">
         <form onsubmit='return false;'
               hx-patch='{{appPath}}/auth/user'
               hx-target='body'
@@ -43,6 +44,12 @@
                 {{/each}}
             </datalist>
         </form>
-    </span>
+        <button title='Cancel'
+                onclick='editTimezone(false)'>❌</button>
+        <button title='Done'
+                class='startStop'
+                onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)">💾</button>
+
+    </div>
 </nav>
 <!-- /navProfile.hbs -->
