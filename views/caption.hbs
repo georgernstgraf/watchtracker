@@ -10,12 +10,12 @@
     </span>
     <span id="caption-edit" style="display: none;">
         <button title="Remove Watch and all Records" class="startStop"
-            hx-delete="{{process.env.APP_PATH}}/auth/watch/{{watch.id}}" hx-target="#allButHeadAndFoot"
+            hx-delete="{{appPath}}/auth/watch/{{watch.id}}" hx-target="#allButHeadAndFoot"
             hx-swap="outerHTML">
             🚮</button>
         <button title="cancel Edit" onclick="captionStyle('normal')">❌</button>
         <button title="Save" onclick="htmx.trigger('#patchWatch', 'trigger')">💾</button>
-        <form id="patchWatch" hx-patch="{{process.env.APP_PATH}}/auth/watch/{{watch.id}}" hx-trigger='trigger'
+        <form id="patchWatch" hx-patch="{{appPath}}/auth/watch/{{watch.id}}" hx-trigger='trigger'
             hx-target="#allButHeadAndFoot" hx-swap="outerHTML">
             <input type="text" name="name" value="{{watch.name}}">
             <input type="text" name="comment" {{#if watch.comment}} value="{{watch.comment}}" {{else}}

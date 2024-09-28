@@ -1,39 +1,106 @@
-<input type="text" name="comment" {{#if e.comment}} value="{{e.comment}}" {{else}}
-                        placeholder="enter comment" {{/if}}>
+<!-- Needs watch, measurements[] and overallMeasure
+t measurements=watch.measurements overallMeasure=watch.overallMeasure-->
+<table>
+    {{> caption}}
+    <thead>
+        <tr>
+            <th scope="rowgroup">
+                <button title="new record" id="newMeasurement" onclick="showMeasurementCreate()">
+                    ＋
+                </button>
+            </th>
+            <th scope="col">Entry Date</th>
+            <th scope="col">Deviation</th>
+            <th scope="col">Start?</th>
+            <th scope="col">Drift</th>
+            <th scope="col">Comment</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr style="display:none" id="measureCreate">
+            <th scope="row">
+                <span>
+                    <button title="Cancel" onclick="hideMeasurementCreate()">❌</button>
+                    <button title="Save Record"
+                        onclick="htmx.trigger('#unsavedMeasurement-form', 'trigger')">💾</button>
+                </span>
+            </th>
+            <form id="unsavedMeasurement-form" hx-post="{{appPath}}/auth/measure/{{watch.id}}"
+                hx-target="closest table" hx-swap="outerHTML" hx-trigger="trigger">
+                <td>
+                    <input id="measureCreateDateTime" type="datetime-local" name="createdAt">
+                </td>
+                <td>
+                    <input type="number" name="value" value="0">
+                </td>
+                <td><input type="checkbox" name="isStart" value="true"></td>
+                <td class="sekPerDay">
+                </td>
+                <td>
+                    <input type="text" name="comment" placeholder="enter comment">
                 </td>
             </form>
         </tr>
-        <tr id="{{e.id}}-show" data-id="{{e.id}}">
+        {{#each watch.measurements}}
+        <tr style="display:none" id="{{id}}-edit" data-id="{{id}}">
             <th scope="row">
-                <button title="Edit Measurement" class="startStop" onclick="editMode('{{e.id}}', true)">✏️</button>
+                <span>
+                    <button title="delete Record" hx-delete="{{appPath}}/auth/measure/{{id}}"
+                        hx-target="closest table" hx-swap="outerHTML">🚮</button>
+                    <button title="cancel Edit" onclick="editMode('<%= e.id _%>', false)">❌</button>
+                    <button title="Save Record" onclick="htmx.trigger('#<%= e.id _%>-form', 'trigger')">💾</button>
+                </span>
+            </th>
+                <form id="<%= e.id _%>-form" hx-patch="<%= process.env.APP_PATH %>/auth/measure/<%= e.id %>"
+                hx-target="closest table" hx-swap="outerHTML" hx-trigger="trigger">
+                <td>
+                    <input type="datetime-local" name="createdAt" value="<%= e.createdAt16 %>">
+                </td>
+                <td>
+                    <input type="number" name="value" value="<%= e.value %>">
+                </td>
+                <td><input type="checkbox" name="isStart" value="true" <% if (e.isStart) { _%>checked<% } _%>></td>
+                <td class="sekPerDay">
+                    <%- e.driftDisplay %>
+                </td>
+                <td>
+                    <input type="text" name="comment" <% if (e.comment) { %> value="<%= e.comment %>" <% } else { %>
+                        placeholder="enter comment" <% } %>>
+                </td>
+            </form>
+        </tr>
+           <tr id="<%= e.id _%>-show" data-id="<%= e.id %>">
+            <th scope="row">
+                <button title="Edit Measurement" class="startStop" onclick="editMode('<%= e.id _%>', true)">✏️</button>
             </th>
             <td>
-                {{e.createdAt16.replace "T" " "}}
+                <%= e.createdAt16.replace("T", " ") %>
             </td>
             <td>
-                {{e.value}}s
+                <%= e.value %>s
             </td>
             <td>
-                {{#if e.isStart}} 🎬
-                {{else}} ⌛
-                {{/if}}
+                <% if (e.isStart) { %> 🎬
+                <% } else { %> ⌛
+                <% } %>
             </td>
             <td class="sekPerDay">
-                {{{e.driftDisplay}}}
+                <%- e.driftDisplay %>
             </td>
             <td>
-                {{e.comment}}
+                <%= e.comment %>
             </td>
         </tr>
         {{/each}}
     </tbody>
-    <tfoot>
+       <tfoot>
         <tr>
-            {{#if overallMeasure}}
-            <td class="driftSummary" colspan="6"> (Duration: {{overallMeasure.durationDays}} Days, Drift:
-                {{overallMeasure.driftSeks}} Sec=&gt; {{overallMeasure.niceDisplay}})</td>
+            {{#if watch.overallMeasure}}
+                <td class="driftSummary" colspan="6">
+                    (Duration: {{watch.overallMeasure.durationDays}} Days, Drift: {{watch.overallMeasure.driftSeks}} Sec => {{watch.overallMeasure.niceDisplay}})
+                </td>
             {{else}}
-            <td class="driftSummary" colspan="6">No records yet</td>
+                <td class="driftSummary" colspan="6">No records yet</td>
             {{/if}}
         </tr>
     </tfoot>

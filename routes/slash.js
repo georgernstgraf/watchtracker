@@ -10,8 +10,7 @@ router.get('/', async (req, res) => {
         const watch = await Watch.userWatchWithMeasurements(user);
         return res.render(`index${full}`, { user, watch, userWatches, timeZones: TimeZone.timeZones });
     } catch (e) {
-        console.log("Error in slash.js:");
-        console.log(e.message);
+        console.log("slash.js:", e.message);
     }
     return res.render(`login${full}`);
 });

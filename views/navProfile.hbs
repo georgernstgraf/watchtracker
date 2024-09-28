@@ -1,5 +1,5 @@
 <nav id='profile'>
-    <form action='' hx-post='{{process.env.APP_PATH}}/logout' hx-target='body'>
+    <form action='' hx-post='{{appPath}}/logout' hx-target='body'>
         <button id='profileLogoutButton' class='logout'>logout</button>
     </form>
     <span id='profileUsername'>
@@ -23,7 +23,7 @@
         >💾</button>
         <form
             onsubmit='return false;'
-            hx-patch='{{process.env.APP_PATH}}/auth/user'
+            hx-patch='{{appPath}}/auth/user'
             hx-target='body'
             id='timeZoneSelectForm'
             hx-trigger='trigger'

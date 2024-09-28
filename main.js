@@ -57,14 +57,41 @@ module.exports = function main(options, cb) {
         app.set('trust proxy', 'loopback');
     }
 
-    app.engine('hbs', exphbs({ extname: '.hbs', partialsDir: path.join(__dirname, 'views') }));
+    app.engine('hbs', exphbs({
+        extname: '.hbs',
+        partialsDir: path.join(__dirname, 'views'),
+        runtimeOptions: { allowProtoPropertiesByDefault: true },
+        helpers: {
+            let: function (options) {
+                const context = Object.assign({}, this, options.hash);
+                return options.fn(context);
+            },
+            or: function () {
+                return Array.prototype.slice.call(arguments, 0, -1).some(Boolean);
+            },
+            //   and: function () {
+            //     return Array.prototype.slice.call(arguments, 0, -1).every(Boolean);
+            // },
+            not: function (value) {
+                return !value;
+            },
+            eq: function (a, b) {
+                return a === b;
+            }
+        }
+    }));
     app.set('view engine', 'hbs');
     app.set('views', path.join(__dirname, 'views'));
+    app.locals.layout = false;
 
     // router with sessions, no auth enforced:
     const sessionRouter = express.Router();
     sessionRouter.use(bodyParser.urlencoded({ extended: true }));
     sessionRouter.use(session);
+    sessionRouter.use((req, res, next) => {
+        res.locals.appPath = process.env.APP_PATH;
+        next();
+    });
     require('./lib/sessionRoutes')(sessionRouter, opts); // calls .use() several times on the sessionRouter
 
     // setting up the authRouter
@@ -74,13 +101,16 @@ module.exports = function main(options, cb) {
     authRouter.use(require('./lib/enforceUser'));
     require('./lib/authRoutes')(authRouter, opts); // calls .use() several times on the authRouter
 
-    // use all this routers in the app:
+    // USE all this routers in the app:
+
+    // rendered
     app.use(process.env.APP_PATH, sessionRouter);
     app.use(`${process.env.APP_PATH}/auth`, authRouter);
 
-    // serve static files as fallbacks
-    app.use(process.env.APP_PATH, expressStaticGzip('static'));
-    app.use(process.env.APP_PATH, express.static('static'));
+    // static files
+    app.use(process.env.APP_PATH, expressStaticGzip(path.join(__dirname, 'static')));
+    app.use(process.env.APP_PATH, express.static(path.join(__dirname, 'static')));
+
     // Common error handlers
     app.use(function fourOhFourHandler(req, res, next) {
         next(httpErrors(404, `Route not found: ${req.url}`));
