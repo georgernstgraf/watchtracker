@@ -46,12 +46,16 @@ function captionStyle(style) {
     switch (style) {
         case "normal": {
             normal$.style.display = "";
+            normal$.classList.add("d-flex");
             edit$.style.display = "none";
+            edit$.classList.remove("d-flex");
             break;
         }
         case "edit": {
             normal$.style.display = "none";
+            normal$.classList.remove("d-flex");
             edit$.style.display = "";
+            edit$.classList.add("d-flex");
             break;
         }
         default: {
@@ -59,22 +63,23 @@ function captionStyle(style) {
         }
     }
 }
-function watchCreateDisplay(what) {
+function watchCreateDisplay(yes = true) {
     const btn$ = document.getElementById('watchCreateBtn');
     const form$ = document.getElementById('watchCreateForm');
-    switch (what) {
-        case "form": {
-            btn$.style.display = "none";
-            form$.style.display = "";
-            break;
-        }
-        case "btn": {
-            btn$.style.display = "";
-            form$.style.display = "none";
-        }
-        default: {
-            throw new Error("not implemented");
-        }
+    if (yes) {
+        // hide the newwatch button
+        btn$.classList.remove("d-flex");
+        btn$.style.display = "none";
+        // un-hide the form
+        form$.style.display = "";
+        form$.classList.add("d-flex");
+    } else {
+        // hide the form
+        form$.style.display = "none";
+        form$.classList.remove("d-flex");
+        // show the button again
+        btn$.style.display = "";
+        btn$.classList.add("d-flex");
     }
 }
 function editTimezone(really = true) {

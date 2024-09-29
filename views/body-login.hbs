@@ -8,7 +8,7 @@
               <p>{{this}}</p>
               {{/each}}
               {{/if}}
-              <form class="my-2"
+              <form class="my-5 text-center"
                     hx-post="{{appPath}}/login"
                     hx-target="body">
                      <input type="text"
@@ -20,6 +20,7 @@
                             id="password"
                             placeholder="Password">
                      <input type="submit"
+                            class="btn btn-outline-light"
                             value="Login">
               </form>
               {{> footer}}

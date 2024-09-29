@@ -1,6 +1,6 @@
 <!-- #navProfile.hbs -->
 <nav id='profile'
-     class="ms-auto w-50">
+     class="mb-2">
     <div class="d-flex justify-content-end align-items-baseline gap-2 mb-2">
 
         <span id='profileUsername'>
@@ -43,12 +43,16 @@
                 {{/each}}
             </datalist>
         </form>
-        <button title='Cancel'
-                onclick='editTimezone(false)'>❌</button>
-        <button title='Done'
-                class='startStop'
-                onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)">💾</button>
-
+        <div class="btn-group"
+             role="group">
+            <button title='Cancel'
+                    class="btn btn-outline-light"
+                    onclick='editTimezone(false)'>❌</button>
+            <button title='Done'
+                    class="btn btn-outline-light"
+                    class='startStop'
+                    onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)">💾</button>
+        </div>
     </div>
 </nav>
 <!-- /navProfile.hbs -->

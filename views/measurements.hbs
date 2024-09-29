@@ -3,15 +3,6 @@
     {{> caption}}
     <thead>
         <tr>
-            <th scope="rowgroup"
-                style="width: 6ch;">
-                <button title="New Measurement"
-                        id="newMeasurement"
-                        class="btn btn-outline-light btn-sm"
-                        onclick="showMeasurementCreate()">
-                    ＋
-                </button>
-            </th>
             <th scope="col"
                 style="width: 13ch">Entry Date</th>
             <th scope="col"
@@ -24,86 +15,74 @@
                 class="text-center"
                 style="width: 20ch">Drift</th>
             <th scope="col">Comment</th>
+            <th scope="rowgroup"
+                style="width: 6ch;">
+                <button title="New Measurement"
+                        id="newMeasurement"
+                        class="btn btn-outline-light btn-sm"
+                        onclick="showMeasurementCreate()">
+                    ＋
+                </button>
+            </th>
         </tr>
-    </thead>
-    <tbody>
         <tr style="display:none"
             id="measureCreate">
-            <th scope="row">
-                <span>
-                    <button title="Cancel"
-                            onclick="hideMeasurementCreate()">❌</button>
-                    <button title="Save Record"
-                            onclick="htmx.trigger('#unsavedMeasurement-form', 'trigger')">💾</button>
-                </span>
-            </th>
-            <form id="unsavedMeasurement-form"
-                  hx-post="{{appPath}}/auth/measure/{{watch.id}}"
-                  hx-target="closest table"
-                  hx-swap="outerHTML"
-                  hx-trigger="trigger">
-                <td>
+            <th colspan="6">
+                <form id="unsavedMeasurement-form"
+                      class="my-3 text-center"
+                      hx-post="{{appPath}}/auth/measure/{{watch.id}}"
+                      hx-target="closest table"
+                      hx-swap="outerHTML"
+                      hx-trigger="trigger">
                     <input id="measureCreateDateTime"
                            type="datetime-local"
                            name="createdAt">
-                </td>
-                <td>
                     <input type="number"
                            name="value"
-                           value="0">
-                </td>
-                <td><input type="checkbox"
+                           value="0"
+                           style="width: 7ch">
+                    <input type="checkbox"
                            name="isStart"
-                           value="true"></td>
-                <td class="sekPerDay">
-                </td>
-                <td>
+                           value="true">
                     <input type="text"
                            name="comment"
                            placeholder="enter comment">
-                </td>
-            </form>
+                    <div class="btn-group">
+                        <button title="Cancel"
+                                class="btn btn-outline-light"
+                                onclick="event.preventDefault(); hideMeasurementCreate()">❌</button>
+                        <button title="Save Record"
+                                class="btn btn-outline-light"
+                                onclick="event.preventDefault(); htmx.trigger('#unsavedMeasurement-form', 'trigger')">💾</button>
+                    </div>
+                </form>
+            </th>
         </tr>
+    </thead>
+    <tbody>
         {{#each watch.measurements}}
         <tr style="display:none"
             id="{{id}}-edit"
             data-id="{{id}}">
-            <th scope="row">
-                <span>
-                    <button title="delete Record"
-                            hx-delete="{{../appPath}}/auth/measure/{{id}}"
-                            hx-target="closest table"
-                            hx-swap="outerHTML">🚮</button>
-                    <button title="cancel Edit"
-                            onclick="editMode('{{id}}', false)">❌</button>
-                    <button title="Save Record"
-                            onclick="htmx.trigger('#{{id}}-form', 'trigger')">💾</button>
-                </span>
-            </th>
-            <form id="{{id}}-form"
-                  hx-patch="{{../appPath}}/auth/measure/{{id}}"
-                  hx-target="closest table"
-                  hx-swap="outerHTML"
-                  hx-trigger="trigger">
-                <td>
+            <td colspan="6">
+                <form id="{{id}}-form"
+                      class="my-3 text-center"
+                      hx-patch="{{../appPath}}/auth/measure/{{id}}"
+                      hx-target="closest table"
+                      hx-swap="outerHTML"
+                      hx-trigger="trigger">
                     <input type="datetime-local"
                            name="createdAt"
                            value="{{createdAt16}}">
-                </td>
-                <td>
                     <input type="number"
                            name="value"
+                           style="width: 7ch"
                            value="{{value}}">
-                </td>
-                <td><input type="checkbox"
+                    <input type="checkbox"
                            name="isStart"
                            value="true"
                            {{#if
-                           isStart}}checked{{/if}}></td>
-                <td class="sekPerDay ps-2">
-                    {{driftDisplay}}
-                </td>
-                <td>
+                           isStart}}checked{{/if}}>
                     <input type="text"
                            name="comment"
                            {{#if
@@ -112,16 +91,25 @@
                            {{else}}
                            placeholder="enter comment"
                            {{/if}}>
-                </td>
-            </form>
+                    <div class="btn-group">
+                        <button title="delete Record"
+                                class="btn btn-outline-light"
+                                hx-delete="{{../appPath}}/auth/measure/{{id}}"
+                                hx-target="closest table"
+                                hx-swap="outerHTML"
+                                onclick="event.preventDefault()">🚮</button>
+                        <button title="cancel Edit"
+                                class="btn btn-outline-light"
+                                onclick="event.preventDefault(); editMode('{{id}}', false)">❌</button>
+                        <button title="Save Record"
+                                class="btn btn-outline-light"
+                                onclick="event.preventDefault(); htmx.trigger('#{{id}}-form', 'trigger')">💾</button>
+                    </div>
+                </form>
+            </td>
         </tr>
         <tr id="{{id}}-show"
             data-id="{{id}}">
-            <th scope="row">
-                <button title="Edit Measurement"
-                        class="btn btn-outline-light btn-sm startStop"
-                        onclick="editMode('{{id}}', true)">✏️</button>
-            </th>
             <td>
                 {{formatDate createdAt16}} <!-- TODO helper.replace("T", " ") -->
             </td>
@@ -141,6 +129,11 @@
             <td>
                 {{comment}}
             </td>
+            <th scope="row">
+                <button title="Edit Measurement"
+                        class="btn btn-outline-light btn-sm startStop"
+                        onclick="editMode('{{id}}', true)">✏️</button>
+            </th>
         </tr>
         {{/each}}
     </tbody>

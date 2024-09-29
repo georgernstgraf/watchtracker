@@ -10,19 +10,15 @@
                 <option value='{{id}}'>{{name}}</option>
                 {{/each}}
         </select>
-        <div class="my-2 d-flex justify-content-around">
+        <div class="my-2 d-flex justify-content-around"
+             id='watchCreateBtn'>
                 <button title='Add a new Watch to track'
-                        onclick="watchCreateDisplay('form')"
-                        id='watchCreateBtn'
+                        onclick="watchCreateDisplay()"
                         class="btn btn-outline-light">Add new Watch to track</button>
         </div>
-        <span id='watchCreateForm'
-              style='display:none'>
-                <button title='cancel Edit'
-                        onclick="watchCreateDisplay('btn')">❌</button>
-                <button title='Save'
-                        type='button'
-                        onclick="htmx.trigger('#newWatchSave', 'trigger')">💾</button>
+        <div id='watchCreateForm'
+             class="my-4 justify-content-center gap-3 align-items-baseline"
+             style='display:none'>
                 <form id='newWatchSave'
                       hx-post='{{appPath}}/auth/watch/'
                       hx-target='#allButHeadAndFoot'
@@ -37,6 +33,15 @@
                                value=''
                                placeholder='enter Comment' />
                 </form>
-        </span>
+                <div class="btn-group">
+                        <button class="btn btn-outline-light"
+                                title='Cancel Edit'
+                                onclick="watchCreateDisplay(false)">❌</button>
+                        <button title='Save'
+                                class="btn btn-outline-light"
+                                type='button'
+                                onclick="htmx.trigger('#newWatchSave', 'trigger')">💾</button>
+                </div>
+        </div>
 </div>
 <!-- /userwatches.hbs -->
