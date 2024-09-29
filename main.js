@@ -77,6 +77,15 @@ module.exports = function main(options, cb) {
             },
             eq: function (a, b) {
                 return a === b;
+            },
+            formatDate: function (dateString) {
+                const date = new Date(dateString);
+                const day = date.getDate();
+                const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+                const month = monthNames[date.getMonth()];
+                const hours = date.getHours().toString().padStart(2, '0');
+                const minutes = date.getMinutes().toString().padStart(2, '0');
+                return `${day}. ${month}, ${hours}:${minutes}`;
             }
         }
     }));

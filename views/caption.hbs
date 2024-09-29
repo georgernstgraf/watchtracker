@@ -1,13 +1,12 @@
 <!-- #caption.hbs -->
-<caption>
+<caption class="caption-top text-center">
     <span id="caption-normal">
         {{#if watch}}
         <button title="Edit Name and Comment"
-                class="startStop"
-                onclick="captionStyle('edit')">✏️</button>
-        {{watch.name}}
+                class="startStop btn btn-outline-light me-3"
+                onclick="captionStyle('edit')">{{watch.name}} ✏️</button>
         {{#if watch.comment}}
-        <p class="smaller"> {{watch.comment}} </p>
+        {{watch.comment}}
         {{/if}}
         {{/if}}
     </span>
