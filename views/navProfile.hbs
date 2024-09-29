@@ -9,16 +9,14 @@
         <form hx-post='{{appPath}}/logout'
               hx-target='body'>
             <button id='profileLogoutButton'
-                    class='logout'>logout</button>
+                    class='logout btn btn-outline-light'>logout</button>
         </form>
     </div>
     <div id='timeZoneDisplay'
          class="d-flex justify-content-end align-items-baseline gap-2">
-        <p>
-            Timezone: {{user.timeZone}}
-        </p>
+        <p> {{user.timeZone}} </p>
         <button title='Switch Timezone'
-                class='startStop '
+                class='startStop btn btn-outline-light'
                 onclick='editTimezone()'>✏️</button>
     </div>
     <div id='timeZoneEdit'

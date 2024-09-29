@@ -13,7 +13,7 @@ router.post('/', async (req, res) => {
         errors.push('Password is required');
     }
     if (errors.length !== 0) {
-        return res.render('login-body');
+        return res.render('body-login');
     }
     const userName = req.body.user;
     const passwd = req.body.passwd;
@@ -32,14 +32,14 @@ router.post('/', async (req, res) => {
         }
     } catch (err) {
         errors.push(`login failed: ${err.message}`);
-        return res.render('login-body');
+        return res.render('body-login');
     }
     // registers the session and sends the cookie
     const user = await User.enforceExists(userName);
     req.session.user = user.getCurrentData();
     const userWatches = await Watch.userWatches(user);
     const watch = await Watch.userWatchWithMeasurements(user);
-    return res.render('auth-body', {
+    return res.render('body-auth', {
         user: req.session.user,
         userWatches,
         watch,

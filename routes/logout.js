@@ -5,7 +5,7 @@ router.post('/', async (req, res) => {
     req.session.destroy();
     res.cookie(process.env.COOKIE_NAME, 'logout', logoutCookie);
     if (req.headers['hx-request']) {
-        return res.render('login-body');
+        return res.render('body-login');
     }
     return res.render('login-full');
 });
