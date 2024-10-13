@@ -86,6 +86,10 @@ module.exports = function main(options, cb) {
                 const hours = date.getHours().toString().padStart(2, '0');
                 const minutes = date.getMinutes().toString().padStart(2, '0');
                 return `${day}. ${month}, ${hours}:${minutes}`;
+            },
+            plusOne: function (number) {
+                if (number == 0) return 1;
+                return number;
             }
         }
     }));

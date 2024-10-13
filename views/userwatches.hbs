@@ -1,14 +1,15 @@
 <!-- #userwatches.hbs -->
 <div id='userWatches'>
         <select id='watchSelect'
-                class="form-select text-center border border-2"
-                size='{{userWatches.length}}'
+                class="form-select text-center border border-2 mb-3"
+                size='{{plusOne userWatches.length}}'
                 hx-get='{{appPath}}/auth/watch/'
                 hx-target='#measurements'
                 hx-vals='js:{id: event.target.value}'>
                 {{#each userWatches}}
                 <option value='{{id}}'>{{name}}</option>
                 {{/each}}
+                <option>-- your watches --</option>
         </select>
         <div class="my-2 d-flex justify-content-around"
              id='watchCreateBtn'>
