@@ -110,25 +110,11 @@
         </tr>
         <tr id="{{id}}-show"
             data-id="{{id}}">
-            <td>
-                {{formatDate createdAt16}} <!-- TODO helper.replace("T", " ") -->
-            </td>
-            <td class="text-center">
-                {{value}}s
-            </td>
-            <td class="text-center">
-                {{#if isStart}}
-                🎬
-                {{else}}
-                ⌛
-                {{/if}}
-            </td>
-            <td class="sekPerDay ps-2 text-center">
-                {{driftDisplay}}
-            </td>
-            <td>
-                {{comment}}
-            </td>
+            <td> {{formatDate createdAt16}} </td>
+            <td class="text-center"> {{value}}s </td>
+            <td class="text-center"> {{#if isStart}} 🎬 {{else}} ⌛ {{/if}} </td>
+            <td class="sekPerDay ps-2 text-center"> {{driftDisplay}} </td>
+            <td> {{comment}} </td>
             <th scope="row">
                 <button title="Edit Measurement"
                         class="btn btn-outline-light btn-sm startStop"

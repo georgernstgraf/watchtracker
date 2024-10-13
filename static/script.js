@@ -24,6 +24,8 @@ function showMeasurementCreate() {
     const dtInput$ = document.getElementById('measureCreateDateTime');
     dtInput$.value = getCurrentDateTime();
     create$.style.display = '';
+    create$.querySelector('input[type="number"]').focus();
+
 }
 function hideMeasurementCreate() {
     const create$ = document.getElementById('measureCreate');
@@ -33,8 +35,9 @@ function editMode(eltId, on = false) {
     const edit$ = document.getElementById(`${eltId}-edit`);
     const show$ = document.getElementById(`${eltId}-show`);
     if (on) {
-        edit$.style.display = "";
         show$.style.display = "none";
+        edit$.style.display = "";
+        edit$.querySelector('input[type="number"]').focus();
     } else {
         edit$.style.display = "none";
         show$.style.display = "";
