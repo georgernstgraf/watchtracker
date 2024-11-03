@@ -4,19 +4,21 @@
     <thead>
         <tr>
             <th scope="col"
-                style="width: 13ch">Entry Date</th>
+                style="vertical-align: middle">Entry Date</th>
             <th scope="col"
-                class="text-center"
-                style="width:9ch">Deviation</th>
+                style="vertical-align: middle"
+                class="text-center">Deviation</th>
             <th scope="col"
-                class="text-center"
-                style="width:6ch">Type</th>
+                style="vertical-align: middle"
+                class="text-center">Type</th>
             <th scope="col"
-                class="text-center"
-                style="width: 12ch">Drift</th>
-            <th scope="col">Comment</th>
+                style="vertical-align: middle"
+                class="text-center">Drift</th>
+            <th scope="col"
+                class="w-25"
+                style="vertical-align: middle">Comment</th>
             <th scope="rowgroup"
-                style="width: 6ch;">
+                style="vertical-align: middle">
                 <button title="New Measurement"
                         id="newMeasurement"
                         class="btn btn-outline-light btn-sm"
@@ -61,6 +63,7 @@
     </thead>
     <tbody>
         {{#each watch.measurements}}
+        <tr style="display:none"></tr>
         <tr style="display:none"
             id="{{id}}-edit"
             data-id="{{id}}">
@@ -110,12 +113,16 @@
         </tr>
         <tr id="{{id}}-show"
             data-id="{{id}}">
-            <td> {{formatDate createdAt16}} </td>
-            <td class="text-center"> {{value}}s </td>
-            <td class="text-center"> {{#if isStart}} 🎬 {{else}} ⌛ {{/if}} </td>
-            <td class="sekPerDay ps-2 text-center"> {{driftDisplay}} </td>
-            <td> {{comment}} </td>
-            <th scope="row">
+            <td style="vertical-align: middle"> {{formatDate createdAt16}} </td>
+            <td class="text-center"
+                style="vertical-align: middle"> {{value}}s </td>
+            <td class="text-center"
+                style="vertical-align: middle"> {{#if isStart}} 🎬 {{else}} ⌛ {{/if}} </td>
+            <td class="sekPerDay ps-2 text-center"
+                style="vertical-align: middle"> {{driftDisplay}} </td>
+            <td style="vertical-align: middle"> {{comment}} </td>
+            <th scope="row"
+                style="vertical-align: middle">
                 <button title="Edit Measurement"
                         class="btn btn-outline-light btn-sm startStop"
                         onclick="editMode('{{id}}', true)">✏️</button>
