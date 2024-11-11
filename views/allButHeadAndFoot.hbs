@@ -1,7 +1,8 @@
 <!-- #allButHeadAndFoot.hbs -->
 <div id="allButHeadAndFoot">
     {{> userwatches}}
-    <div id="measurements">
+    <div id="measurements"
+         class="border border-2 px-1 rounded">
         {{#if watch}}
         {{> measurements}}
         {{/if}}
