@@ -1,9 +1,5 @@
 # Watch Deviation Tracker
 
-<https://paypal.me/schurlix>
-
-![paypal](static/qr_paypal_schurlix.png)
-
 ## Route Definitions
 
 #### GET %/
