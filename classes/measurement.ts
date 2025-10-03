@@ -21,11 +21,12 @@ class Measurement extends dbEntity {
                             return false;
                         }
                         break;
-                    case "createdAt": // I get a 16-char localtime thinggy here like "2024-05-24T19:29"
+                    case "createdAt": { // I get a 16-char localtime thinggy here like "2024-05-24T19:29"
                         const newDate = TimeZone.from16(value, target.watch.user.timeZone);
                         if (newDate.invalid) throw new Error("invalid Date");
                         value = newDate;
                         break;
+                    }
                 }
                 let success = true;
                 success &&= Reflect.set(target, property, value);

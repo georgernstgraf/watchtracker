@@ -4,8 +4,6 @@ run
 yarn-error.log
 debug.js
 playground.mongodb.js
-.vscode
-.vercel
 static/htmx.*
 **/*.db
 *.rest

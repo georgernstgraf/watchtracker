@@ -1,5 +1,6 @@
+import * as generated_prisma from "generated-prisma-client";
 export default class dbEntity {
-    constructor(data, prismaModel) {
+    constructor(data, prismaModel: generated_prisma.PrismaClient) {
         if ((!data) instanceof Object) {
             throw new TypeError("data must be Object");
         }
