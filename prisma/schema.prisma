@@ -4,9 +4,9 @@ datasource db {
 }
 
 generator client {
-    provider = "prisma-clients"
-    output = "client"
-    runtime = "deno"
+    provider = "prisma-client"
+    output   = "client"
+    runtime  = "deno"
 }
 
 model User {

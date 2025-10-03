@@ -12,9 +12,14 @@ import { session } from "./lib/session.ts";
 import httpErrors from "http-errors";
 import path from "node:path";
 import { engine as exphbs } from "express-handlebars";
-const expressStaticGzip = require("express-static-gzip");
-const bodyParser = require("body-parser");
-const prisma = require("./lib/db");
+import expressStaticGzip from "express-static-gzip";
+import bodyParser from "body-parser";
+import { prisma } from "./lib/db.ts";
+import process from "node:process";
+import sessionRoutes from "./lib/sessionRoutes.ts";
+import enforceUser from "./lib/enforceUser.ts";
+import authRoutes from "./lib/authRoutes.ts";
+
 export function main(options: unknown) {
     // Set default options
     const ready = function () {};
@@ -25,11 +30,10 @@ export function main(options: unknown) {
         options,
     );
     // Server state
-    let server;
     let serverStarted = false;
     let serverClosing = false;
     // Setup error handling
-    function unhandledError(err) {
+    function unhandledError(err: Error) {
         // Log the errors
         console.error(err);
         /* console.error('NOT RESTARTING!');
@@ -63,7 +67,7 @@ export function main(options: unknown) {
             partialsDir: path.join(__dirname, "views"),
             runtimeOptions: { allowProtoPropertiesByDefault: true },
             helpers: {
-                let: function (options) {
+                let: function (options: any) {
                     const context = Object.assign({}, this, options.hash);
                     return options.fn(context);
                 },
@@ -73,13 +77,13 @@ export function main(options: unknown) {
                 //   and: function () {
                 //     return Array.prototype.slice.call(arguments, 0, -1).every(Boolean);
                 // },
-                not: function (value) {
+                not: function (value: any) {
                     return !value;
                 },
-                eq: function (a, b) {
+                eq: function (a: any, b: any) {
                     return a === b;
                 },
-                formatDate: function (dateString) {
+                formatDate: function (dateString: string) {
                     const date = new Date(dateString);
                     const day = date.getDate();
                     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
@@ -88,9 +92,9 @@ export function main(options: unknown) {
                     const minutes = date.getMinutes().toString().padStart(2, "0");
                     return `${day}. ${month}, ${hours}:${minutes}`;
                 },
-                plusOne: function (number) {
-                    if (number == 0) return 1;
-                    return number;
+                plusOne: function (val: number) {
+                    if (val == 0) return 1;
+                    return val;
                 },
             },
         }),
@@ -103,18 +107,18 @@ export function main(options: unknown) {
     const sessionRouter = express.Router();
     sessionRouter.use(bodyParser.urlencoded({ extended: true }));
     sessionRouter.use(session);
-    sessionRouter.use((req, res, next) => {
+    sessionRouter.use((req: any, res: any, next: any) => {
         res.locals.appPath = process.env.APP_PATH;
         next();
     });
-    require("./lib/sessionRoutes")(sessionRouter, opts); // calls .use() several times on the sessionRouter
+    sessionRoutes(sessionRouter, opts); // calls .use() several times on the sessionRouter
 
     // setting up the authRouter
     const authRouter = express.Router();
     authRouter.use(bodyParser.urlencoded({ extended: true }));
     authRouter.use(session);
-    authRouter.use(require("./lib/enforceUser"));
-    require("./lib/authRoutes")(authRouter, opts); // calls .use() several times on the authRouter
+    authRouter.use(enforceUser);
+    authRoutes(authRouter, opts); // calls .use() several times on the authRouter
 
     // USE all this routers in the app:
 
@@ -123,14 +127,14 @@ export function main(options: unknown) {
     app.use(`${process.env.APP_PATH}/auth`, authRouter);
 
     // static files
-    app.use(process.env.APP_PATH, expressStaticGzip(path.join(__dirname, "static")));
+    app.use(process.env.APP_PATH, expressStaticGzip(path.join(__dirname, "static"), {}));
     app.use(process.env.APP_PATH, express.static(path.join(__dirname, "static")));
 
     // Common error handlers
-    app.use(function fourOhFourHandler(req, res, next) {
+    app.use(function fourOhFourHandler(req: any, res: any, next: any) {
         next(httpErrors(404, `Route not found: ${req.url}`));
     });
-    app.use(function fiveHundredHandler(err, req, res, next) {
+    app.use(function fiveHundredHandler(err: any, req: any, res: any, next: any) {
         if (err.status >= 500) {
             console.error(err);
         }
@@ -140,7 +144,7 @@ export function main(options: unknown) {
         res.status(err.status || 500).send(err.message);
     });
     // Start server
-    server = app.listen(opts.port, opts.host, function (err) {
+    const server = app.listen(opts.port, opts.host, function (err: any) {
         if (err) {
             return ready(err, app, server);
         }

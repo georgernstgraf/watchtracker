@@ -13,3 +13,4 @@ tmp
 README.pdf
 bundle.js
 secrets.rest
+prisma/client/

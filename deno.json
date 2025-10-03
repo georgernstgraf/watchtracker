@@ -1,15 +1,17 @@
 {
     "tasks": {
         "bastel": "deno run --inspect bastel.ts",
-        "p:generate": "deno -A",
-        "start": "node --env-file=.env bin/app.js",
+        "p:generate": "deno -A prisma generate",
+        "start": "deno run bin/app.ts",
         "dev": "node --watch --inspect-brk bin/app.js",
         "purgecss": "purgecss --config purgecss.config.js"
     },
     "imports": {
         "@std/assert": "jsr:@std/assert@1",
+        "body-parser": "npm:body-parser@^2.2.0",
         "express": "npm:express@^5.1.0",
         "express-handlebars": "npm:express-handlebars@^8.0.3",
+        "express-static-gzip": "npm:express-static-gzip@^3.0.0",
         "http-errors": "npm:http-errors@^2.0.0",
         "prisma": "npm:prisma@^6.16.3"
     },

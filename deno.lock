@@ -3,7 +3,9 @@
   "specifiers": {
     "jsr:@std/assert@1": "1.0.14",
     "jsr:@std/internal@^1.0.10": "1.0.10",
+    "npm:body-parser@^2.2.0": "2.2.0",
     "npm:express-handlebars@^8.0.3": "8.0.3",
+    "npm:express-static-gzip@3": "3.0.0",
     "npm:express@^5.1.0": "5.1.0",
     "npm:http-errors@2": "2.0.0",
     "npm:prisma@^6.16.3": "6.16.3"
@@ -280,6 +282,14 @@
         "glob",
         "graceful-fs",
         "handlebars"
+      ]
+    },
+    "express-static-gzip@3.0.0": {
+      "integrity": "sha512-36O10S0asHl3QojOBQQ0ZjXNtElmhgPS6erSUCCZymXkB/CK1mnGqOj4BTJN+FYRDIzVFnzo3wLFCZJvAk6rQQ==",
+      "dependencies": [
+        "mime-types",
+        "parseurl",
+        "serve-static"
       ]
     },
     "express@5.1.0": {
@@ -811,7 +821,9 @@
   "workspace": {
     "dependencies": [
       "jsr:@std/assert@1",
+      "npm:body-parser@^2.2.0",
       "npm:express-handlebars@^8.0.3",
+      "npm:express-static-gzip@3",
       "npm:express@^5.1.0",
       "npm:http-errors@2",
       "npm:prisma@^6.16.3"
