@@ -4,7 +4,7 @@
     "description": "Tracker for wristwatch inaccuracies",
     "main": "main.js",
     "scripts": {
-        "start": "node bin/app.js",
+        "start": "node --env-file=.env bin/app.js",
         "bastel": "node --inspect bastel.js",
         "dev": "node --watch --inspect-brk bin/app.js",
         "purgecss": "purgecss --config purgecss.config.js"
