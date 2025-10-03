@@ -23,11 +23,6 @@ interface MainOptions {
 
 export function main(options: MainOptions) {
     // Set default options
-    const ready: (
-        err?: Error,
-        app?: express.Express,
-        server?: import("node:http").Server,
-    ) => void = function () {};
     const opts = Object.assign(
         {
             host: "localhost",
@@ -166,20 +161,62 @@ export function main(options: MainOptions) {
         res.status(err.status || 500).send(err.message);
     });
     // Start server
-    const server = app.listen(opts.port, opts.host, function (err: Error) {
+    const server = app.listen(opts.port, opts.host, function (err: NodeJS.ErrnoException) {
         if (err) {
-            return ready(err, app, server);
+            console.error(`❌ Failed to start server on ${opts.host}:${opts.port}`);
+
+            if (err.code === "EADDRINUSE") {
+                console.error(`❌ Port ${opts.port} is already in use on ${opts.host}`);
+                console.error(`   Please choose a different port or stop the service using this port`);
+                console.error(`   You can check what's using the port with: lsof -i :${opts.port}`);
+            } else if (err.code === "EACCES") {
+                console.error(`❌ Permission denied to bind to port ${opts.port} on ${opts.host}`);
+                console.error(`   You may need elevated privileges to bind to this port`);
+            } else if (err.code === "EADDRNOTAVAIL") {
+                console.error(`❌ Address ${opts.host}:${opts.port} is not available`);
+                console.error(`   Please check if the host address is valid`);
+            } else {
+                console.error(`❌ Server error: ${err.message}`);
+                console.error(`   Error code: ${err.code || "UNKNOWN"}`);
+            }
+
+            console.error(`\n💥 Server startup failed. Exiting...`);
+            process.exit(1);
         }
         // If some other error means we should close
         if (serverClosing) {
-            return ready(new Error("Server was closed before it could start"));
+            const closeError = new Error("Server was closed before it could start");
+            console.error(closeError.message);
+            return;
         }
         serverStarted = true;
         const addr = server.address();
         console.info(
-            `Started at http://${opts.host || addr.host || "localhost"}:${addr.port}${process.env.APP_PATH} ${new Date().toLocaleTimeString()}`,
+            `✅ Server started successfully at http://${opts.host || addr.host || "localhost"}:${addr.port}${process.env.APP_PATH} ${
+                new Date().toLocaleTimeString()
+            }`,
         );
-        ready(err, app, server);
+    });
+
+    // Handle server errors (like port binding failures)
+    server.on("error", function (err: NodeJS.ErrnoException) {
+        if (err.code === "EADDRINUSE") {
+            console.error(`Port ${opts.port} is already in use on ${opts.host}`);
+            console.error(`Cannot bind to address ${opts.host}:${opts.port}`);
+            console.error("Please choose a different port or stop the service using this port");
+        } else if (err.code === "EACCES") {
+            console.error(`Permission denied to bind to port ${opts.port} on ${opts.host}`);
+            console.error("You may need elevated privileges to bind to this port");
+        } else if (err.code === "EADDRNOTAVAIL") {
+            console.error(`Address ${opts.host}:${opts.port} is not available`);
+            console.error("Please check if the host address is valid");
+        } else {
+            console.error(`Server error occurred while trying to start on ${opts.host}:${opts.port}`);
+            console.error(`Error code: ${err.code}`);
+            console.error(`Error message: ${err.message}`);
+        }
+        console.error("Server startup failed. Exiting...");
+        process.exit(1);
     });
     process.on("SIGTERM", async () => {
         console.log("SIGTERM received");
