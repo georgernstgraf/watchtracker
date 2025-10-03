@@ -1,5 +1,7 @@
-const router = require("express").Router();
-const { logoutCookie } = require("../lib/session");
+import { Router } from "express";
+import { logoutCookie } from "../lib/session.ts";
+
+const router = Router();
 // this gets the login form req.body.passwd, req.body.user
 router.post("/", async (req, res) => {
     req.session.destroy();

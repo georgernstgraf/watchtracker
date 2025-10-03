@@ -1,5 +1,5 @@
-const prisma = require("../lib/db");
-const dbEntity = require("./dbEntity");
+import prisma from "../lib/db.ts";
+import dbEntity from "./dbEntity.ts";
 export default class User extends dbEntity {
     constructor(data) {
         super(data, prisma.user);

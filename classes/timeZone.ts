@@ -1,5 +1,5 @@
-const moment = require("moment-timezone");
-const luxon = require("luxon");
+import moment from "moment-timezone";
+import * as luxon from "luxon";
 
 export default class TimeZone {
     static timeZones = moment.tz.names();

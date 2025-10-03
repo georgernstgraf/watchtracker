@@ -1,6 +1,8 @@
-const router = require("express").Router();
-const Watch = require("../classes/watch");
-const User = require("../classes/user");
+import { Router } from "express";
+import Watch from "../classes/watch.ts";
+import User from "../classes/user.ts";
+
+const router = Router();
 // This route renders the measurements table incl. headings
 async function handleGet(id, req, res) {
     const watch = await Watch.userWatchWithMeasurements(req.session.user, id);

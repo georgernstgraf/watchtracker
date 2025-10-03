@@ -1,6 +1,6 @@
 import prisma from "../lib/db.ts";
 import dbEntity from "./dbEntity.ts";
-const Measurement = require("./measurement.ts");
+import Measurement from "./measurement.ts";
 export default class Watch extends dbEntity {
     constructor(data) {
         super(data, prisma.watch);

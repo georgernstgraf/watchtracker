@@ -1,7 +1,9 @@
-const router = require("express").Router();
-const Watch = require("../classes/watch");
-const TimeZone = require("../classes/timeZone");
-const validSessionUser = require("../lib/validSessionUser");
+import { Router } from "express";
+import Watch from "../classes/watch.ts";
+import TimeZone from "../classes/timeZone.ts";
+import validSessionUser from "../lib/validSessionUser.ts";
+
+const router = Router();
 router.get("/", async (req, res) => {
     const full = req.headers["hx-request"] ? "-body" : "-full";
     try {
