@@ -1,7 +1,9 @@
 import prisma from "../lib/db.ts";
 import dbEntity from "./dbEntity.ts";
+import type { Prisma } from "generated-prisma-client";
+
 export default class User extends dbEntity {
-    constructor(data) {
+    constructor(data: Prisma.UserCreateInput) {
         super(data, prisma.user);
     }
     static async setLastWatchIdForUserId(watchId, userId) {
