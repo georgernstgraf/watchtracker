@@ -1,0 +1,20 @@
+<!-- #login-body.hbs -->
+
+<body>
+       <div class="container-sm mt-3" style="padding-left: 7px;padding-right: 7px;">
+              {{> mainHeading}}
+              {{#if errors}}
+              {{#each errors}}
+              <p>{{this}}</p>
+              {{/each}}
+              {{/if}}
+              <form class="my-5 text-center" hx-post="{{appPath}}/login" hx-target="body">
+                     <input type="text" name="user" id="username" autocomplete="username" placeholder="Username">
+                     <input type="password" name="passwd" id="password" autocomplete="current-password"
+                            placeholder="Password">
+                     <input type="submit" class="btn btn-outline-light" value="Login">
+              </form>
+              {{> footer}}
+       </div>
+</body>
+<!-- /login-body.hbs -->

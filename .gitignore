@@ -7,7 +7,7 @@ playground.mongodb.js
 .vscode
 .vercel
 static/htmx.*
-dev.db
+**/*.db
 *.rest
 tmp
 README.pdf
