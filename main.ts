@@ -57,7 +57,7 @@ export function main(options: MainOptions) {
     // Create the express app
     const app = express();
     // Template engine
-    if (process.env.NODE_ENV === "production") {
+    if (Deno.env.get("NODE_ENV") === "production") {
         app.set("trust proxy", "loopback");
     }
 
@@ -122,7 +122,7 @@ export function main(options: MainOptions) {
     sessionRouter.use(bodyParser.urlencoded({ extended: true }));
     sessionRouter.use(session);
     sessionRouter.use((req: any, res: any, next: any) => {
-        res.locals.appPath = process.env.APP_PATH;
+        res.locals.appPath = Deno.env.get("APP_PATH");
         next();
     });
     sessionRoutes(sessionRouter, opts); // calls .use() several times on the sessionRouter
@@ -137,15 +137,15 @@ export function main(options: MainOptions) {
     // USE all this routers in the app:
 
     // rendered
-    app.use(process.env.APP_PATH, sessionRouter);
-    app.use(`${process.env.APP_PATH}/auth`, authRouter);
+    app.use(Deno.env.get("APP_PATH") || "", sessionRouter);
+    app.use(`${Deno.env.get("APP_PATH") || ""}/auth`, authRouter);
 
     // static files
     app.use(
-        process.env.APP_PATH,
+        Deno.env.get("APP_PATH") || "",
         expressStaticGzip(path.join(__dirname, "static"), {}),
     );
-    app.use(process.env.APP_PATH, express.static(path.join(__dirname, "static")));
+    app.use(Deno.env.get("APP_PATH") || "", express.static(path.join(__dirname, "static")));
 
     // Common error handlers
     app.use(function fourOhFourHandler(req: any, res: any, next: any) {
@@ -192,7 +192,7 @@ export function main(options: MainOptions) {
         serverStarted = true;
         const addr = server.address();
         console.info(
-            `✅ Server started successfully at http://${opts.host || addr.host || "localhost"}:${addr.port}${process.env.APP_PATH} ${
+            `✅ Server started successfully at http://${opts.host || addr.host || "localhost"}:${addr.port}${Deno.env.get("APP_PATH") || ""} ${
                 new Date().toLocaleTimeString()
             }`,
         );
