@@ -1,13 +1,16 @@
 // function for the authRouter that enforces a user, use as middleware
-import validSessionUser from "./validSessionUser.ts";
-export default function (req: any, res: any, next: any) {
+import { UserService } from "../service/index.ts";
+import type * as express from "express";
+
+export default function (req: express.Request, res: express.Response, next: express.NextFunction) {
     let user;
     try {
-        user = validSessionUser(req.session);
-    } catch (e: any) {
+        user = UserService.validateSessionUser(req.session);
+    } catch (e: unknown) {
+        const error = e as Error;
         console.log("Error in enforceUser.js");
-        console.log(e);
-        return res.status(401).send(e.message);
+        console.log(error);
+        return res.status(401).send(error.message);
     }
     res.locals.user = user;
     next();
