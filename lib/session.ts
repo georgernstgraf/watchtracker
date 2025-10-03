@@ -1,7 +1,8 @@
 import ms from "ms";
 import expressSession from "express-session";
-import connect_memcached from "connect-memcached";
-const MemcachedStore = connect_memcached(expressSession);
+import connectMemcached from "connect-memcached";
+// const MemcachedStore = connect_memcached(expressSession);
+const MemcachedStore = connectMemcached(expressSession);
 ms(process.env.COOKIE_MAX_AGE) / 1000;
 export const session = expressSession({
     name: process.env.COOKIE_NAME,
