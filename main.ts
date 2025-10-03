@@ -1,6 +1,6 @@
 "use strict";
 
-import express from "express";
+import * as express from "express";
 import { session } from "./lib/session.ts";
 import httpErrors from "http-errors";
 import path from "node:path";
@@ -23,7 +23,11 @@ interface MainOptions {
 
 export function main(options: MainOptions) {
   // Set default options
-  const ready = function () {};
+  const ready: (
+    err?: Error,
+    app?: express.Express,
+    server?: import("node:http").Server,
+  ) => void = function () {};
   const opts = Object.assign(
     {
       host: "localhost",
@@ -162,7 +166,7 @@ export function main(options: MainOptions) {
     res.status(err.status || 500).send(err.message);
   });
   // Start server
-  const server = app.listen(opts.port, opts.host, function (err: any) {
+  const server = app.listen(opts.port, opts.host, function (err: Error) {
     if (err) {
       return ready(err, app, server);
     }
