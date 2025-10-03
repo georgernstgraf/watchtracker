@@ -1,50 +1,49 @@
 import express from "express";
 const router = express.Router();
-import Watch from "../classes/watch.ts";
-import User from "../classes/user.ts";
+import { UserService, WatchService } from "../service/index.ts";
 import TimeZone from "../classes/timeZone.ts";
 // this gets the login form req.body.passwd, req.body.user
 // renders the index page on success
-router.post("/", async (req, res) => {
-  const errors = (res.locals.errors = []);
-  if (!req.body.user || req.body.user.trim() === "") {
-    errors.push("Username is required");
-  }
-  if (!req.body.passwd || req.body.passwd.trim() === "") {
-    errors.push("Password is required");
-  }
-  if (errors.length !== 0) {
-    return res.render("login-body");
-  }
-  const userName = req.body.user;
-  const passwd = req.body.passwd;
-  try {
-    const authResp = await fetch(process.env.AUTH_API_URL, {
-      method: "POST",
-      body: JSON.stringify({
-        user: userName,
-        passwd: passwd,
-      }),
-      headers: { "Content-Type": "application/json" },
-    });
-    // auth (bool) und user (string)
-    if (!(await authResp.json()).auth) {
-      throw new Error("invalid credentials");
+router.post("/", async (req: express.Request, res: express.Response) => {
+    const errors: string[] = res.locals.errors = [];
+    if (!req.body.user || req.body.user.trim() === "") {
+        errors.push("Username is required");
     }
-  } catch (err) {
-    errors.push(`login failed: ${err.message}`);
-    return res.render("login-body");
-  }
-  // registers the session and sends the cookie
-  const user = await User.enforceExists(userName);
-  req.session.user = user.getCurrentData();
-  const userWatches = await Watch.userWatches(user);
-  const watch = await Watch.userWatchWithMeasurements(user);
-  return res.render("body-auth", {
-    user: req.session.user,
-    userWatches,
-    watch,
-    timeZones: TimeZone.timeZones,
-  });
+    if (!req.body.passwd || req.body.passwd.trim() === "") {
+        errors.push("Password is required");
+    }
+    if (errors.length !== 0) {
+        return res.render("login-body");
+    }
+    const userName = req.body.user;
+    const passwd = req.body.passwd;
+    try {
+        const authResp = await fetch(Deno.env.get("AUTH_API_URL") as string, {
+            method: "POST",
+            body: JSON.stringify({
+                user: userName,
+                passwd: passwd,
+            }),
+            headers: { "Content-Type": "application/json" },
+        });
+        // auth (bool) und user (string)
+        if (!(await authResp.json()).auth) {
+            throw new Error("invalid credentials");
+        }
+    } catch (err: unknown) {
+        errors.push(`login failed: ${err instanceof Error ? err.message : "unknown error"}`);
+        return res.render("login-body");
+    }
+    // registers the session and sends the cookie
+    const user = await UserService.enforceUserExists(userName);
+    req.session.user = user; // Store the user data in session
+    const userWatches = await WatchService.getUserWatches(user.id);
+    const watch = await WatchService.getUserWatchWithMeasurements(user.id);
+    return res.render("body-auth", {
+        user: req.session.user,
+        userWatches,
+        watch,
+        timeZones: TimeZone.timeZones,
+    });
 });
 export default router;

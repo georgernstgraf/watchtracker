@@ -1,55 +1,71 @@
-import { Router } from "express";
-import Watch from "../classes/watch.ts";
-import User from "../classes/user.ts";
+import express from "express";
+import { UserService, WatchService } from "../service/index.ts";
 
-const router = Router();
+const router = express.Router();
 // This route renders the measurements table incl. headings
-async function handleGet(id, req, res) {
-    const watch = await Watch.userWatchWithMeasurements(req.session.user, id);
+async function handleGet(id: string, req: express.Request, res: express.Response) {
+    const userId = req.session.user.id;
+    const watch = await WatchService.getUserWatchWithMeasurements(userId, id);
     if (!watch) {
         return res.status(403).send("Wrong Watch ID");
     }
-    await User.setLastWatchIdForUserId(watch.id, req.session.user.id);
+    await UserService.setLastWatch(userId, watch.id);
     res.locals.watch = watch;
     return res.render("measurements");
 }
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req: express.Request, res: express.Response) => {
     return await handleGet(req.params.id, req, res);
 });
-router.get("/", async (req, res) => {
-    return await handleGet(req.query.id, req, res);
+router.get("/", async (req: express.Request, res: express.Response) => {
+    return await handleGet(req.query.id as string, req, res);
 });
 // This route only renders the caption (patching only name and comment)
-router.patch("/:id", async (req, res) => {
-    const user = req.session.user;
-    const watch = await Watch.userWatchWithMeasurements(user, req.params.id);
+router.patch("/:id", async (req: express.Request, res: express.Response) => {
+    const userId = req.session.user.id;
+    const watch = await WatchService.getUserWatchWithMeasurements(userId, req.params.id);
     if (!watch) {
         return res.status(403).send("This is not your watch");
     }
-    watch.patch(req.body);
-    await watch.save();
-    res.locals.watch = watch;
-    res.locals.userWatches = await Watch.userWatches(user);
+
+    // Update the watch
+    await WatchService.updateWatch(req.params.id, {
+        name: req.body.name,
+        comment: req.body.comment,
+    });
+
+    const updatedWatch = await WatchService.getUserWatchWithMeasurements(userId, req.params.id);
+    res.locals.watch = updatedWatch;
+    res.locals.userWatches = await WatchService.getUserWatches(userId);
     return res.render("allButHeadAndFoot");
 });
-router.post("/", async (req, res) => {
-    const user = req.session.user;
-    let watch = new Watch(req.body);
-    watch.userId = user.id;
+router.post("/", async (req: express.Request, res: express.Response) => {
+    const userId = req.session.user.id;
+
     try {
-        await watch.save();
-    } catch (e) {
-        return res.status(422).send(e.message);
+        const watch = await WatchService.createWatch({
+            name: req.body.name,
+            comment: req.body.comment,
+            user: { connect: { id: userId } },
+        });
+
+        await UserService.setLastWatch(userId, watch.id);
+        res.locals.userWatches = await WatchService.getUserWatches(userId);
+        res.locals.watch = await WatchService.getUserWatchWithMeasurements(userId, watch.id);
+        return res.render("allButHeadAndFoot");
+    } catch (e: unknown) {
+        const error = e as Error;
+        return res.status(422).send(error.message);
     }
-    await User.setLastWatchIdForUser(watch.id, user);
-    res.locals.userWatches = await Watch.userWatches(user);
-    res.locals.watch = await Watch.userWatchWithMeasurements(user, watch.id);
-    return res.render("allButHeadAndFoot");
 });
-router.delete("/:id", async (req, res) => {
-    const user = req.session.user;
-    await Watch.deleteIDForUser(req.params.id, user);
-    res.locals.userWatches = await Watch.userWatches(user);
-    return res.render("allButHeadAndFoot");
+router.delete("/:id", async (req: express.Request, res: express.Response) => {
+    const userId = req.session.user.id;
+
+    try {
+        await WatchService.deleteWatch(req.params.id, userId);
+        res.locals.userWatches = await WatchService.getUserWatches(userId);
+        return res.render("allButHeadAndFoot");
+    } catch (_e) {
+        return res.status(403).send("Watch not found or access denied");
+    }
 });
 export default router;

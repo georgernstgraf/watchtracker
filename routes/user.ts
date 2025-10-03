@@ -1,20 +1,31 @@
 import { Router } from "express";
+import * as express from "express";
 import TimeZone from "../classes/timeZone.ts";
-import User from "../classes/user.ts";
-import Watch from "../classes/watch.ts";
+import { UserService, WatchService } from "../service/index.ts";
 
 const router = Router();
-router.patch("", async (req, res) => {
-    const userObj = new User(req.session.user);
-    if (req.body.hasOwnProperty("timeZone") && !TimeZone.timeZones.includes(req.body.timeZone)) {
+router.patch("", async (req: express.Request, res: express.Response) => {
+    const userId = req.session.user.id;
+
+    if ("timeZone" in req.body && !TimeZone.timeZones.includes(req.body.timeZone)) {
         return res.status(422).send("Unknown / invalid time zone");
     }
-    userObj.patch(req.body);
-    const user = await userObj.save();
-    req.session.user = user.getCurrentData(); // not daring / willing to put a proxy object onto the session
-    const userWatches = await Watch.userWatches(user);
-    const watch = await Watch.userWatchWithMeasurements(user);
-    return res.render("body-auth", { user, timeZones: TimeZone.timeZones, userWatches, watch });
+
+    // Update the user
+    const updatedUser = await UserService.updateUser(userId, {
+        timeZone: req.body.timeZone,
+        name: req.body.name,
+    });
+
+    req.session.user = updatedUser; // Update session with new user data
+    const userWatches = await WatchService.getUserWatches(userId);
+    const watch = await WatchService.getUserWatchWithMeasurements(userId);
+    return res.render("body-auth", {
+        user: updatedUser,
+        timeZones: TimeZone.timeZones,
+        userWatches,
+        watch,
+    });
 });
 
 export default router;
