@@ -2,7 +2,7 @@
     "tasks": {
         "bastel": "deno run --inspect bastel.ts",
         "p:generate": "deno -A prisma generate",
-        "start": "deno run --env-file --allow-env bin/app.ts",
+        "start": "deno run --env-file --allow-env --allow-read --allow-ffi bin/app.ts",
         "dev": "node --watch --inspect-brk bin/app.js",
         "purgecss": "purgecss --config purgecss.config.js"
     },

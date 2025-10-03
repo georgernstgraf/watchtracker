@@ -1,7 +1,7 @@
-const prisma = require('../lib/db');
-const dbEntity = require('./dbEntity');
-const Measurement = require('./measurement');
-class Watch extends dbEntity {
+import prisma from "../lib/db.ts";
+import dbEntity from "./dbEntity.ts";
+const Measurement = require("./measurement.ts");
+export default class Watch extends dbEntity {
     constructor(data) {
         super(data, prisma.watch);
     }
@@ -12,34 +12,32 @@ class Watch extends dbEntity {
             whereClause = { id: watchId, user: { id: user.id } };
         } else {
             whereClause = { lastUserId: user.id };
-        };
+        }
         const rawWatch = await prisma.watch.findFirst({
             // TODO findUnique should work!!
             where: whereClause,
             include: {
                 measurements: {
                     orderBy: {
-                        createdAt: 'desc'
-                    }
+                        createdAt: "desc",
+                    },
                 },
-            }
+            },
         });
         if (!rawWatch) return rawWatch;
         const watch = new Watch(rawWatch);
         // now cook the stuff for rendering:
         watch.measurements = watch.measurements.map((e) => new Measurement(e));
         watch.overallMeasure = Measurement.calculateDrifts(
-            watch['measurements']
+            watch["measurements"],
         );
-        watch.measurements.forEach((m) =>
-            m.setDisplayData(user.timeZone)
-        );
+        watch.measurements.forEach((m) => m.setDisplayData(user.timeZone));
         return watch;
     }
     static async userWatch(user, watchId) {
         const watch = await prisma.watch.findUnique({
             where: { id: watchId, user: { id: user.id } },
-            include: { user: true }
+            include: { user: true },
         });
         if (!watch) return;
         return new Watch(watch);
@@ -47,7 +45,7 @@ class Watch extends dbEntity {
     static async userWatches(user) {
         return (
             await prisma.watch.findMany({
-                where: { user: { id: user.id } }
+                where: { user: { id: user.id } },
             })
         )?.map((w) => new Watch(w));
     }
@@ -55,15 +53,15 @@ class Watch extends dbEntity {
         const ownedIds = (
             await prisma.watch.findMany({
                 where: { user: { id: user.id } },
-                select: { id: true }
+                select: { id: true },
             })
         ).map((e) => e.id);
         return ownedIds.includes(watchId);
     }
     static async deleteIDForUser(watchId, user) {
         await prisma.watch.delete({
-            where: { id: watchId, user: { id: user.id } }
+            where: { id: watchId, user: { id: user.id } },
         });
     }
 }
-module.exports = Watch;
+Watch;

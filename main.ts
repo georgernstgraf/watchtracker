@@ -14,7 +14,7 @@ import path from "node:path";
 import { engine as exphbs } from "express-handlebars";
 import expressStaticGzip from "express-static-gzip";
 import bodyParser from "body-parser";
-import { prisma } from "./lib/db.ts";
+import prisma from "./lib/db.ts";
 import process from "node:process";
 import sessionRoutes from "./lib/sessionRoutes.ts";
 import enforceUser from "./lib/enforceUser.ts";

@@ -1,11 +1,11 @@
-const moment = require('moment-timezone');
-const luxon = require('luxon');
+const moment = require("moment-timezone");
+const luxon = require("luxon");
 
-class TimeZone {
+export default class TimeZone {
     static timeZones = moment.tz.names();
     static timeZonesIdxLC = TimeZone.timeZones.map((tz, idx) => [
         idx,
-        tz.toLowerCase()
+        tz.toLowerCase(),
     ]);
     static search(inpt) {
         const inptLC = inpt.toLowerCase();
@@ -18,13 +18,11 @@ class TimeZone {
         // tz not string or tz not in timeZones
         try {
             return luxon.DateTime.fromJSDate(date, { zone: tz }).toISO().substring(0, 16);
-        }
-        catch (e) {
-            return luxon.DateTime.fromJSDate(date, { zone: 'UTC' }).toISO().substring(0, 16);
+        } catch (e) {
+            return luxon.DateTime.fromJSDate(date, { zone: "UTC" }).toISO().substring(0, 16);
         }
     }
     static from16(str, tz) {
         return luxon.DateTime.fromISO(str, { zone: tz });
     }
 }
-module.exports = TimeZone;

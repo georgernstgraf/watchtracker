@@ -1,5 +1,5 @@
 // function for the authRouter that enforces a user, use as middleware
-const validSessionUser = require("./validSessionUser.js");
+import validSessionUser from "./validSessionUser.ts";
 export default function (req: any, res: any, next: any) {
     let user;
     try {

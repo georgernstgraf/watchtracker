@@ -1,9 +1,29 @@
 import ms from "ms";
 import expressSession from "express-session";
 import connectMemcached from "connect-memcached";
-// const MemcachedStore = connect_memcached(expressSession);
-const MemcachedStore = connectMemcached(expressSession);
-ms(process.env.COOKIE_MAX_AGE) / 1000;
+import { EventEmitter } from "node:events";
+
+// Handle ES module import of CommonJS factory function
+const connectMemcachedFactory = (connectMemcached as any).deffault || connectMemcached;
+const BaseMemcachedStore = connectMemcachedFactory(expressSession);
+
+// Fix the prototype chain - the library uses deprecated __proto__ which doesn't work in Deno
+// We need to manually copy EventEmitter methods to the prototype
+const Store = expressSession.Store;
+Object.getOwnPropertyNames(EventEmitter.prototype).forEach((name) => {
+    if (name !== "constructor" && !BaseMemcachedStore.prototype[name]) {
+        BaseMemcachedStore.prototype[name] = EventEmitter.prototype[name];
+    }
+});
+
+// Also copy Store prototype methods if needed
+Object.getOwnPropertyNames(Store.prototype).forEach((name) => {
+    if (name !== "constructor" && !BaseMemcachedStore.prototype[name]) {
+        BaseMemcachedStore.prototype[name] = Store.prototype[name];
+    }
+});
+
+const MemcachedStore = BaseMemcachedStore;
 export const session = expressSession({
     name: process.env.COOKIE_NAME,
     resave: false,
