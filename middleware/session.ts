@@ -1,5 +1,6 @@
 import ms from "ms";
 import expressSession from "express-session";
+import { defaultCookieOptions, logoutCookieOptions } from "../lib/cookies.ts";
 // import connectMemcached from "connect-memcached";
 // import { EventEmitter } from "node:events";
 
@@ -24,28 +25,16 @@ import expressSession from "express-session";
 // });
 
 // const MemcachedStore = BaseMemcachedStore;
-export const session = expressSession({
+const session = expressSession({
     name: Deno.env.get("COOKIE_NAME"),
     resave: false,
     saveUninitialized: true, // Allow session creation without user data
     secret: Deno.env.get("COOKIE_SECRET"),
     proxy: Deno.env.get("NODE_ENV") === "production",
-    cookie: {
-        maxAge: ms(Deno.env.get("COOKIE_MAX_AGE") || "4 weeks"),
-        httpOnly: true,
-        secure: Deno.env.get("NODE_ENV") === "production",
-        sameSite: "strict" as const,
-        path: Deno.env.get("APP_PATH"),
-    },
+    cookie: defaultCookieOptions,
     // Temporarily using memory store instead of memcached
     // store: new MemcachedStore({
     //     hosts: ["127.0.0.1:11211"],
     // }),
 });
-export const logoutCookie = {
-    maxAge: 0,
-    httpOnly: true,
-    secure: Deno.env.get("NODE_ENV") === "production",
-    sameSite: "strict" as const,
-    path: Deno.env.get("APP_PATH"),
-};
+export default session;

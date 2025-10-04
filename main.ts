@@ -1,18 +1,16 @@
 "use strict";
 
 import express from "express";
-import { session } from "./lib/session.ts";
+import session from "./middleware/session.ts";
 import httpErrors from "http-errors";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { engine as exphbs } from "express-handlebars";
 import expressStaticGzip from "express-static-gzip";
-import bodyParser from "body-parser";
 import prisma from "./lib/db.ts";
 import process from "node:process";
-import sessionRoutes from "./lib/sessionRoutes.ts";
-import enforceUser from "./lib/enforceUser.ts";
-import authRoutes from "./lib/authRoutes.ts";
+import sessionRouter from "./routers/sessionRouter.ts";
+import authRouter from "./routers/authRouter.ts";
 import { HelperOptions } from "handlebars";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -57,6 +55,7 @@ function main() {
         app.set("trust proxy", "loopback");
     }
 
+    // initialize handlebars renderer
     app.engine(
         "hbs",
         exphbs({
@@ -111,39 +110,24 @@ function main() {
     app.locals.layout = false;
 
     // router with sessions, no auth enforced:
-    const sessionRouter = express.Router();
-    sessionRouter.use(bodyParser.urlencoded({ extended: true }));
-    sessionRouter.use(session);
-    sessionRouter.use((_req: express.Request, res: express.Response, next: express.NextFunction) => {
-        res.locals.appPath = Deno.env.get("APP_PATH");
-        next();
-    });
-    sessionRoutes(sessionRouter); // calls .use() several times on the sessionRouter
+    app.use(Deno.env.get("APP_PATH") || "", sessionRouter);
 
     // setting up the authRouter
-    const authRouter = express.Router();
-    authRouter.use(bodyParser.urlencoded({ extended: true }));
-    authRouter.use(session);
-    authRouter.use(enforceUser);
-    authRoutes(authRouter); // calls .use() several times on the authRouter
-
-    // USE all this routers in the app:
-
-    // rendered
-    app.use(Deno.env.get("APP_PATH") || "", sessionRouter);
     app.use(`${Deno.env.get("APP_PATH") || ""}/auth`, authRouter);
 
-    // static files
+    // static files - zip first
     app.use(
         Deno.env.get("APP_PATH") || "",
         expressStaticGzip(path.join(__dirname, "static"), {}),
     );
+    // static files uncompressed
     app.use(Deno.env.get("APP_PATH") || "", express.static(path.join(__dirname, "static")));
 
-    // Common error handlers
+    // 404 handler
     app.use(function fourOhFourHandler(req: express.Request, _res: express.Response, next: express.NextFunction) {
         next(httpErrors(404, `Route not found: ${req.url}`));
     });
+    // 500 handler
     app.use(
         function fiveHundredHandler(
             err: Error & { status?: number; statusCode?: number },
