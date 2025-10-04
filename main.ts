@@ -13,6 +13,7 @@ import process from "node:process";
 import sessionRoutes from "./lib/sessionRoutes.ts";
 import enforceUser from "./lib/enforceUser.ts";
 import authRoutes from "./lib/authRoutes.ts";
+import { HelperOptions } from "handlebars";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -21,15 +22,10 @@ interface MainOptions {
     port?: number;
 }
 
-export function main(options: MainOptions) {
-    // Set default options
-    const opts = Object.assign(
-        {
-            host: "localhost",
-            port: 8000,
-        },
-        options,
-    );
+function main() {
+    const listen_host = Deno.env.get("APP_HOST") ?? "localhost";
+    const listen_port = Number(Deno.env.get("APP_PORT")) || 8000;
+
     // Server state
     let serverStarted = false;
     let serverClosing = false;
@@ -68,20 +64,17 @@ export function main(options: MainOptions) {
             partialsDir: path.join(__dirname, "views"),
             runtimeOptions: { allowProtoPropertiesByDefault: true },
             helpers: {
-                let: function (options: any) {
+                let: function (options: HelperOptions) {
                     const context = Object.assign({}, this, options.hash);
                     return options.fn(context);
                 },
-                or: function () {
-                    return Array.prototype.slice.call(arguments, 0, -1).some(Boolean);
+                or: function (...args: unknown[]) {
+                    return args.slice(0, -1).some(Boolean);
                 },
-                //   and: function () {
-                //     return Array.prototype.slice.call(arguments, 0, -1).every(Boolean);
-                // },
-                not: function (value: any) {
+                not: function (value: unknown) {
                     return !value;
                 },
-                eq: function (a: any, b: any) {
+                eq: function (a: unknown, b: unknown) {
                     return a === b;
                 },
                 formatDate: function (dateString: string) {
@@ -121,18 +114,18 @@ export function main(options: MainOptions) {
     const sessionRouter = express.Router();
     sessionRouter.use(bodyParser.urlencoded({ extended: true }));
     sessionRouter.use(session);
-    sessionRouter.use((req: any, res: any, next: any) => {
+    sessionRouter.use((_req: express.Request, res: express.Response, next: express.NextFunction) => {
         res.locals.appPath = Deno.env.get("APP_PATH");
         next();
     });
-    sessionRoutes(sessionRouter, opts); // calls .use() several times on the sessionRouter
+    sessionRoutes(sessionRouter); // calls .use() several times on the sessionRouter
 
     // setting up the authRouter
     const authRouter = express.Router();
     authRouter.use(bodyParser.urlencoded({ extended: true }));
     authRouter.use(session);
     authRouter.use(enforceUser);
-    authRoutes(authRouter, opts); // calls .use() several times on the authRouter
+    authRoutes(authRouter); // calls .use() several times on the authRouter
 
     // USE all this routers in the app:
 
@@ -148,32 +141,36 @@ export function main(options: MainOptions) {
     app.use(Deno.env.get("APP_PATH") || "", express.static(path.join(__dirname, "static")));
 
     // Common error handlers
-    app.use(function fourOhFourHandler(req: any, res: any, next: any) {
+    app.use(function fourOhFourHandler(req: express.Request, _res: express.Response, next: express.NextFunction) {
         next(httpErrors(404, `Route not found: ${req.url}`));
     });
-    app.use(function fiveHundredHandler(err: any, req: any, res: any, next: any) {
-        if (err.status >= 500) {
-            console.error(err);
-        }
-        console.error(`fiveHundred activated: ${err} (${err.status})`);
-        res.locals.error = err;
-        res.set("Content-Type", "text/plain");
-        res.status(err.status || 500).send(err.message);
-    });
+    app.use(
+        function fiveHundredHandler(
+            err: Error & { status?: number; statusCode?: number },
+            _req: express.Request,
+            res: express.Response,
+            _next: express.NextFunction,
+        ) {
+            console.error(`fiveHundred activated: ${err} (${err.status || err.statusCode})`);
+            res.locals.error = err;
+            res.set("Content-Type", "text/plain");
+            res.status(err.status || err.statusCode || 500).send(err.message);
+        },
+    );
     // Start server
-    const server = app.listen(opts.port, opts.host, function (err: NodeJS.ErrnoException) {
+    const server = app.listen(listen_port, listen_host, function (err: NodeJS.ErrnoException) {
         if (err) {
-            console.error(`❌ Failed to start server on ${opts.host}:${opts.port}`);
+            console.error(`❌ Failed to start server on ${listen_host}:${listen_port}`);
 
             if (err.code === "EADDRINUSE") {
-                console.error(`❌ Port ${opts.port} is already in use on ${opts.host}`);
+                console.error(`❌ Port ${listen_port} is already in use on ${listen_host}`);
                 console.error(`   Please choose a different port or stop the service using this port`);
-                console.error(`   You can check what's using the port with: lsof -i :${opts.port}`);
+                console.error(`   You can check what's using the port with: lsof -i :${listen_port}`);
             } else if (err.code === "EACCES") {
-                console.error(`❌ Permission denied to bind to port ${opts.port} on ${opts.host}`);
+                console.error(`❌ Permission denied to bind to port ${listen_port} on ${listen_host}`);
                 console.error(`   You may need elevated privileges to bind to this port`);
             } else if (err.code === "EADDRNOTAVAIL") {
-                console.error(`❌ Address ${opts.host}:${opts.port} is not available`);
+                console.error(`❌ Address ${listen_host}:${listen_port} is not available`);
                 console.error(`   Please check if the host address is valid`);
             } else {
                 console.error(`❌ Server error: ${err.message}`);
@@ -192,7 +189,7 @@ export function main(options: MainOptions) {
         serverStarted = true;
         const addr = server.address();
         console.info(
-            `✅ Server started successfully at http://${opts.host || addr.host || "localhost"}:${addr.port}${Deno.env.get("APP_PATH") || ""} ${
+            `✅ Server started successfully at http://${listen_host || addr.host || "localhost"}:${addr.port}${Deno.env.get("APP_PATH") || ""} ${
                 new Date().toLocaleTimeString()
             }`,
         );
@@ -201,17 +198,17 @@ export function main(options: MainOptions) {
     // Handle server errors (like port binding failures)
     server.on("error", function (err: NodeJS.ErrnoException) {
         if (err.code === "EADDRINUSE") {
-            console.error(`Port ${opts.port} is already in use on ${opts.host}`);
-            console.error(`Cannot bind to address ${opts.host}:${opts.port}`);
+            console.error(`Port ${listen_port} is already in use on ${listen_host}`);
+            console.error(`Cannot bind to address ${listen_host}:${listen_port}`);
             console.error("Please choose a different port or stop the service using this port");
         } else if (err.code === "EACCES") {
-            console.error(`Permission denied to bind to port ${opts.port} on ${opts.host}`);
+            console.error(`Permission denied to bind to port ${listen_port} on ${listen_host}`);
             console.error("You may need elevated privileges to bind to this port");
         } else if (err.code === "EADDRNOTAVAIL") {
-            console.error(`Address ${opts.host}:${opts.port} is not available`);
+            console.error(`Address ${listen_host}:${listen_port} is not available`);
             console.error("Please check if the host address is valid");
         } else {
-            console.error(`Server error occurred while trying to start on ${opts.host}:${opts.port}`);
+            console.error(`Server error occurred while trying to start on ${listen_host}:${listen_port}`);
             console.error(`Error code: ${err.code}`);
             console.error(`Error message: ${err.message}`);
         }
@@ -225,3 +222,5 @@ export function main(options: MainOptions) {
         process.exit();
     });
 }
+
+main();
