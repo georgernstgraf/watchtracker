@@ -1,7 +1,7 @@
-import ms from "ms";
 import expressSession from "express-session";
-import { defaultCookieOptions, logoutCookieOptions } from "../lib/cookies.ts";
-// import connectMemcached from "connect-memcached";
+import { defaultCookieOptions } from "../lib/cookies.ts";
+import connectMemcached from "connect-memcached";
+const MemcachedStore = connectMemcached(expressSession);
 // import { EventEmitter } from "node:events";
 
 // Temporarily use memory store instead of memcached to isolate the cookie issue
@@ -27,14 +27,13 @@ import { defaultCookieOptions, logoutCookieOptions } from "../lib/cookies.ts";
 // const MemcachedStore = BaseMemcachedStore;
 const session = expressSession({
     name: Deno.env.get("COOKIE_NAME"),
-    resave: false,
-    saveUninitialized: true, // Allow session creation without user data
+    resave: false, // dont save if not modified
+    saveUninitialized: false, // dont write to store if not modified
     secret: Deno.env.get("COOKIE_SECRET"),
     proxy: Deno.env.get("NODE_ENV") === "production",
     cookie: defaultCookieOptions,
-    // Temporarily using memory store instead of memcached
-    // store: new MemcachedStore({
-    //     hosts: ["127.0.0.1:11211"],
-    // }),
+    store: new MemcachedStore({
+        hosts: ["127.0.0.1:11211"],
+    }),
 });
 export default session;
