@@ -1,6 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 import session from "../middleware/session.ts";
+import * as config from "../lib/config.ts";
 
 import slash from "../routes/slash.ts";
 import login from "../routes/login.ts";
@@ -10,7 +11,7 @@ const sessionRouter = express.Router();
 sessionRouter.use(bodyParser.urlencoded({ extended: true }));
 sessionRouter.use(session);
 sessionRouter.use((_req: express.Request, res: express.Response, next: express.NextFunction) => {
-    res.locals.appPath = Deno.env.get("APP_PATH");
+    res.locals.appPath = config.APP_PATH;
     next();
 });
 sessionRouter.use("/", slash);

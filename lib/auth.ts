@@ -1,7 +1,9 @@
+import * as config from "./config.ts";
+
 // just dont throw if credentials are valid
 async function authenticate(user: string, passwd: string) {
     if (user === "test" && passwd === "test") return;
-    const authResp = await fetch(Deno.env.get("AUTH_API_URL") as string, {
+    const authResp = await fetch(config.AUTH_API_URL, {
         method: "POST",
         body: JSON.stringify({
             user,

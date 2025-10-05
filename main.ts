@@ -12,6 +12,7 @@ import process from "node:process";
 import sessionRouter from "./routers/sessionRouter.ts";
 import authRouter from "./routers/authRouter.ts";
 import { HelperOptions } from "handlebars";
+import * as config from "./lib/config.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -21,8 +22,8 @@ interface MainOptions {
 }
 
 function main() {
-    const listen_host = Deno.env.get("APP_HOST") ?? "localhost";
-    const listen_port = Number(Deno.env.get("APP_PORT")) || 8000;
+    const listen_host = config.APP_HOST;
+    const listen_port = config.APP_PORT;
 
     // Server state
     let serverStarted = false;
@@ -51,7 +52,7 @@ function main() {
     // Create the express app
     const app = express();
     // Template engine
-    if (Deno.env.get("NODE_ENV") === "production") {
+    if (config.NODE_ENV === "production") {
         app.set("trust proxy", "loopback");
     }
 
@@ -110,18 +111,18 @@ function main() {
     app.locals.layout = false;
 
     // router with sessions, no auth enforced:
-    app.use(Deno.env.get("APP_PATH") || "", sessionRouter);
+    app.use(config.APP_PATH, sessionRouter);
 
     // setting up the authRouter
-    app.use(`${Deno.env.get("APP_PATH") || ""}/auth`, authRouter);
+    app.use(`${config.APP_PATH}/auth`, authRouter);
 
     // static files - zip first
     app.use(
-        Deno.env.get("APP_PATH") || "",
+        config.APP_PATH,
         expressStaticGzip(path.join(__dirname, "static"), {}),
     );
     // static files uncompressed
-    app.use(Deno.env.get("APP_PATH") || "", express.static(path.join(__dirname, "static")));
+    app.use(config.APP_PATH, express.static(path.join(__dirname, "static")));
 
     // 404 handler
     app.use(function fourOhFourHandler(req: express.Request, _res: express.Response, next: express.NextFunction) {
@@ -173,7 +174,7 @@ function main() {
         serverStarted = true;
         const addr = server.address();
         console.info(
-            `✅ Server started successfully at http://${listen_host || addr.host || "localhost"}:${addr.port}${Deno.env.get("APP_PATH") || ""} ${
+            `✅ Server started successfully at http://${listen_host || addr.host || "localhost"}:${addr.port}${config.APP_PATH} ${
                 new Date().toLocaleTimeString()
             }`,
         );

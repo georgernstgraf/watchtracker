@@ -1,16 +1,17 @@
 import ms from "ms";
+import * as config from "./config.ts";
 
 export const defaultCookieOptions = {
-    maxAge: ms(Deno.env.get("COOKIE_MAX_AGE") || "4 weeks"),
+    maxAge: ms(config.COOKIE_MAX_AGE),
     httpOnly: true,
-    secure: Deno.env.get("NODE_ENV") === "production",
+    secure: config.NODE_ENV === "production",
     sameSite: "strict" as const,
-    path: Deno.env.get("APP_PATH"),
+    path: config.APP_PATH,
 };
 export const logoutCookieOptions = {
     maxAge: 0,
     httpOnly: true,
-    secure: Deno.env.get("NODE_ENV") === "production",
+    secure: config.NODE_ENV === "production",
     sameSite: "strict" as const,
-    path: Deno.env.get("APP_PATH"),
+    path: config.APP_PATH,
 };
