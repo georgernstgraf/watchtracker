@@ -1,15 +1,29 @@
 import { Memcached } from "@avroit/memcached";
-import * as express_session from "express-session";
 import ms from "ms";
 import * as config from "./config.ts";
 
-class MemcachedSessionStore extends express_session.Store {
+export interface SessionData {
+    user?: {
+        id: string;
+        name: string;
+        timeZone?: string;
+        lastWatchId?: string;
+    };
+    cookie?: {
+        maxAge?: number;
+        httpOnly?: boolean;
+        secure?: boolean;
+        sameSite?: string;
+    };
+    [key: string]: unknown;
+}
+
+class MemcachedSessionStore {
     memcached: Memcached;
     prefix = config.MEMCACHE_PREFIX;
     ttl: number; // TTL in seconds
 
     constructor() {
-        super();
         this.memcached = new Memcached({
             host: config.MEMCACHE_HOST,
             port: config.MEMCACHE_PORT,
@@ -27,7 +41,7 @@ class MemcachedSessionStore extends express_session.Store {
     }
 
     // Implement required methods for a session store
-    async set(sessionId: string, sessionData: express_session.SessionData, callback?: (err?: Error) => void) {
+    async set(sessionId: string, sessionData: SessionData, callback?: (err?: Error) => void) {
         try {
             const key = this.getKeyFromSessionId(sessionId);
             const data = JSON.stringify(sessionData);
@@ -55,7 +69,7 @@ class MemcachedSessionStore extends express_session.Store {
         }
     }
 
-    async touch(sessionId: string, sessionData: express_session.SessionData, callback?: (err?: Error) => void) {
+    async touch(sessionId: string, sessionData: SessionData, callback?: (err?: Error) => void) {
         // Touch extends the session's TTL by re-setting it
         if (config.NODE_ENV === "development") {
             console.log(`Touching session: ${sessionId}`);
@@ -83,7 +97,7 @@ class MemcachedSessionStore extends express_session.Store {
         }
     }
 
-    async get(sessionId: string, callback: (err: Error | null, session: express_session.SessionData | null) => void) {
+    async get(sessionId: string, callback: (err: Error | null, session: SessionData | null) => void) {
         try {
             const key = this.getKeyFromSessionId(sessionId);
 
@@ -119,4 +133,5 @@ class MemcachedSessionStore extends express_session.Store {
         }
     }
 }
+
 export default new MemcachedSessionStore();

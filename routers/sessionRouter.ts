@@ -1,20 +1,20 @@
-import express from "express";
-import bodyParser from "body-parser";
-import session from "../middleware/session.ts";
+import { Hono } from "hono";
 import * as config from "../lib/config.ts";
 
 import slash from "../routes/slash.ts";
 import login from "../routes/login.ts";
 import logout from "../routes/logout.ts";
 
-const sessionRouter = express.Router();
-sessionRouter.use(bodyParser.urlencoded({ extended: true }));
-sessionRouter.use(session);
-sessionRouter.use((_req: express.Request, res: express.Response, next: express.NextFunction) => {
-    res.locals.appPath = config.APP_PATH;
-    next();
+const sessionRouter = new Hono();
+
+// Add appPath to all routes
+sessionRouter.use("*", async (c, next) => {
+    c.set("appPath", config.APP_PATH);
+    await next();
 });
-sessionRouter.use("/", slash);
-sessionRouter.use("/login", login);
-sessionRouter.use("/logout", logout);
+
+sessionRouter.route("/", slash);
+sessionRouter.route("/login", login);
+sessionRouter.route("/logout", logout);
+
 export default sessionRouter;

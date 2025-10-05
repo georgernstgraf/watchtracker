@@ -1,18 +1,20 @@
-// function for the authRouter that enforces a user, use as middleware
+// Middleware for the authRouter that enforces a user
 import { UserService } from "../service/index.ts";
-import type * as express from "express";
+import { createMiddleware } from "hono/factory";
 
-export default function (req: express.Request, res: express.Response, next: express.NextFunction) {
-    let user;
+export default createMiddleware(async (c, next) => {
+    const session = c.get("session");
+
     try {
         // throws if no valid user in session
-        user = UserService.validateSessionUser(req.session);
+        const user = UserService.validateSessionUser(session);
+        c.set("user", user);
     } catch (e: unknown) {
         const error = e as Error;
-        console.log("Error in enforceUser.js");
+        console.log("Error in enforceUser middleware");
         console.log(error);
-        return res.status(401).send(error.message);
+        return c.text(error.message, 401);
     }
-    res.locals.user = user;
-    next();
-}
+
+    await next();
+});

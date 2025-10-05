@@ -1,26 +1,36 @@
-import { Router } from "express";
-import * as express from "express";
+import { Hono } from "hono";
 import TimeZone from "../classes/timeZone.ts";
 import { UserService, WatchService } from "../service/index.ts";
+import "../lib/types.ts";
 
-const router = Router();
-router.patch("", async (req: express.Request, res: express.Response) => {
-    const userId = req.session.user.id;
+const router = new Hono();
 
-    if ("timeZone" in req.body && !TimeZone.timeZones.includes(req.body.timeZone)) {
-        return res.status(422).send("Unknown / invalid time zone");
+router.patch("", async (c) => {
+    const session = c.get("session");
+    const userId = session.user?.id;
+
+    if (!userId) {
+        return c.text("Unauthorized", 401);
+    }
+
+    const body = await c.req.parseBody();
+
+    if ("timeZone" in body && !TimeZone.timeZones.includes(body.timeZone as string)) {
+        return c.text("Unknown / invalid time zone", 422);
     }
 
     // Update the user
     const updatedUser = await UserService.updateUser(userId, {
-        timeZone: req.body.timeZone,
-        name: req.body.name,
+        timeZone: body.timeZone as string,
+        name: body.name as string,
     });
 
-    req.session.user = updatedUser; // Update session with new user data
+    session.user = updatedUser; // Update session with new user data
     const userWatches = await WatchService.getUserWatches(userId);
     const watch = await WatchService.getUserWatchWithMeasurements(userId);
-    return res.render("body-auth", {
+
+    const render = c.get("render");
+    return render("body-auth", {
         user: updatedUser,
         timeZones: TimeZone.timeZones,
         userWatches,

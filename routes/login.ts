@@ -1,39 +1,57 @@
-import express from "express";
-const router = express.Router();
+import { Hono } from "hono";
 import { UserService, WatchService } from "../service/index.ts";
 import TimeZone from "../classes/timeZone.ts";
 import authenticate from "../lib/auth.ts";
+import "../lib/types.ts";
+
+const router = new Hono();
+
 // this gets the login form req.body.passwd, req.body.user
 // renders the index page on success
-router.post("/", async (req: express.Request, res: express.Response) => {
-    const errors: string[] = res.locals.errors = [];
-    if (!req.body.user || req.body.user.trim() === "") {
+router.post("/", async (c) => {
+    const session = c.get("session");
+    const body = await c.req.parseBody();
+    const errors: string[] = [];
+
+    if (!body.user || (body.user as string).trim() === "") {
         errors.push("Username is required");
     }
-    if (!req.body.passwd || req.body.passwd.trim() === "") {
+    if (!body.passwd || (body.passwd as string).trim() === "") {
         errors.push("Password is required");
     }
+
     if (errors.length !== 0) {
-        return res.render("login-body");
+        c.set("errors", errors);
+        const render = c.get("render");
+        return render("login-body");
     }
-    const userName = req.body.user;
-    const passwd = req.body.passwd;
+
+    const userName = body.user as string;
+    const passwd = body.passwd as string;
+
     try {
         await authenticate(userName, passwd);
     } catch (err: unknown) {
         errors.push(`login failed: ${err instanceof Error ? err.message : "unknown error"}`);
-        return res.render("login-body");
+        c.set("errors", errors);
+        const render = c.get("render");
+        return render("login-body");
     }
+
     // registers the session and sends the cookie
     const user = await UserService.enforceUserExists(userName);
-    req.session.user = user; // Store the user data in session
+    session.user = user; // Store the user data in session
+
     const userWatches = await WatchService.getUserWatches(user.id);
     const watch = await WatchService.getUserWatchWithMeasurements(user.id);
-    return res.render("body-auth", {
-        user: req.session.user,
+
+    const render = c.get("render");
+    return render("body-auth", {
+        user: session.user,
         userWatches,
         watch,
         timeZones: TimeZone.timeZones,
     });
 });
+
 export default router;

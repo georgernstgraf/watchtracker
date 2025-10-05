@@ -1,20 +1,28 @@
-import { Router } from "express";
-import * as express from "express";
+import { Hono } from "hono";
 import { UserService, WatchService } from "../service/index.ts";
 import TimeZone from "../classes/timeZone.ts";
+import "../lib/types.ts";
 
-const router = Router();
-router.get("/", async (req: express.Request, res: express.Response) => {
-    const full = req.headers["hx-request"] ? "-body" : "-full";
+const router = new Hono();
+
+router.get("/", async (c) => {
+    const session = c.get("session");
+    const full = c.req.header("hx-request") ? "-body" : "-full";
+
     try {
-        const user = UserService.validateSessionUser(req.session);
+        const user = UserService.validateSessionUser(session);
         const userWatches = await WatchService.getUserWatches(user.id);
         const watch = await WatchService.getUserWatchWithMeasurements(user.id);
-        return res.render(`index${full}`, { user, watch, userWatches, timeZones: TimeZone.timeZones });
+
+        const render = c.get("render");
+        return render(`index${full}`, { user, watch, userWatches, timeZones: TimeZone.timeZones });
     } catch (e: unknown) {
         const error = e as Error;
-        console.log("slash.js:", error.message);
+        console.log("slash.ts:", error.message);
     }
-    return res.render(`login${full}`);
+
+    const render = c.get("render");
+    return render(`login${full}`);
 });
+
 export default router;

@@ -1,15 +1,29 @@
-import * as express from "express";
+import { Hono } from "hono";
+import { setCookie } from "hono/cookie";
 import { logoutCookieOptions } from "../lib/cookieOptions.ts";
 import * as config from "../lib/config.ts";
+import "../lib/types.ts";
 
-const router = express.Router();
+const router = new Hono();
+
 // this gets the login form req.body.passwd, req.body.user
-router.post("/", (req: express.Request, res: express.Response) => {
-    req.session.destroy();
-    res.cookie(config.COOKIE_NAME, "logout", logoutCookieOptions);
-    if (req.headers["hx-request"]) {
-        return res.render("login-body");
+router.post("/", async (c) => {
+    const session = c.get("session");
+    await session.destroy();
+
+    setCookie(c, config.COOKIE_NAME, "logout", {
+        maxAge: 0,
+        httpOnly: logoutCookieOptions.httpOnly,
+        secure: logoutCookieOptions.secure,
+        sameSite: logoutCookieOptions.sameSite === "strict" ? "Strict" : "Lax",
+        path: logoutCookieOptions.path,
+    });
+
+    const render = c.get("render");
+    if (c.req.header("hx-request")) {
+        return render("login-body");
     }
-    return res.render("login-full");
+    return render("login-full");
 });
+
 export default router;

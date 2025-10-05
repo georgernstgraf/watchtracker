@@ -1,88 +1,112 @@
-import express from "express";
+import { Hono } from "hono";
 import { UserService, WatchService } from "../service/index.ts";
+import type { HonoContext } from "../lib/types.ts";
+import "../lib/types.ts";
 
-const router = express.Router();
+const router = new Hono();
+
 // This route renders the measurements table incl. headings
-async function handleGet(id: string, req: express.Request, res: express.Response) {
+async function handleGet(id: string, c: HonoContext) {
     try {
-        const user = UserService.validateSessionUser(req.session);
+        const session = c.get("session");
+        const user = UserService.validateSessionUser(session);
         const watch = await WatchService.getUserWatchWithMeasurements(user.id, id);
         if (!watch) {
-            return res.status(403).send("Wrong Watch ID");
+            return c.text("Wrong Watch ID", 403);
         }
         await UserService.setLastWatch(user.id, watch.id);
-        res.locals.watch = watch;
-        return res.render("measurements");
+        c.set("watch", watch);
+        const render = c.get("render");
+        return render("measurements");
     } catch (e: unknown) {
         const error = e as Error;
         console.log("Error in watch route:", error.message);
-        return res.status(401).send(error.message);
+        return c.text(error.message, 401);
     }
 }
-router.get("/:id", async (req: express.Request, res: express.Response) => {
-    return await handleGet(req.params.id, req, res);
+
+router.get("/:id", async (c) => {
+    return await handleGet(c.req.param("id"), c);
 });
-router.get("/", async (req: express.Request, res: express.Response) => {
-    return await handleGet(req.query.id as string, req, res);
+
+router.get("/", async (c) => {
+    const id = c.req.query("id");
+    if (!id) {
+        return c.text("Watch ID required", 400);
+    }
+    return await handleGet(id, c);
 });
+
 // This route only renders the caption (patching only name and comment)
-router.patch("/:id", async (req: express.Request, res: express.Response) => {
+router.patch("/:id", async (c) => {
     try {
-        const user = UserService.validateSessionUser(req.session);
-        const watch = await WatchService.getUserWatchWithMeasurements(user.id, req.params.id);
+        const session = c.get("session");
+        const user = UserService.validateSessionUser(session);
+        const body = await c.req.parseBody();
+        const watch = await WatchService.getUserWatchWithMeasurements(user.id, c.req.param("id"));
+
         if (!watch) {
-            return res.status(403).send("This is not your watch");
+            return c.text("This is not your watch", 403);
         }
 
         // Update the watch
-        await WatchService.updateWatch(req.params.id, {
-            name: req.body.name,
-            comment: req.body.comment,
+        await WatchService.updateWatch(c.req.param("id"), {
+            name: body.name as string,
+            comment: body.comment as string,
         });
 
-        const updatedWatch = await WatchService.getUserWatchWithMeasurements(user.id, req.params.id);
-        res.locals.watch = updatedWatch;
-        res.locals.userWatches = await WatchService.getUserWatches(user.id);
-        return res.render("allButHeadAndFoot");
+        const updatedWatch = await WatchService.getUserWatchWithMeasurements(user.id, c.req.param("id"));
+        c.set("watch", updatedWatch);
+        c.set("userWatches", await WatchService.getUserWatches(user.id));
+        const render = c.get("render");
+        return render("allButHeadAndFoot");
     } catch (e: unknown) {
         const error = e as Error;
         console.log("Error in watch patch route:", error.message);
-        return res.status(401).send(error.message);
+        return c.text(error.message, 401);
     }
 });
-router.post("/", async (req: express.Request, res: express.Response) => {
+
+router.post("/", async (c) => {
     try {
-        const user = UserService.validateSessionUser(req.session);
+        const session = c.get("session");
+        const user = UserService.validateSessionUser(session);
+        const body = await c.req.parseBody();
         const watch = await WatchService.createWatch({
-            name: req.body.name,
-            comment: req.body.comment,
+            name: body.name as string,
+            comment: body.comment as string,
             user: { connect: { id: user.id } },
         });
 
         await UserService.setLastWatch(user.id, watch.id);
-        res.locals.userWatches = await WatchService.getUserWatches(user.id);
-        res.locals.watch = await WatchService.getUserWatchWithMeasurements(user.id, watch.id);
-        return res.render("allButHeadAndFoot");
+        c.set("userWatches", await WatchService.getUserWatches(user.id));
+        c.set("watch", await WatchService.getUserWatchWithMeasurements(user.id, watch.id));
+        const render = c.get("render");
+        return render("allButHeadAndFoot");
     } catch (e: unknown) {
         const error = e as Error;
         if (error.message.includes("session")) {
-            return res.status(401).send(error.message);
+            return c.text(error.message, 401);
         }
-        return res.status(422).send(error.message);
+        return c.text(error.message, 422);
     }
 });
-router.delete("/:id", async (req: express.Request, res: express.Response) => {
+
+router.delete("/:id", async (c) => {
     try {
-        const user = UserService.validateSessionUser(req.session);
-        await WatchService.deleteWatch(req.params.id, user.id);
-        res.locals.userWatches = await WatchService.getUserWatches(user.id);
-        return res.render("allButHeadAndFoot");
+        const session = c.get("session");
+        const user = UserService.validateSessionUser(session);
+        await WatchService.deleteWatch(c.req.param("id"), user.id);
+        c.set("userWatches", await WatchService.getUserWatches(user.id));
+        const render = c.get("render");
+        return render("allButHeadAndFoot");
     } catch (e: unknown) {
         const error = e as Error;
         if (error.message.includes("session")) {
-            return res.status(401).send(error.message);
+            return c.text(error.message, 401);
         }
-        return res.status(403).send("Watch not found or access denied");
+        return c.text("Watch not found or access denied", 403);
     }
 });
+
 export default router;

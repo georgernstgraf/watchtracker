@@ -1,7 +1,7 @@
 import { UserRepository } from "../repo/userRepository.ts";
 import { WatchRepository } from "../repo/watchRepository.ts";
 import type { Prisma, User } from "generated-prisma-client";
-import express_session from "express-session";
+import type { SessionData } from "../lib/memcachedSessionStore.ts";
 
 export class UserService {
     /**
@@ -109,19 +109,18 @@ export class UserService {
      * Validate and extract user from session
      * Ensures user exists in session and has all required fields
      */
-    static validateSessionUser(session: express_session.Session): User {
+    static validateSessionUser(session: SessionData): User {
         const user = session.user;
         if (!user) {
             throw new Error("No user in session.");
         }
 
         // Check if user has all required fields by comparing with Prisma User model fields
-        const requiredFields = ["id", "name", "timeZone"];
+        const requiredFields = ["id", "name"];
         for (const field of requiredFields) {
             if (!(field in user)) {
-                session.destroy();
                 throw new Error(
-                    `Destroyed session for ${user.email || user.name || "unknown user"} because of missing key ${field} in user session object.`,
+                    `Missing key ${field} in user session object for ${user.name || "unknown user"}.`,
                 );
             }
         }

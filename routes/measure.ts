@@ -1,62 +1,86 @@
-import * as express from "express";
+import { Hono } from "hono";
 import { MeasurementService, WatchService } from "../service/index.ts";
+import "../lib/types.ts";
 
-const router = express.Router(); // new Router
-router.post("/:id", async (req: express.Request, res: express.Response) => {
+const router = new Hono();
+
+router.post("/:id", async (c) => {
     // this is a watchId here!!
-    const watchId = req.params.id;
-    const userId = req.session.user.id;
+    const session = c.get("session");
+    const watchId = c.req.param("id");
+    const userId = session.user?.id;
+
+    if (!userId) {
+        return c.text("Unauthorized", 401);
+    }
 
     // Verify the watch belongs to the user
     const belongsToUser = await WatchService.watchBelongsToUser(watchId, userId);
     if (!belongsToUser) {
-        return res.status(403).send("Wrong Watch ID");
+        return c.text("Wrong Watch ID", 403);
     }
+
+    const body = await c.req.parseBody();
 
     // Create the measurement using the service
     const measurement = await MeasurementService.createMeasurementForWatch(
         userId,
         watchId,
         {
-            value: parseInt(req.body.value),
-            isStart: req.body.isStart === "true" || req.body.isStart === true,
-            comment: req.body.comment,
-            createdAt: req.body.createdAt ? new Date(req.body.createdAt) : undefined,
+            value: parseInt(body.value as string),
+            isStart: body.isStart === "true" || body.isStart === true,
+            comment: body.comment as string,
+            createdAt: body.createdAt ? new Date(body.createdAt as string) : undefined,
         },
     );
 
     if (!measurement) {
-        return res.status(403).send("Failed to create measurement");
+        return c.text("Failed to create measurement", 403);
     }
 
     const watchFull = await WatchService.getUserWatchWithMeasurements(userId, watchId);
-    res.locals.watch = watchFull;
-    return res.render("measurements");
+    c.set("watch", watchFull);
+    const render = c.get("render");
+    return render("measurements");
 });
-router.delete("/:id", async (req: express.Request, res: express.Response) => {
-    const userId = req.session.user.id;
-    const measureId = req.params.id;
+
+router.delete("/:id", async (c) => {
+    const session = c.get("session");
+    const userId = session.user?.id;
+    const measureId = c.req.param("id");
+
+    if (!userId) {
+        return c.text("Unauthorized", 401);
+    }
 
     // Get the watch ID for the user's measurement
     const watchId = await MeasurementService.getWatchIdForUserMeasurement(userId, measureId);
     if (!watchId) {
-        return res.status(403).send("Wrong Measurement ID");
+        return c.text("Wrong Measurement ID", 403);
     }
 
     // Delete the measurement
     await MeasurementService.deleteUserMeasurement(userId, measureId);
     const watch = await WatchService.getUserWatchWithMeasurements(userId, watchId);
 
-    res.locals.watch = watch;
-    return res.render("measurements");
+    c.set("watch", watch);
+    const render = c.get("render");
+    return render("measurements");
 });
-router.patch("/:id", async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const userId = req.session.user.id;
+
+router.patch("/:id", async (c) => {
+    const session = c.get("session");
+    const userId = session.user?.id;
+
+    if (!userId) {
+        return c.text("Unauthorized", 401);
+    }
+
     try {
-        const measureId = req.params.id;
+        const measureId = c.req.param("id");
         const measure = await MeasurementService.getUserMeasurement(userId, measureId);
         if (!measure) {
-            return res.status(403).send("Wrong Measurement ID");
+            return c.text("Wrong Measurement ID", 403);
         }
 
         // Get the watch ID from the measurement
@@ -65,8 +89,10 @@ router.patch("/:id", async (req: express.Request, res: express.Response, next: e
         };
         const watchId = measurementWithWatch?.watch?.id || measure.watchId;
 
-        if (!req.body.isStart) {
-            req.body.isStart = false;
+        const body = await c.req.parseBody();
+
+        if (!body.isStart) {
+            body.isStart = "false";
         }
 
         try {
@@ -77,13 +103,13 @@ router.patch("/:id", async (req: express.Request, res: express.Response, next: e
                 comment?: string;
                 createdAt?: Date;
             } = {
-                value: req.body.value ? parseInt(req.body.value) : undefined,
-                isStart: req.body.isStart === "true" || req.body.isStart === true,
-                comment: req.body.comment,
+                value: body.value ? parseInt(body.value as string) : undefined,
+                isStart: body.isStart === "true" || body.isStart === true,
+                comment: body.comment as string,
             };
 
-            if (req.body.createdAt) {
-                updateData.createdAt = new Date(req.body.createdAt);
+            if (body.createdAt) {
+                updateData.createdAt = new Date(body.createdAt as string);
             }
 
             // Remove undefined values
@@ -96,13 +122,15 @@ router.patch("/:id", async (req: express.Request, res: express.Response, next: e
             await MeasurementService.updateMeasurement(measureId, updateData);
         } catch (e: unknown) {
             const error = e as Error;
-            return res.status(422).send(error.message);
+            return c.text(error.message, 422);
         }
 
         const watch = await WatchService.getUserWatchWithMeasurements(userId, watchId);
-        return res.render("measurements", { watch });
+        const render = c.get("render");
+        return render("measurements", { watch });
     } catch (err) {
-        next(err);
+        const error = err as Error;
+        return c.text(error.message, 500);
     }
 });
 

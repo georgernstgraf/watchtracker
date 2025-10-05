@@ -1,18 +1,19 @@
 "use strict";
 
-import express from "express";
+import { Hono } from "hono";
+import { serve } from "@hono/node-server";
+import { serveStatic } from "@hono/node-server/serve-static";
 import session from "./middleware/session.ts";
-import httpErrors from "http-errors";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { engine as exphbs } from "express-handlebars";
-import expressStaticGzip from "express-static-gzip";
+import Handlebars from "handlebars";
+import { readdirSync, readFileSync } from "node:fs";
 import prisma from "./lib/db.ts";
 import process from "node:process";
 import sessionRouter from "./routers/sessionRouter.ts";
 import authRouter from "./routers/authRouter.ts";
-import { HelperOptions } from "handlebars";
 import * as config from "./lib/config.ts";
+import "./lib/types.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -21,6 +22,78 @@ interface MainOptions {
     port?: number;
 }
 
+// Setup Handlebars
+const viewsDir = path.join(__dirname, "views");
+const templates: Record<string, HandlebarsTemplateDelegate> = {};
+const partials: Record<string, string> = {};
+
+// Load all templates and partials
+function loadTemplates() {
+    const files = readdirSync(viewsDir);
+    files.forEach((file) => {
+        if (file.endsWith(".hbs")) {
+            const filePath = path.join(viewsDir, file);
+            const content = readFileSync(filePath, "utf-8");
+            const templateName = file.replace(".hbs", "");
+            templates[templateName] = Handlebars.compile(content);
+            partials[templateName] = content;
+        }
+    });
+
+    // Register all partials
+    Object.keys(partials).forEach((name) => {
+        Handlebars.registerPartial(name, partials[name]);
+    });
+}
+
+// Register Handlebars helpers
+Handlebars.registerHelper("let", function (this: unknown, options: Handlebars.HelperOptions) {
+    const context = Object.assign({}, this, options.hash);
+    return options.fn(context);
+});
+
+Handlebars.registerHelper("or", function (...args: unknown[]) {
+    return args.slice(0, -1).some(Boolean);
+});
+
+Handlebars.registerHelper("not", function (value: unknown) {
+    return !value;
+});
+
+Handlebars.registerHelper("eq", function (a: unknown, b: unknown) {
+    return a === b;
+});
+
+Handlebars.registerHelper("formatDate", function (dateString: string) {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const monthNames = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sept",
+        "Oct",
+        "Nov",
+        "Dec",
+    ];
+    const month = monthNames[date.getMonth()];
+    const hours = date.getHours().toString().padStart(2, "0");
+    const minutes = date.getMinutes().toString().padStart(2, "0");
+    return `${day}. ${month}, ${hours}:${minutes}`;
+});
+
+Handlebars.registerHelper("plusOne", function (val: number) {
+    if (val == 0) return 1;
+    return val;
+});
+
+loadTemplates();
+
 function main() {
     const listen_host = config.APP_HOST;
     const listen_port = config.APP_PORT;
@@ -28,6 +101,7 @@ function main() {
     // Server state
     let serverStarted = false;
     let serverClosing = false;
+
     // Setup error handling
     function unhandledError(err: Error) {
         // Log the errors
@@ -42,168 +116,88 @@ function main() {
         serverClosing = true;
         // If server has started, close it down
         if (serverStarted) {
-            server.close(() => {
-                process.exit(1);
-            });
+            process.exit(1);
         }
     }
     process.on("uncaughtException", unhandledError);
     process.on("unhandledRejection", unhandledError);
-    // Create the express app
-    const app = express();
-    // Template engine
-    if (config.NODE_ENV === "production") {
-        app.set("trust proxy", "loopback");
-    }
 
-    // initialize handlebars renderer
-    app.engine(
-        "hbs",
-        exphbs({
-            extname: ".hbs",
-            partialsDir: path.join(__dirname, "views"),
-            runtimeOptions: { allowProtoPropertiesByDefault: true },
-            helpers: {
-                let: function (options: HelperOptions) {
-                    const context = Object.assign({}, this, options.hash);
-                    return options.fn(context);
-                },
-                or: function (...args: unknown[]) {
-                    return args.slice(0, -1).some(Boolean);
-                },
-                not: function (value: unknown) {
-                    return !value;
-                },
-                eq: function (a: unknown, b: unknown) {
-                    return a === b;
-                },
-                formatDate: function (dateString: string) {
-                    const date = new Date(dateString);
-                    const day = date.getDate();
-                    const monthNames = [
-                        "Jan",
-                        "Feb",
-                        "Mar",
-                        "Apr",
-                        "May",
-                        "Jun",
-                        "Jul",
-                        "Aug",
-                        "Sept",
-                        "Oct",
-                        "Nov",
-                        "Dec",
-                    ];
-                    const month = monthNames[date.getMonth()];
-                    const hours = date.getHours().toString().padStart(2, "0");
-                    const minutes = date.getMinutes().toString().padStart(2, "0");
-                    return `${day}. ${month}, ${hours}:${minutes}`;
-                },
-                plusOne: function (val: number) {
-                    if (val == 0) return 1;
-                    return val;
-                },
-            },
-        }),
-    );
-    app.set("view engine", "hbs");
-    app.set("views", path.join(__dirname, "views"));
-    app.locals.layout = false;
+    // Create the Hono app
+    const app = new Hono();
 
-    // router with sessions, no auth enforced:
-    app.use(config.APP_PATH, sessionRouter);
+    // Add appPath to all responses
+    app.use("*", async (c, next) => {
+        c.set("appPath", config.APP_PATH);
+        await next();
+    });
 
-    // setting up the authRouter
-    app.use(`${config.APP_PATH}/auth`, authRouter);
+    // Add render helper to context
+    app.use("*", async (c, next) => {
+        c.set("render", (templateName: string, data?: Record<string, unknown>) => {
+            const template = templates[templateName];
+            if (!template) {
+                throw new Error(`Template ${templateName} not found`);
+            }
+            const allData = {
+                ...data,
+                appPath: c.get("appPath"),
+                user: c.get("user"),
+                watch: c.get("watch"),
+                userWatches: c.get("userWatches"),
+                timeZones: c.get("timeZones"),
+                edit: c.get("edit"),
+                errors: c.get("errors"),
+            };
+            return c.html(template(allData));
+        });
+        await next();
+    });
 
-    // static files - zip first
+    // Session middleware
+    app.use("*", session);
+
+    // Mount routers
+    app.route(config.APP_PATH, sessionRouter);
+    app.route(`${config.APP_PATH}/auth`, authRouter);
+
+    // Static files
+    const staticPath = config.APP_PATH || "/";
     app.use(
-        config.APP_PATH,
-        expressStaticGzip(path.join(__dirname, "static"), {}),
+        `${staticPath}/*`,
+        serveStatic({ root: "./static" }),
     );
-    // static files uncompressed
-    app.use(config.APP_PATH, express.static(path.join(__dirname, "static")));
 
     // 404 handler
-    app.use(function fourOhFourHandler(req: express.Request, _res: express.Response, next: express.NextFunction) {
-        return next(httpErrors(404, `Route not found: ${req.url}`));
+    app.notFound((c) => {
+        return c.text(`Route not found: ${c.req.url}`, 404);
     });
-    // 500 handler
-    app.use(
-        function fiveHundredHandler(
-            err: Error & { status?: number; statusCode?: number },
-            _req: express.Request,
-            res: express.Response,
-            _next: express.NextFunction,
-        ) {
-            console.error(`fiveHundred activated: ${err} (${err.status || err.statusCode})`);
-            if (config.NODE_ENV === "development") {
-                console.error(err);
-                console.error(_req);
-            }
-            res.locals.error = err;
-            res.set("Content-Type", "text/plain");
-            res.status(err.status || err.statusCode || 500).send(err.message);
-        },
-    );
+
+    // Error handler
+    app.onError((err, c) => {
+        console.error(`Error: ${err.message}`);
+        if (config.NODE_ENV === "development") {
+            console.error(err);
+        }
+        const status = (err as Error & { status?: number }).status || 500;
+        return c.text(err.message, status as 500);
+    });
+
     // Start server
-    const server = app.listen(listen_port, listen_host, function (err: NodeJS.ErrnoException) {
-        if (err) {
-            console.error(`❌ Failed to start server on ${listen_host}:${listen_port}`);
+    console.log(`Starting server on ${listen_host}:${listen_port}${config.APP_PATH}...`);
 
-            if (err.code === "EADDRINUSE") {
-                console.error(`❌ Port ${listen_port} is already in use on ${listen_host}`);
-                console.error(`   Please choose a different port or stop the service using this port`);
-                console.error(`   You can check what's using the port with: lsof -i :${listen_port}`);
-            } else if (err.code === "EACCES") {
-                console.error(`❌ Permission denied to bind to port ${listen_port} on ${listen_host}`);
-                console.error(`   You may need elevated privileges to bind to this port`);
-            } else if (err.code === "EADDRNOTAVAIL") {
-                console.error(`❌ Address ${listen_host}:${listen_port} is not available`);
-                console.error(`   Please check if the host address is valid`);
-            } else {
-                console.error(`❌ Server error: ${err.message}`);
-                console.error(`   Error code: ${err.code || "UNKNOWN"}`);
-            }
-
-            console.error(`\n💥 Server startup failed. Exiting...`);
-            process.exit(1);
-        }
-        // If some other error means we should close
-        if (serverClosing) {
-            const closeError = new Error("Server was closed before it could start");
-            console.error(closeError.message);
-            return;
-        }
+    serve({
+        fetch: app.fetch,
+        port: listen_port,
+        hostname: listen_host,
+    }, (info) => {
         serverStarted = true;
-        const addr = server.address();
         console.info(
-            `✅ Server started successfully at http://${listen_host || addr.host || "localhost"}:${addr.port}${config.APP_PATH} ${
+            `✅ Server started successfully at http://${listen_host || "localhost"}:${info.port}${config.APP_PATH} ${
                 new Date().toLocaleTimeString()
             }`,
         );
     });
 
-    // Handle server errors (like port binding failures)
-    server.on("error", function (err: NodeJS.ErrnoException) {
-        if (err.code === "EADDRINUSE") {
-            console.error(`Port ${listen_port} is already in use on ${listen_host}`);
-            console.error(`Cannot bind to address ${listen_host}:${listen_port}`);
-            console.error("Please choose a different port or stop the service using this port");
-        } else if (err.code === "EACCES") {
-            console.error(`Permission denied to bind to port ${listen_port} on ${listen_host}`);
-            console.error("You may need elevated privileges to bind to this port");
-        } else if (err.code === "EADDRNOTAVAIL") {
-            console.error(`Address ${listen_host}:${listen_port} is not available`);
-            console.error("Please check if the host address is valid");
-        } else {
-            console.error(`Server error occurred while trying to start on ${listen_host}:${listen_port}`);
-            console.error(`Error code: ${err.code}`);
-            console.error(`Error message: ${err.message}`);
-        }
-        console.error("Server startup failed. Exiting...");
-        process.exit(1);
-    });
     process.on("SIGTERM", async () => {
         console.log("SIGTERM received");
         await prisma.$disconnect();
