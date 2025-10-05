@@ -8,7 +8,7 @@ export default createMiddleware(async (c, next) => {
     try {
         // throws if no valid user in session
         const user = UserService.validateSessionUser(session);
-        c.set("user", user);
+        // Session is already in context via @hono/sessions
     } catch (e: unknown) {
         const error = e as Error;
         console.log("Error in enforceUser middleware");

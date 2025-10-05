@@ -1,8 +1,7 @@
 "use strict";
 
 import { Hono } from "hono";
-import { serve } from "@hono/node-server";
-import { serveStatic } from "@hono/node-server/serve-static";
+import { serveStatic } from "hono/deno";
 import session from "./middleware/session.ts";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -156,16 +155,15 @@ function main() {
     // Session middleware
     app.use("*", session);
 
+    // Static files - must come before routers to serve files from /watchtracker/static/*
+    app.use(
+        `${config.APP_PATH}/*`,
+        serveStatic({ root: "./static", rewriteRequestPath: (path) => path.replace(config.APP_PATH, "") }),
+    );
+
     // Mount routers
     app.route(config.APP_PATH, sessionRouter);
     app.route(`${config.APP_PATH}/auth`, authRouter);
-
-    // Static files
-    const staticPath = config.APP_PATH || "/";
-    app.use(
-        `${staticPath}/*`,
-        serveStatic({ root: "./static" }),
-    );
 
     // 404 handler
     app.notFound((c) => {
@@ -185,18 +183,16 @@ function main() {
     // Start server
     console.log(`Starting server on ${listen_host}:${listen_port}${config.APP_PATH}...`);
 
-    serve({
-        fetch: app.fetch,
+    Deno.serve({
         port: listen_port,
         hostname: listen_host,
-    }, (info) => {
-        serverStarted = true;
-        console.info(
-            `✅ Server started successfully at http://${listen_host || "localhost"}:${info.port}${config.APP_PATH} ${
-                new Date().toLocaleTimeString()
-            }`,
-        );
-    });
+        onListen: ({ hostname, port }) => {
+            serverStarted = true;
+            console.info(
+                `✅ Server started successfully at http://${hostname}:${port}${config.APP_PATH} ${new Date().toLocaleTimeString()}`,
+            );
+        },
+    }, app.fetch);
 
     process.on("SIGTERM", async () => {
         console.log("SIGTERM received");

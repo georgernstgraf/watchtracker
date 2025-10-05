@@ -1,106 +1,120 @@
 import { createMiddleware } from "hono/factory";
-import { getCookie, setCookie } from "hono/cookie";
-import mySessionStore, { type SessionData } from "../lib/memcachedSessionStore.ts";
+import { deleteCookie, getCookie, setCookie } from "hono/cookie";
+import memcachedStore, { type SessionData } from "../lib/memcachedSessionStore.ts";
 import * as config from "../lib/config.ts";
-import { defaultCookieOptions } from "../lib/cookieOptions.ts";
+import ms from "ms";
 
 export type { SessionData };
 
-declare module "hono" {
-    interface ContextVariableMap {
-        session: SessionData & {
-            destroy: () => Promise<void>;
-            save: () => Promise<void>;
-        };
+// Session class that wraps session data
+class Session {
+    private sessionId: string;
+    private data: SessionData;
+    private isNew: boolean;
+    private isDeleted: boolean = false;
+
+    constructor(sessionId: string, data: SessionData, isNew: boolean) {
+        this.sessionId = sessionId;
+        this.data = data;
+        this.isNew = isNew;
+    }
+
+    get user() {
+        return this.data.user;
+    }
+
+    set user(value: SessionData["user"]) {
+        this.data.user = value;
+    }
+
+    // Get any property from session data
+    get(key: string): unknown {
+        return this.data[key];
+    }
+
+    // Set any property in session data
+    set(key: string, value: unknown): void {
+        this.data[key] = value;
+    }
+
+    // Delete the session
+    deleteSession(): void {
+        this.isDeleted = true;
+    }
+
+    // Internal method to save session
+    async save(): Promise<void> {
+        if (this.isDeleted) {
+            await memcachedStore.deleteSession(this.sessionId);
+        } else {
+            await memcachedStore.persistSessionData(this.sessionId, this.data);
+        }
+    }
+
+    getId(): string {
+        return this.sessionId;
+    }
+
+    shouldDelete(): boolean {
+        return this.isDeleted;
     }
 }
 
-const session = createMiddleware(async (c, next) => {
-    // Get session ID from cookie
-    let sessionId = getCookie(c, config.COOKIE_NAME);
-
-    // Generate new session ID if none exists
-    if (!sessionId) {
-        sessionId = generateSessionId();
-    }
-
-    // Load session data from store
-    let sessionData: SessionData = {};
-
-    if (sessionId) {
-        try {
-            const data = await new Promise<SessionData | null>((resolve, reject) => {
-                mySessionStore.get(sessionId!, (err, session) => {
-                    if (err) reject(err);
-                    else resolve(session);
-                });
-            });
-
-            if (data) {
-                sessionData = data;
-            }
-        } catch (err) {
-            console.error("Error loading session:", err);
-        }
-    }
-
-    // Create session object with helper methods
-    const session = {
-        ...sessionData,
-        destroy: async () => {
-            if (sessionId) {
-                await new Promise<void>((resolve, reject) => {
-                    mySessionStore.destroy(sessionId!, (err) => {
-                        if (err) reject(err);
-                        else resolve();
-                    });
-                });
-            }
-        },
-        save: async () => {
-            if (sessionId) {
-                await new Promise<void>((resolve, reject) => {
-                    mySessionStore.set(sessionId!, sessionData, (err) => {
-                        if (err) reject(err);
-                        else resolve();
-                    });
-                });
-            }
-        },
-    };
-
-    // Attach session to context
-    c.set("session", session);
-
-    // Continue with request
-    await next();
-
-    // Save session after request (if modified)
-    if (sessionId) {
-        try {
-            await new Promise<void>((resolve, reject) => {
-                mySessionStore.set(sessionId!, sessionData, (err) => {
-                    if (err) reject(err);
-                    else resolve();
-                });
-            });
-
-            // Set session cookie
-            setCookie(c, config.COOKIE_NAME, sessionId, {
-                maxAge: defaultCookieOptions.maxAge / 1000, // Hono expects seconds
-                httpOnly: defaultCookieOptions.httpOnly,
-                secure: defaultCookieOptions.secure,
-                sameSite: defaultCookieOptions.sameSite === "strict" ? "Strict" : "Lax",
-                path: defaultCookieOptions.path,
-            });
-        } catch (err) {
-            console.error("Error saving session:", err);
-        }
-    }
-});
-
+// Generate random session ID
 function generateSessionId(): string {
     return Array.from({ length: 32 }, () => Math.floor(Math.random() * 16).toString(16)).join("");
 }
+
+// Session middleware
+const session = createMiddleware(async (c, next) => {
+    // Get session ID from cookie
+    let sessionId = getCookie(c, config.COOKIE_NAME);
+    let sessionData: SessionData = {};
+    let isNew = false;
+
+    if (sessionId) {
+        // Try to load existing session
+        const existingData = await memcachedStore.getSessionById(sessionId);
+        if (existingData) {
+            sessionData = existingData;
+        } else {
+            // Session expired or doesn't exist, create new one
+            sessionId = generateSessionId();
+            isNew = true;
+        }
+    } else {
+        // No session cookie, create new session
+        sessionId = generateSessionId();
+        isNew = true;
+    }
+
+    // Create session object
+    const sessionObj = new Session(sessionId, sessionData, isNew);
+    c.set("session", sessionObj as unknown as import("../lib/types.ts").SessionInterface);
+
+    // Process request
+    await next();
+
+    // Save session after request
+    if (sessionObj.shouldDelete()) {
+        // Delete session cookie
+        deleteCookie(c, config.COOKIE_NAME, {
+            path: config.APP_PATH || "/",
+        });
+        await sessionObj.save();
+    } else {
+        // Save session data
+        await sessionObj.save();
+
+        // Set session cookie
+        setCookie(c, config.COOKIE_NAME, sessionObj.getId(), {
+            maxAge: Math.floor(ms(config.COOKIE_MAX_AGE) / 1000),
+            httpOnly: true,
+            secure: config.NODE_ENV === "production",
+            sameSite: "Strict",
+            path: config.APP_PATH || "/",
+        });
+    }
+});
 
 export default session;

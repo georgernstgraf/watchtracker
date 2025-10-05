@@ -1,12 +1,23 @@
-import type { SessionData } from "../middleware/session.ts";
 import type { Context } from "hono";
+
+// Session interface matching our Session class
+export interface SessionInterface {
+    user?: {
+        id: string;
+        name: string;
+        timeZone?: string;
+        lastWatchId?: string;
+    };
+    get(key: string): unknown;
+    set(key: string, value: unknown): void;
+    deleteSession(): void;
+    save(): Promise<void>;
+    getId(): string;
+}
 
 declare module "hono" {
     interface ContextVariableMap {
-        session: SessionData & {
-            destroy: () => Promise<void>;
-            save: () => Promise<void>;
-        };
+        session: SessionInterface;
         appPath: string;
         user?: {
             id: string;
