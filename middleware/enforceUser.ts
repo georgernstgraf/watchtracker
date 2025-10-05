@@ -5,6 +5,7 @@ import type * as express from "express";
 export default function (req: express.Request, res: express.Response, next: express.NextFunction) {
     let user;
     try {
+        // throws if no valid user in session
         user = UserService.validateSessionUser(req.session);
     } catch (e: unknown) {
         const error = e as Error;

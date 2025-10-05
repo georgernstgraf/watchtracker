@@ -4,7 +4,6 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
         {
             "request": "launch",
             "name": "debug backend",
@@ -14,11 +13,14 @@
             "runtimeExecutable": "/home/georg/.deno/bin/deno",
             "runtimeArgs": [
                 "run",
-                "--unstable",
+                "--allow-ffi",
                 "--inspect-wait",
                 "--env-file",
                 "--allow-env",
-                "bin/app.ts"
+                "--allow-read",
+                "--allow-net",
+                "--watch",
+                "main.ts"
             ],
             "attachSimplePort": 9229
         }

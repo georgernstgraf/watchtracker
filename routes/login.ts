@@ -2,6 +2,7 @@ import express from "express";
 const router = express.Router();
 import { UserService, WatchService } from "../service/index.ts";
 import TimeZone from "../classes/timeZone.ts";
+import authenticate from "../lib/auth.ts";
 // this gets the login form req.body.passwd, req.body.user
 // renders the index page on success
 router.post("/", async (req: express.Request, res: express.Response) => {
@@ -18,18 +19,7 @@ router.post("/", async (req: express.Request, res: express.Response) => {
     const userName = req.body.user;
     const passwd = req.body.passwd;
     try {
-        const authResp = await fetch(Deno.env.get("AUTH_API_URL") as string, {
-            method: "POST",
-            body: JSON.stringify({
-                user: userName,
-                passwd: passwd,
-            }),
-            headers: { "Content-Type": "application/json" },
-        });
-        // auth (bool) und user (string)
-        if (!(await authResp.json()).auth) {
-            throw new Error("invalid credentials");
-        }
+        await authenticate(userName, passwd);
     } catch (err: unknown) {
         errors.push(`login failed: ${err instanceof Error ? err.message : "unknown error"}`);
         return res.render("login-body");

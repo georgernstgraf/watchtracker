@@ -8,6 +8,6 @@ const session = expressSession({
     secret: Deno.env.get("COOKIE_SECRET"),
     proxy: Deno.env.get("NODE_ENV") === "production",
     cookie: defaultCookieOptions,
-    store: mySessionStore,
+    store: new mySessionStore(),
 });
 export default session;
