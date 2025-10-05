@@ -20,6 +20,8 @@ value=3
 ###
 ### alle!
 GET http://localhost:16631/watchtracker
+### uRXN!
+GET http://localhost:16631/watchtracker/URXN
 ### nur die liste
 GET http://localhost:16631/watchtracker/liste
 ### dummy uhr

@@ -1,5 +1,5 @@
 import * as express from "express";
-import { logoutCookieOptions } from "../lib/cookies.ts";
+import { logoutCookieOptions } from "../lib/cookieOptions.ts";
 import * as config from "../lib/config.ts";
 
 const router = express.Router();

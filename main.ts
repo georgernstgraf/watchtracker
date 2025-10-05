@@ -126,7 +126,7 @@ function main() {
 
     // 404 handler
     app.use(function fourOhFourHandler(req: express.Request, _res: express.Response, next: express.NextFunction) {
-        next(httpErrors(404, `Route not found: ${req.url}`));
+        return next(httpErrors(404, `Route not found: ${req.url}`));
     });
     // 500 handler
     app.use(
@@ -137,6 +137,10 @@ function main() {
             _next: express.NextFunction,
         ) {
             console.error(`fiveHundred activated: ${err} (${err.status || err.statusCode})`);
+            if (config.NODE_ENV === "development") {
+                console.error(err);
+                console.error(_req);
+            }
             res.locals.error = err;
             res.set("Content-Type", "text/plain");
             res.status(err.status || err.statusCode || 500).send(err.message);

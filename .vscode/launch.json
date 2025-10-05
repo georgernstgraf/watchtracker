@@ -13,13 +13,13 @@
             "runtimeExecutable": "/home/georg/.deno/bin/deno",
             "runtimeArgs": [
                 "run",
-                "--allow-ffi",
                 "--inspect-wait",
+                "--inspect-brk",
                 "--env-file",
+                "--allow-ffi",
                 "--allow-env",
                 "--allow-read",
                 "--allow-net",
-                "--watch",
                 "main.ts"
             ],
             "attachSimplePort": 9229
