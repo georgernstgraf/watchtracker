@@ -2,7 +2,6 @@
 
 import { Hono } from "hono";
 import { serveStatic } from "hono/deno";
-import session from "./middleware/session.ts";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import Handlebars from "handlebars";
@@ -13,6 +12,7 @@ import sessionRouter from "./routers/sessionRouter.ts";
 import authRouter from "./routers/authRouter.ts";
 import * as config from "./lib/config.ts";
 import "./lib/types.ts";
+import { Session } from "./middleware/session.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -124,36 +124,8 @@ function main() {
     // Create the Hono app
     const app = new Hono();
 
-    // Add appPath to all responses
-    app.use("*", async (c, next) => {
-        c.set("appPath", config.APP_PATH);
-        await next();
-    });
-
-    // Add render helper to context
-    app.use("*", async (c, next) => {
-        c.set("render", (templateName: string, data?: Record<string, unknown>) => {
-            const template = templates[templateName];
-            if (!template) {
-                throw new Error(`Template ${templateName} not found`);
-            }
-            const allData = {
-                ...data,
-                appPath: c.get("appPath"),
-                user: c.get("user"),
-                watch: c.get("watch"),
-                userWatches: c.get("userWatches"),
-                timeZones: c.get("timeZones"),
-                edit: c.get("edit"),
-                errors: c.get("errors"),
-            };
-            return c.html(template(allData));
-        });
-        await next();
-    });
-
-    // Session middleware
-    app.use("*", session);
+    //    app.use("*", session);
+    app.use((c, next) => Session.middleware(c, next));
 
     // Static files - must come before routers to serve files from /watchtracker/static/*
     app.use(

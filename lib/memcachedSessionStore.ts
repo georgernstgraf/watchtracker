@@ -3,16 +3,6 @@ import ms from "ms";
 import * as config from "./config.ts";
 import type { SessionStore } from "@hono/sessions";
 
-export interface SessionData {
-    user?: {
-        id: string;
-        name: string;
-        timeZone?: string;
-        lastWatchId?: string;
-    };
-    [key: string]: unknown;
-}
-
 class MemcachedSessionStore implements SessionStore<SessionData> {
     memcached: Memcached;
     prefix = config.MEMCACHE_PREFIX;

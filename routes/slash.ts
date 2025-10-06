@@ -1,12 +1,15 @@
 import { Hono } from "hono";
 import { UserService, WatchService } from "../service/index.ts";
+import * as config from "../lib/config.ts";
+
+import { Session } from "../middleware/session.ts";
 import TimeZone from "../classes/timeZone.ts";
 import "../lib/types.ts";
 
 const router = new Hono();
 
 router.get("/", async (c) => {
-    const session = c.get("session");
+    const session: Session = c.get("session");
     const full = c.req.header("hx-request") ? "-body" : "-full";
 
     try {
