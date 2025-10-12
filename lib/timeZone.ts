@@ -1,7 +1,7 @@
 import moment from "moment-timezone";
 import * as luxon from "luxon";
 
-export default class TimeZone {
+export class TimeZone {
     static timeZones = moment.tz.names();
     static timeZonesIdxLC: [number, string][] = TimeZone.timeZones.map((tz, idx) => [
         idx,
@@ -18,7 +18,7 @@ export default class TimeZone {
         // tz not string or tz not in timeZones
         try {
             return luxon.DateTime.fromJSDate(date, { zone: tz }).toISO().substring(0, 16);
-        } catch (e) {
+        } catch (_e) {
             return luxon.DateTime.fromJSDate(date, { zone: "UTC" }).toISO().substring(0, 16);
         }
     }

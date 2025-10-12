@@ -1,6 +1,6 @@
-import prisma from "../lib/db.ts";
+import { prisma } from "../lib/db.ts";
 import ms from "ms";
-import TimeZone from "./timeZone.ts";
+import TimeZone from "../lib/timeZone.ts";
 import dbEntity from "./dbEntity.ts";
 import hb from "handlebars";
 class Measurement extends dbEntity {

@@ -6,7 +6,7 @@ export default {
     resave: false, // dont save if not modified
     saveUninitialized: false, // dont write to store if not modified
     secret: config.COOKIE_SECRET,
-    proxy: config.NODE_ENV === "production",
+    proxy: config.DENO_ENV === "production",
     cookie: defaultCookieOptions,
     store: mySessionStore,
 };

@@ -1,4 +1,4 @@
-import db from "../lib/db.ts";
+import { prisma } from "../lib/db.ts";
 import type { Prisma, Watch } from "generated-prisma-client";
 
 export class WatchRepository {
@@ -6,7 +6,7 @@ export class WatchRepository {
      * Create a new watch
      */
     static async create(data: Prisma.WatchCreateInput): Promise<Watch> {
-        return await db.watch.create({
+        return await prisma.watch.create({
             data,
         });
     }
@@ -15,7 +15,7 @@ export class WatchRepository {
      * Find a watch by unique identifier
      */
     static async findUnique(where: Prisma.WatchWhereUniqueInput): Promise<Watch | null> {
-        return await db.watch.findUnique({
+        return await prisma.watch.findUnique({
             where,
         });
     }
@@ -24,7 +24,7 @@ export class WatchRepository {
      * Find the first watch matching the criteria
      */
     static async findFirst(where?: Prisma.WatchWhereInput): Promise<Watch | null> {
-        return await db.watch.findFirst({
+        return await prisma.watch.findFirst({
             where,
         });
     }
@@ -38,7 +38,7 @@ export class WatchRepository {
         take?: number;
         skip?: number;
     }): Promise<Watch[]> {
-        return await db.watch.findMany(params);
+        return await prisma.watch.findMany(params);
     }
 
     /**
@@ -49,7 +49,7 @@ export class WatchRepository {
         data: Prisma.WatchUpdateInput;
     }): Promise<Watch> {
         const { where, data } = params;
-        return await db.watch.update({
+        return await prisma.watch.update({
             where,
             data,
         });
@@ -63,7 +63,7 @@ export class WatchRepository {
         data: Prisma.WatchUpdateInput;
     }): Promise<{ count: number }> {
         const { where, data } = params;
-        return await db.watch.updateMany({
+        return await prisma.watch.updateMany({
             where,
             data,
         });
@@ -73,7 +73,7 @@ export class WatchRepository {
      * Delete a watch
      */
     static async delete(where: Prisma.WatchWhereUniqueInput): Promise<Watch> {
-        return await db.watch.delete({
+        return await prisma.watch.delete({
             where,
         });
     }
@@ -82,7 +82,7 @@ export class WatchRepository {
      * Delete many watches
      */
     static async deleteMany(where?: Prisma.WatchWhereInput): Promise<{ count: number }> {
-        return await db.watch.deleteMany({
+        return await prisma.watch.deleteMany({
             where,
         });
     }
@@ -91,7 +91,7 @@ export class WatchRepository {
      * Count watches
      */
     static async count(where?: Prisma.WatchWhereInput): Promise<number> {
-        return await db.watch.count({
+        return await prisma.watch.count({
             where,
         });
     }
@@ -100,7 +100,7 @@ export class WatchRepository {
      * Find watch with its measurements and user
      */
     static async findWatchWithMeasurements(where: Prisma.WatchWhereUniqueInput): Promise<Watch | null> {
-        return await db.watch.findUnique({
+        return await prisma.watch.findUnique({
             where,
             include: {
                 measurements: {
@@ -116,7 +116,7 @@ export class WatchRepository {
      * Find watches by user ID
      */
     static async findByUserId(userId: string): Promise<Watch[]> {
-        return await db.watch.findMany({
+        return await prisma.watch.findMany({
             where: { userId },
             include: {
                 measurements: {
@@ -131,7 +131,7 @@ export class WatchRepository {
      * Find watch by name and user ID
      */
     static async findByNameAndUserId(name: string, userId: string): Promise<Watch | null> {
-        return await db.watch.findUnique({
+        return await prisma.watch.findUnique({
             where: {
                 name_userId: {
                     name,
@@ -145,7 +145,7 @@ export class WatchRepository {
      * Check if watch exists
      */
     static async exists(where: Prisma.WatchWhereInput): Promise<boolean> {
-        const count = await db.watch.count({ where });
+        const count = await prisma.watch.count({ where });
         return count > 0;
     }
 
@@ -153,7 +153,7 @@ export class WatchRepository {
      * Get watch statistics
      */
     static async getWatchStats(watchId: string) {
-        const measurements = await db.measurement.findMany({
+        const measurements = await prisma.measurement.findMany({
             where: { watchId },
             orderBy: { createdAt: "asc" },
         });

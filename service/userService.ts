@@ -1,7 +1,7 @@
 import { UserRepository } from "../repo/userRepository.ts";
 import { WatchRepository } from "../repo/watchRepository.ts";
 import type { Prisma, User } from "generated-prisma-client";
-import type { SessionData } from "../lib/memcachedSessionStore.ts";
+import type { Session } from "../lib/memcachedSessionStore.ts";
 
 export class UserService {
     /**
@@ -33,7 +33,6 @@ export class UserService {
         if (existingUser) {
             return existingUser;
         }
-
         return await UserRepository.create({ name: userName });
     }
 
@@ -109,7 +108,7 @@ export class UserService {
      * Validate and extract user from session
      * Ensures user exists in session and has all required fields
      */
-    static assertSessionUserIsPresent(session: SessionData): User {
+    static assertSessionUserIsPresent(session: Session): User {
         const user = session.user;
         if (!user) {
             throw new Error("No user in session.");

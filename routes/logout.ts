@@ -1,18 +1,13 @@
-import { Hono } from "hono";
-import "../lib/types.ts";
+import { sessionRouter } from "../routers/sessionRouter.ts";
 
-const router = new Hono();
+export function serve_under_for(path: string, router: typeof sessionRouter) {
+    router.post(path, async (c) => {
+        const session = c.get("session");
+        await session.logout();
 
-// this gets the login form req.body.passwd, req.body.user
-router.post("/", async (c) => {
-    const session = c.get("session");
-    session.deleteSession();
-
-    const render = c.get("render");
-    if (c.req.header("hx-request")) {
-        return render("login-body");
-    }
-    return render("login-full");
-});
-
-export default router;
+        if (c.req.header("hx-request")) {
+            return c.render("login-body");
+        }
+        return c.render("login-full");
+    });
+}

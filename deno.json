@@ -3,6 +3,7 @@
         "bastel": "deno run --inspect bastel.ts",
         "p_g": "deno -A prisma generate",
         "p_m": "deno -A prisma migrate",
+        "lint": "deno lint lib/*.ts middleware/*.ts routes/*.ts routers/*.ts service/*.ts repo/*.ts main.ts",
         "start": "deno run --env-file --allow-env --allow-read --allow-ffi --allow-net main.ts",
         "watch": "deno run --env-file --allow-env --allow-read --allow-ffi --allow-net --watch main.ts",
         "purgecss": "purgecss --config purgecss.config.js"

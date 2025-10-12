@@ -1,26 +1,22 @@
+/*
+ Session Class
+ */
+
 import { Context } from "hono";
 import { deleteCookie, getSignedCookie, setSignedCookie } from "hono/cookie";
 import { v4 as uuidv4 } from "uuid";
-import { Client } from "memjs";
-import { Buffer } from "node:buffer";
-
-import { defaultCookieOptions } from "../lib/cookieOptions.ts";
+import store from "../lib/memcachedSessionStore.ts";
+import { defaultCookieOptions, logoutCookieOptions } from "../lib/cookieOptions.ts";
 import * as config from "../lib/config.ts";
 
-const memjs = Client.create("localhost:11211");
+export type SessionData = {
+    username: string;
+};
 
-export interface ISession {
-    username?: string;
-    isAdmin?: boolean;
-}
-
-export class Session implements ISession {
+export class Session {
     c: Context;
     sessionId: string;
     #username: string = "";
-    #isAdmin: boolean = false; // TODO: get from DB
-    // need those guys in the after step
-    _admins = ["georg", "graf georg"];
     gotLogin = false;
     gotLogout = false;
     needsSave = false;
@@ -40,13 +36,7 @@ export class Session implements ISession {
         return this.#username;
     }
     set username(username: string) {
-        if (this._admins.includes(username.toLowerCase())) { // TODO: get from DB
-            this.#isAdmin = true;
-        }
         this.#username = username;
-    }
-    get isAdmin(): boolean {
-        return this.#isAdmin;
     }
     login(username: string): void {
         this.username = username;
@@ -55,91 +45,46 @@ export class Session implements ISession {
     logout(): void {
         this.gotLogout = true;
     }
-    toJSON(): ISession {
-        return {
-            username: this.#username,
-        };
+    sessionDataString() {
+        return JSON.stringify({
+            username: this.username,
+        });
     }
-    renderJSON(): ISession {
-        return {
-            username: this.#username,
-            isAdmin: this.#isAdmin,
-        };
-    }
-
     async save(): Promise<void> {
         const id = this.sessionId;
-        const value = JSON.stringify(this);
-        return new Promise((resolve, reject) => {
-            try {
-                memjs.set(
-                    id,
-                    Buffer.from(value),
-                    {},
-                    function (err: Error, val: unknown) {
-                        if (err) {
-                            console.error(`Error saving ${id} to Memcached:`, err);
-                            return reject(err);
-                        } else {
-                            console.log(`SUCCESS saving ${id} to Memcached:`, val);
-                            return resolve();
-                        }
-                    },
-                );
-            } catch (e) {
-                console.error(`Error saving session ${id}:`, e);
-                return reject(e);
-            }
-        });
+        await store.persistSessionData(id, this.sessionDataString());
     }
     async sendCookie() {
         await setSignedCookie(this.c, config.COOKIE_NAME, this.sessionId, config.COOKIE_SECRET, defaultCookieOptions);
     }
-    async delete(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            try {
-                memjs.delete(this.sessionId, (err: Error, val: unknown) => {
-                    if (err) {
-                        console.error(`Error deleting session ${this.sessionId}:`, err);
-                        return reject(err);
-                    } else {
-                        console.log(`SUCCESS deleting session ${this.sessionId}:`, val);
-                        return resolve();
-                    }
-                });
-            } catch (e) {
-                console.error(`Error deleting session ${this.sessionId}:`, e);
-                return reject(e);
-            }
-        });
+    /**
+     * Deletes the session from the memcached store.
+     *
+     * @returns A promise that resolves when the session is successfully deleted,
+     * or rejects with an error if the deletion fails.
+     *
+     * @remarks
+     * This method removes the session data associated with the current sessionId
+     * from the memcached store. Success and error messages are logged to the console.
+     *
+     * @throws {Error} If the memcached delete operation fails or if an exception
+     * occurs during the deletion process.
+     */
+    async remove_from_store(): Promise<void> {
+        await store.deleteSession(this.sessionId);
     }
     static async load(
         id: string,
         c: Context, // id comes from cookie
     ): Promise<Session> {
-        return new Promise((resolve, reject) => {
-            try {
-                memjs.get(id, (err: Error, value: Buffer) => {
-                    if (value) {
-                        // console.log(`loadSession ${id} got '${value.toString("utf8")}'.`);
-                        try {
-                            const session = new Session(c, id);
-                            Object.assign(session, JSON.parse(value.toString("utf8")));
-                            session.loadedFromStore = true;
-                            return resolve(session);
-                        } catch (e) {
-                            return reject(e);
-                        }
-                    } else {
-                        console.log(`loadSession ERR ${err}`);
-                        return reject(err);
-                    }
-                });
-            } catch (e) {
-                console.error(`Error loading session ${id}:`, e);
-                return reject(e);
-            }
-        });
+        const sessionData = await store.getSessionDataById(id);
+        if (!sessionData) {
+            throw new Error(`Session not found: ${id}`);
+        }
+        const session = new Session(c, id);
+        Object.assign(session, sessionData);
+        session.loadedFromStore = true;
+        return session;
     }
 
     static async middleware(
@@ -179,8 +124,8 @@ export class Session implements ISession {
             return;
         }
         if (session.gotLogout) {
-            await session.delete();
-            await deleteCookie(c, config.COOKIE_NAME, defaultCookieOptions);
+            await session.remove_from_store();
+            await deleteCookie(session.c, config.COOKIE_NAME, logoutCookieOptions);
             console.log(
                 `Session and cookie deleted: ${session.sessionId}`,
             );
@@ -191,7 +136,7 @@ export class Session implements ISession {
                 await deleteCookie(c, config.COOKIE_NAME, defaultCookieOptions);
             }
             if (session.loadedFromStore) {
-                await session.delete();
+                await session.remove_from_store();
             }
             return;
         }

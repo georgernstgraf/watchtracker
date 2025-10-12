@@ -1,4 +1,4 @@
-import db from "../lib/db.ts";
+import { prisma } from "../lib/db.ts";
 import type { Measurement, Prisma } from "generated-prisma-client";
 
 export class MeasurementRepository {
@@ -6,7 +6,7 @@ export class MeasurementRepository {
      * Create a new measurement
      */
     static async create(data: Prisma.MeasurementCreateInput): Promise<Measurement> {
-        return await db.measurement.create({
+        return await prisma.measurement.create({
             data,
         });
     }
@@ -15,7 +15,7 @@ export class MeasurementRepository {
      * Find a measurement by unique identifier
      */
     static async findUnique(where: Prisma.MeasurementWhereUniqueInput): Promise<Measurement | null> {
-        return await db.measurement.findUnique({
+        return await prisma.measurement.findUnique({
             where,
         });
     }
@@ -24,7 +24,7 @@ export class MeasurementRepository {
      * Find the first measurement matching the criteria
      */
     static async findFirst(where?: Prisma.MeasurementWhereInput): Promise<Measurement | null> {
-        return await db.measurement.findFirst({
+        return await prisma.measurement.findFirst({
             where,
         });
     }
@@ -38,7 +38,7 @@ export class MeasurementRepository {
         take?: number;
         skip?: number;
     }): Promise<Measurement[]> {
-        return await db.measurement.findMany(params);
+        return await prisma.measurement.findMany(params);
     }
 
     /**
@@ -49,7 +49,7 @@ export class MeasurementRepository {
         data: Prisma.MeasurementUpdateInput;
     }): Promise<Measurement> {
         const { where, data } = params;
-        return await db.measurement.update({
+        return await prisma.measurement.update({
             where,
             data,
         });
@@ -63,7 +63,7 @@ export class MeasurementRepository {
         data: Prisma.MeasurementUpdateInput;
     }): Promise<{ count: number }> {
         const { where, data } = params;
-        return await db.measurement.updateMany({
+        return await prisma.measurement.updateMany({
             where,
             data,
         });
@@ -73,7 +73,7 @@ export class MeasurementRepository {
      * Delete a measurement
      */
     static async delete(where: Prisma.MeasurementWhereUniqueInput): Promise<Measurement> {
-        return await db.measurement.delete({
+        return await prisma.measurement.delete({
             where,
         });
     }
@@ -82,7 +82,7 @@ export class MeasurementRepository {
      * Delete many measurements
      */
     static async deleteMany(where?: Prisma.MeasurementWhereInput): Promise<{ count: number }> {
-        return await db.measurement.deleteMany({
+        return await prisma.measurement.deleteMany({
             where,
         });
     }
@@ -91,7 +91,7 @@ export class MeasurementRepository {
      * Count measurements
      */
     static async count(where?: Prisma.MeasurementWhereInput): Promise<number> {
-        return await db.measurement.count({
+        return await prisma.measurement.count({
             where,
         });
     }
@@ -100,7 +100,7 @@ export class MeasurementRepository {
      * Find measurement with its watch
      */
     static async findMeasurementWithWatch(where: Prisma.MeasurementWhereUniqueInput): Promise<Measurement | null> {
-        return await db.measurement.findUnique({
+        return await prisma.measurement.findUnique({
             where,
             include: {
                 watch: {
@@ -120,7 +120,7 @@ export class MeasurementRepository {
         take?: number;
         skip?: number;
     }): Promise<Measurement[]> {
-        return await db.measurement.findMany({
+        return await prisma.measurement.findMany({
             where: { watchId },
             ...params,
         });
@@ -130,7 +130,7 @@ export class MeasurementRepository {
      * Find latest measurement for a watch
      */
     static async findLatestByWatchId(watchId: string): Promise<Measurement | null> {
-        return await db.measurement.findFirst({
+        return await prisma.measurement.findFirst({
             where: { watchId },
             orderBy: { createdAt: "desc" },
         });
@@ -158,7 +158,7 @@ export class MeasurementRepository {
             where.watchId = watchId;
         }
 
-        return await db.measurement.findMany({
+        return await prisma.measurement.findMany({
             where,
             ...rest,
         });
@@ -168,7 +168,7 @@ export class MeasurementRepository {
      * Check if measurement exists
      */
     static async exists(where: Prisma.MeasurementWhereInput): Promise<boolean> {
-        const count = await db.measurement.count({ where });
+        const count = await prisma.measurement.count({ where });
         return count > 0;
     }
 
@@ -177,10 +177,10 @@ export class MeasurementRepository {
      */
     static async getMeasurementStats(watchId: string) {
         const [total, starts, stops, latest] = await Promise.all([
-            db.measurement.count({ where: { watchId } }),
-            db.measurement.count({ where: { watchId, isStart: true } }),
-            db.measurement.count({ where: { watchId, isStart: false } }),
-            db.measurement.findFirst({
+            prisma.measurement.count({ where: { watchId } }),
+            prisma.measurement.count({ where: { watchId, isStart: true } }),
+            prisma.measurement.count({ where: { watchId, isStart: false } }),
+            prisma.measurement.findFirst({
                 where: { watchId },
                 orderBy: { createdAt: "desc" },
             }),
@@ -199,7 +199,7 @@ export class MeasurementRepository {
      */
     static async getRunningMeasurements(watchId: string): Promise<Measurement[]> {
         // Find all start measurements
-        const startMeasurements = await db.measurement.findMany({
+        const startMeasurements = await prisma.measurement.findMany({
             where: {
                 watchId,
                 isStart: true,
@@ -211,7 +211,7 @@ export class MeasurementRepository {
 
         for (const start of startMeasurements) {
             // Check if there's a stop measurement after this start
-            const stopExists = await db.measurement.findFirst({
+            const stopExists = await prisma.measurement.findFirst({
                 where: {
                     watchId,
                     isStart: false,

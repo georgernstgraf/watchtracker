@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import TimeZone from "../classes/timeZone.ts";
+import { TimeZone } from "../lib/timeZone.ts";
 import { UserService, WatchService } from "../service/index.ts";
 import "../lib/types.ts";
 

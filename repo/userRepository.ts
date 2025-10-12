@@ -1,4 +1,4 @@
-import db from "../lib/db.ts";
+import { prisma } from "../lib/db.ts";
 import type { Prisma, User } from "generated-prisma-client";
 
 export class UserRepository {
@@ -6,7 +6,7 @@ export class UserRepository {
      * Create a new user
      */
     static async create(data: Prisma.UserCreateInput): Promise<User> {
-        return await db.user.create({
+        return await prisma.user.create({
             data,
         });
     }
@@ -15,7 +15,7 @@ export class UserRepository {
      * Find a user by unique identifier
      */
     static async findUnique(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
-        return await db.user.findUnique({
+        return await prisma.user.findUnique({
             where,
         });
     }
@@ -24,7 +24,7 @@ export class UserRepository {
      * Find the first user matching the criteria
      */
     static async findFirst(where?: Prisma.UserWhereInput): Promise<User | null> {
-        return await db.user.findFirst({
+        return await prisma.user.findFirst({
             where,
         });
     }
@@ -38,7 +38,7 @@ export class UserRepository {
         take?: number;
         skip?: number;
     }): Promise<User[]> {
-        return await db.user.findMany(params);
+        return await prisma.user.findMany(params);
     }
 
     /**
@@ -49,7 +49,7 @@ export class UserRepository {
         data: Prisma.UserUpdateInput;
     }): Promise<User> {
         const { where, data } = params;
-        return await db.user.update({
+        return await prisma.user.update({
             where,
             data,
         });
@@ -63,7 +63,7 @@ export class UserRepository {
         data: Prisma.UserUpdateInput;
     }): Promise<{ count: number }> {
         const { where, data } = params;
-        return await db.user.updateMany({
+        return await prisma.user.updateMany({
             where,
             data,
         });
@@ -73,7 +73,7 @@ export class UserRepository {
      * Delete a user
      */
     static async delete(where: Prisma.UserWhereUniqueInput): Promise<User> {
-        return await db.user.delete({
+        return await prisma.user.delete({
             where,
         });
     }
@@ -82,7 +82,7 @@ export class UserRepository {
      * Delete many users
      */
     static async deleteMany(where?: Prisma.UserWhereInput): Promise<{ count: number }> {
-        return await db.user.deleteMany({
+        return await prisma.user.deleteMany({
             where,
         });
     }
@@ -91,7 +91,7 @@ export class UserRepository {
      * Count users
      */
     static async count(where?: Prisma.UserWhereInput): Promise<number> {
-        return await db.user.count({
+        return await prisma.user.count({
             where,
         });
     }
@@ -100,7 +100,7 @@ export class UserRepository {
      * Find user with their watches
      */
     static async findUserWithWatches(where: Prisma.UserWhereUniqueInput): Promise<User | null> {
-        return await db.user.findUnique({
+        return await prisma.user.findUnique({
             where,
             include: {
                 watches: true,
@@ -113,7 +113,7 @@ export class UserRepository {
      * Find user by name
      */
     static async findByName(name: string): Promise<User | null> {
-        return await db.user.findUnique({
+        return await prisma.user.findUnique({
             where: { name },
         });
     }
@@ -122,7 +122,7 @@ export class UserRepository {
      * Check if user exists
      */
     static async exists(where: Prisma.UserWhereInput): Promise<boolean> {
-        const count = await db.user.count({ where });
+        const count = await prisma.user.count({ where });
         return count > 0;
     }
 }
