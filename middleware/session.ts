@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 import { Client } from "memjs";
 import { Buffer } from "node:buffer";
 
-import { defaultCookieOptions as cookieOpts } from "../lib/cookieOptions.ts";
+import { defaultCookieOptions } from "../lib/cookieOptions.ts";
 import * as config from "../lib/config.ts";
 
 const memjs = Client.create("localhost:11211");
@@ -14,7 +14,7 @@ export interface ISession {
     isAdmin?: boolean;
 }
 
-export class Session {
+export class Session implements ISession {
     c: Context;
     sessionId: string;
     #username: string = "";
@@ -45,7 +45,7 @@ export class Session {
         }
         this.#username = username;
     }
-    isAdmin(): boolean {
+    get isAdmin(): boolean {
         return this.#isAdmin;
     }
     login(username: string): void {
@@ -67,7 +67,7 @@ export class Session {
         };
     }
 
-    save(): Promise<void> {
+    async save(): Promise<void> {
         const id = this.sessionId;
         const value = JSON.stringify(this);
         return new Promise((resolve, reject) => {
@@ -76,7 +76,7 @@ export class Session {
                     id,
                     Buffer.from(value),
                     {},
-                    function (err: unknown, val: unknown) {
+                    function (err: Error, val: unknown) {
                         if (err) {
                             console.error(`Error saving ${id} to Memcached:`, err);
                             return reject(err);
@@ -93,12 +93,12 @@ export class Session {
         });
     }
     async sendCookie() {
-        await setSignedCookie(this.c, config.COOKIE_NAME, this.sessionId, config.COOKIE_SECRET, cookieOpts);
+        await setSignedCookie(this.c, config.COOKIE_NAME, this.sessionId, config.COOKIE_SECRET, defaultCookieOptions);
     }
-    delete(): Promise<void> {
+    async delete(): Promise<void> {
         return new Promise((resolve, reject) => {
             try {
-                memjs.delete(this.sessionId, (err: unknown, val: unknown) => {
+                memjs.delete(this.sessionId, (err: Error, val: unknown) => {
                     if (err) {
                         console.error(`Error deleting session ${this.sessionId}:`, err);
                         return reject(err);
@@ -113,13 +113,13 @@ export class Session {
             }
         });
     }
-    static load(
+    static async load(
         id: string,
         c: Context, // id comes from cookie
     ): Promise<Session> {
         return new Promise((resolve, reject) => {
             try {
-                memjs.get(id, (err: unknown, value: Buffer) => {
+                memjs.get(id, (err: Error, value: Buffer) => {
                     if (value) {
                         // console.log(`loadSession ${id} got '${value.toString("utf8")}'.`);
                         try {
@@ -146,7 +146,7 @@ export class Session {
         c: Context,
         next: () => Promise<void>,
     ): Promise<void> {
-        let session: Session | null = null;
+        let session = undefined;
         console.log(
             `Session middleware started: ${c.req.method} ${c.req.path}`,
         );
@@ -180,7 +180,7 @@ export class Session {
         }
         if (session.gotLogout) {
             await session.delete();
-            await deleteCookie(c, config.COOKIE_NAME, cookieOpts);
+            await deleteCookie(c, config.COOKIE_NAME, defaultCookieOptions);
             console.log(
                 `Session and cookie deleted: ${session.sessionId}`,
             );
@@ -188,7 +188,7 @@ export class Session {
         }
         if (!session.username) {
             if (session.idIsFromCookie) {
-                await deleteCookie(c, config.COOKIE_NAME, cookieOpts);
+                await deleteCookie(c, config.COOKIE_NAME, defaultCookieOptions);
             }
             if (session.loadedFromStore) {
                 await session.delete();

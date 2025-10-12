@@ -109,7 +109,7 @@ export class UserService {
      * Validate and extract user from session
      * Ensures user exists in session and has all required fields
      */
-    static validateSessionUser(session: SessionData): User {
+    static assertSessionUserIsPresent(session: SessionData): User {
         const user = session.user;
         if (!user) {
             throw new Error("No user in session.");

@@ -13,7 +13,7 @@ router.get("/", async (c) => {
     const full = c.req.header("hx-request") ? "-body" : "-full";
 
     try {
-        const user = UserService.validateSessionUser(session);
+        const user = UserService.assertSessionUserIsPresent(session);
         const userWatches = await WatchService.getUserWatches(user.id);
         const watch = await WatchService.getUserWatchWithMeasurements(user.id);
 

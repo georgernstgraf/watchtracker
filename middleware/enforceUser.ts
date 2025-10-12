@@ -7,7 +7,7 @@ export default createMiddleware(async (c, next) => {
 
     try {
         // throws if no valid user in session
-        const user = UserService.validateSessionUser(session);
+        const user = UserService.assertSessionUserIsPresent(session);
         // Session is already in context via @hono/sessions
     } catch (e: unknown) {
         const error = e as Error;

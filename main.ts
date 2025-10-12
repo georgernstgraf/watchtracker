@@ -4,7 +4,6 @@ import { Hono } from "hono";
 import { serveStatic } from "hono/deno";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import Handlebars from "handlebars";
 import { readdirSync, readFileSync } from "node:fs";
 import prisma from "./lib/db.ts";
 import process from "node:process";

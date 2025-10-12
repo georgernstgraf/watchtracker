@@ -11,3 +11,4 @@ export const AUTH_API_URL = Deno.env.get("AUTH_API_URL") || "";
 export const MEMCACHE_PREFIX = Deno.env.get("MEMCACHE_PREFIX") || "watchtracker";
 export const MEMCACHE_HOST = Deno.env.get("MEMCACHE_HOST") || "127.0.0.1";
 export const MEMCACHE_PORT = Number(Deno.env.get("MEMCACHE_PORT")) || 11211;
+export const partialsDir = "./views";

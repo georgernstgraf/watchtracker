@@ -9,7 +9,7 @@ const router = new Hono();
 async function handleGet(id: string, c: HonoContext) {
     try {
         const session = c.get("session");
-        const user = UserService.validateSessionUser(session);
+        const user = UserService.assertSessionUserIsPresent(session);
         const watch = await WatchService.getUserWatchWithMeasurements(user.id, id);
         if (!watch) {
             return c.text("Wrong Watch ID", 403);
@@ -41,7 +41,7 @@ router.get("/", async (c) => {
 router.patch("/:id", async (c) => {
     try {
         const session = c.get("session");
-        const user = UserService.validateSessionUser(session);
+        const user = UserService.assertSessionUserIsPresent(session);
         const body = await c.req.parseBody();
         const watch = await WatchService.getUserWatchWithMeasurements(user.id, c.req.param("id"));
 
@@ -70,7 +70,7 @@ router.patch("/:id", async (c) => {
 router.post("/", async (c) => {
     try {
         const session = c.get("session");
-        const user = UserService.validateSessionUser(session);
+        const user = UserService.assertSessionUserIsPresent(session);
         const body = await c.req.parseBody();
         const watch = await WatchService.createWatch({
             name: body.name as string,
@@ -95,7 +95,7 @@ router.post("/", async (c) => {
 router.delete("/:id", async (c) => {
     try {
         const session = c.get("session");
-        const user = UserService.validateSessionUser(session);
+        const user = UserService.assertSessionUserIsPresent(session);
         await WatchService.deleteWatch(c.req.param("id"), user.id);
         c.set("userWatches", await WatchService.getUserWatches(user.id));
         const render = c.get("render");
