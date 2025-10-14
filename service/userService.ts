@@ -20,14 +20,18 @@ export class UserService {
     /**
      * Find user by name
      */
-    static async findUserByName(name: string): Promise<User | null> {
-        return await UserRepository.findByName(name);
+    static async getUserByName(name: string): Promise<User> {
+        const user = await UserRepository.findByName(name);
+        if (!user) {
+            throw new Error("User not found");
+        }
+        return user;
     }
 
     /**
      * Get or create user by name - ensures user exists
      */
-    static async enforceUserExists(userName: string): Promise<User> {
+    static async ensureUserExists(userName: string): Promise<User> {
         const existingUser = await UserRepository.findByName(userName);
         if (existingUser) {
             return existingUser;
@@ -38,9 +42,9 @@ export class UserService {
     /**
      * Update user information
      */
-    static async updateUser(userId: string, updateData: Prisma.UserUpdateInput): Promise<User> {
+    static async updateUser(username: string, updateData: Prisma.UserUpdateInput): Promise<User> {
         return await UserRepository.update({
-            where: { id: userId },
+            where: { name: username },
             data: updateData,
         });
     }
@@ -62,9 +66,9 @@ export class UserService {
     /**
      * Set the last watch for a user
      */
-    static async setLastWatch(userId: string, watchId: string): Promise<User> {
+    static async setLastWatch(username: string, watchId: string): Promise<User> {
         return await UserRepository.update({
-            where: { id: userId },
+            where: { name: username },
             data: {
                 lastWatch: { connect: { id: watchId } },
             },

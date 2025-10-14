@@ -1,41 +1,35 @@
-import { Hono } from "hono";
+import { sessionRouter } from "../routers/sessionRouter.ts";
 import { TimeZone } from "../lib/timeZone.ts";
 import { UserService, WatchService } from "../service/index.ts";
 import "../lib/types.ts";
+import render from "../lib/hbs.ts";
 
-const router = new Hono();
+export default function serve_under_for(path: string, router: typeof sessionRouter) {
+    // patch a user
+    router.patch(path, async (c) => {
+        const session = c.get("session");
+        const username = session.username;
 
-router.patch("", async (c) => {
-    const session = c.get("session");
-    const userId = session.user?.id;
+        const body = await c.req.parseBody();
 
-    if (!userId) {
-        return c.text("Unauthorized", 401);
-    }
+        if ("timeZone" in body && !TimeZone.timeZones.includes(body.timeZone as string)) {
+            return c.text("Unknown / invalid time zone", 422);
+        }
 
-    const body = await c.req.parseBody();
+        // Update the user
+        const updatedUser = await UserService.updateUser(username, {
+            timeZone: body.timeZone as string,
+            name: body.name as string,
+        });
 
-    if ("timeZone" in body && !TimeZone.timeZones.includes(body.timeZone as string)) {
-        return c.text("Unknown / invalid time zone", 422);
-    }
+        const userWatches = await WatchService.getUserWatchesByUname(username);
+        const watch = await WatchService.getUserWatchWithMeasurements(username, body.selectedWatchId as string);
 
-    // Update the user
-    const updatedUser = await UserService.updateUser(userId, {
-        timeZone: body.timeZone as string,
-        name: body.name as string,
+        return c.html(render("body-auth", {
+            user: updatedUser,
+            timeZones: TimeZone.timeZones,
+            userWatches,
+            watch,
+        }));
     });
-
-    session.user = updatedUser; // Update session with new user data
-    const userWatches = await WatchService.getUserWatches(userId);
-    const watch = await WatchService.getUserWatchWithMeasurements(userId);
-
-    const render = c.get("render");
-    return render("body-auth", {
-        user: updatedUser,
-        timeZones: TimeZone.timeZones,
-        userWatches,
-        watch,
-    });
-});
-
-export default router;
+}

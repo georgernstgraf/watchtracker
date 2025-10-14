@@ -25,14 +25,14 @@ export class MeasurementService {
     }
 
     /**
-     * Get user's measurement (ensures user owns the measurement)
+     * Get user's measurement (also ensures user owns the measurement)
      */
-    static async getUserMeasurement(userId: string, measurementId: string): Promise<Measurement | null> {
+    static async getUserMeasurement(username: string, measurementId: string): Promise<Measurement | null> {
         const measurement = await MeasurementRepository.findMeasurementWithWatch({ id: measurementId });
         const measurementWithWatch = measurement as typeof measurement & {
-            watch?: { id: string; userId: string };
+            watch?: { id: string; user: { name: string } };
         };
-        if (!measurementWithWatch || !measurementWithWatch.watch || measurementWithWatch.watch.userId !== userId) {
+        if (!measurementWithWatch || !measurementWithWatch.watch || measurementWithWatch.watch.user.name !== username) {
             return null;
         }
         return measurementWithWatch;
@@ -88,8 +88,8 @@ export class MeasurementService {
     /**
      * Delete a user's measurement (ensures user owns the measurement)
      */
-    static async deleteUserMeasurement(userId: string, measurementId: string): Promise<Measurement | null> {
-        const measurement = await this.getUserMeasurement(userId, measurementId);
+    static async deleteUserMeasurement(username: string, measurementId: string): Promise<Measurement | null> {
+        const measurement = await this.getUserMeasurement(username, measurementId);
         if (!measurement) {
             return null;
         }

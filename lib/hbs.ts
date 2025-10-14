@@ -1,12 +1,11 @@
-import * as hbs from "handlebars";
+import hbs from "handlebars";
 import { walk } from "@std/fs";
 import { partialsDir } from "./config.ts";
 import { renderData } from "./types.ts";
-
 // map "template name" => compiled template function
 const map = new Map();
 
-export function render(templateName: string, renderData: renderData): string {
+export default function render(templateName: string, renderData: renderData): string {
     return map.get(templateName)(renderData);
 }
 

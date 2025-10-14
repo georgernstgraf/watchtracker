@@ -25,7 +25,7 @@ export class WatchTrackerService {
         } | null
     > {
         // Ensure user exists
-        const user = await UserService.enforceUserExists(params.userName);
+        const user = await UserService.ensureUserExists(params.userName);
 
         // Get or create the watch
         const watch = await WatchService.getOrCreateWatch(
@@ -90,48 +90,6 @@ export class WatchTrackerService {
         }
 
         return watchWithMeasurements;
-    }
-
-    /**
-     * Get user's dashboard data: user info, watches, and recent measurements
-     */
-    static async getUserDashboard(userId: string) {
-        const [user, watches, userWithWatches] = await Promise.all([
-            UserService.findUserById(userId),
-            WatchService.getUserWatches(userId),
-            UserService.getUserWithWatches(userId),
-        ]);
-
-        if (!user) {
-            return null;
-        }
-
-        // Get recent measurements for each watch
-        const watchesWithRecentMeasurements = await Promise.all(
-            watches.map(async (watch) => {
-                const recentMeasurements = await MeasurementService.getWatchMeasurements(
-                    watch.id,
-                    { orderBy: { createdAt: "desc" }, take: 5 },
-                );
-                const stats = await MeasurementService.getMeasurementStatistics(watch.id);
-
-                return {
-                    ...watch,
-                    recentMeasurements,
-                    stats,
-                };
-            }),
-        );
-
-        const userWithLastWatch = userWithWatches as typeof userWithWatches & {
-            lastWatch?: { id: string; name: string };
-        };
-
-        return {
-            user,
-            watches: watchesWithRecentMeasurements,
-            lastWatch: userWithLastWatch?.lastWatch,
-        };
     }
 
     /**

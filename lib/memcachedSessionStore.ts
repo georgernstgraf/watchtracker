@@ -16,7 +16,7 @@ class MemcachedSessionStore {
             host: config.MEMCACHE_HOST,
             port: config.MEMCACHE_PORT,
         });
-        console.log(`MSStore initialized: ${config.MEMCACHE_HOST}:${config.MEMCACHE_PORT}, TTL: ${this.ttl_secs}s`);
+        console.log(`MCDStore initialized: ${config.MEMCACHE_HOST}:${config.MEMCACHE_PORT}, TTL: ${this.ttl_secs}s`);
     }
 
     private getStoreKeyFromSessionId(sessionId: string): string {
@@ -29,11 +29,11 @@ class MemcachedSessionStore {
             const retrieved_string = await this.memcached.get(key);
 
             if (config.isDevelopment) {
-                console.log(`MSStoreGetting session: ${key} (${retrieved_string ? retrieved_string.length : 0} bytes)`);
+                console.log(`MCDStoreGetting session: ${key} (${retrieved_string ? retrieved_string.length : 0} bytes)`);
             }
             return retrieved_string ?? undefined;
         } catch (err: unknown) {
-            console.error(`MSStore Error getting session:`, err);
+            console.error(`MCDStore Error getting session:`, err);
             return undefined;
         }
     }
@@ -47,16 +47,16 @@ class MemcachedSessionStore {
             const key = this.getStoreKeyFromSessionId(sessionId);
 
             if (config.isDevelopment) {
-                console.log(`MSStore Destroying session: ${key}`);
+                console.log(`MCDStore Destroying session: ${key}`);
             }
 
             await this.memcached.delete(key);
 
             if (config.isDevelopment) {
-                console.log(`MSStoreSession destroyed successfully: ${key}`);
+                console.log(`MCDStoreSession destroyed successfully: ${key}`);
             }
         } catch (err: unknown) {
-            console.error(`MSStore Error destroying session:`, err);
+            console.error(`MCDStore Error destroying session:`, err);
         }
     }
 
@@ -64,7 +64,7 @@ class MemcachedSessionStore {
         try {
             const key = this.getStoreKeyFromSessionId(sessionId);
             if (config.isDevelopment) {
-                console.log(`MSStore Setting session: ${key} (${sessionData.length} bytes)`);
+                console.log(`MCDStore Setting session: ${key} (${sessionData.length} bytes)`);
             }
 
             // Set with TTL (expiration time in seconds)
@@ -72,13 +72,13 @@ class MemcachedSessionStore {
 
             if (success) {
                 if (config.isDevelopment) {
-                    console.log(`MSStore Session set successfully: ${key} (expires in ${this.ttl_secs}s)`);
+                    console.log(`MCDStore Session set successfully: ${key} (expires in ${this.ttl_secs}s)`);
                 }
             } else {
-                throw new Error(`MSStore Failed to set session: ${key}`);
+                throw new Error(`MCDStore Failed to set session: ${key}`);
             }
         } catch (err: unknown) {
-            console.error(`MSStore Error setting session:`, err);
+            console.error(`MCDStore Error setting session:`, err);
             throw err;
         }
     }

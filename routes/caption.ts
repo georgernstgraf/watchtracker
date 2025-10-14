@@ -1,36 +1,22 @@
 import { WatchService } from "../service/index.ts";
-import { Hono } from "hono";
 import "../lib/types.ts";
+import render from "../lib/hbs.ts";
+import { sessionRouter } from "../routers/sessionRouter.ts";
 
-const router = new Hono();
+export default function serve_under_for(path: string, router: typeof sessionRouter) {
+    router.get(`${path}/:id`, async (c) => {
+        const session = c.get("session");
+        const username = session.username;
+        const watchId = c.req.param("id");
+        // Use WatchService to get the user's watch with ownership validation
+        const watch = await WatchService.getUserWatchWithMeasurements(username, watchId);
+        if (!watch) {
+            return c.text("Wrong Watch ID", 403);
+        }
+        return c.html(render("caption", { watch }));
+    });
 
-router.get("/:id", async (c) => {
-    const session = c.get("session");
-    const userId = session.user?.id;
-    const watchId = c.req.param("id");
-
-    if (!userId) {
-        return c.text("Unauthorized", 401);
-    }
-
-    // Use WatchService to get the user's watch with ownership validation
-    const watch = await WatchService.getUserWatchWithMeasurements(userId, watchId);
-    if (!watch) {
-        return c.text("Wrong Watch ID", 403);
-    }
-
-    c.set("watch", watch);
-    c.set("edit", true);
-    const render = c.get("render");
-    return render("caption");
-});
-
-router.get("/", (_c) => {
-    // Das ist unschön, rendert das input feld für einen neue caption
-    const c = _c;
-    c.set("edit", true);
-    const render = c.get("render");
-    return render("caption");
-});
-
-export default router;
+    router.get("/", (c) => {
+        return c.html(render("caption", {}));
+    });
+}

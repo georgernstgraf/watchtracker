@@ -1,5 +1,5 @@
 import { prisma } from "../lib/db.ts";
-import type { Prisma, Watch } from "generated-prisma-client";
+import type { Prisma, User, Watch } from "generated-prisma-client";
 
 export class WatchRepository {
     /**
@@ -14,9 +14,10 @@ export class WatchRepository {
     /**
      * Find a watch by unique identifier
      */
-    static async findUnique(where: Prisma.WatchWhereUniqueInput): Promise<Watch | null> {
+    static async findUnique(where: Prisma.WatchWhereUniqueInput): Promise<(Watch & { user: User | null }) | null> {
         return await prisma.watch.findUnique({
             where,
+            include: { user: true },
         });
     }
 
@@ -118,6 +119,25 @@ export class WatchRepository {
     static async findByUserId(userId: string): Promise<Watch[]> {
         return await prisma.watch.findMany({
             where: { userId },
+            include: {
+                measurements: {
+                    orderBy: { createdAt: "desc" },
+                    take: 1,
+                },
+            },
+        });
+    }
+
+    /**
+     * Find watches by user name
+     */
+    static async findByUsername(name: string): Promise<Watch[]> {
+        return await prisma.watch.findMany({
+            where: {
+                user: {
+                    name,
+                },
+            },
             include: {
                 measurements: {
                     orderBy: { createdAt: "desc" },

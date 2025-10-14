@@ -28,17 +28,17 @@ export class WatchService {
     /**
      * Get user's watch with measurements (either specific watch or last used watch)
      */
-    static async getUserWatchWithMeasurements(userId: string, watchId?: string): Promise<Watch | null> {
+    static async getUserWatchWithMeasurements(username: string, watchId?: string): Promise<Watch | null> {
         if (watchId) {
             // Verify the watch belongs to the user
             const watch = await WatchRepository.findUnique({ id: watchId });
-            if (!watch || watch.userId !== userId) {
+            if (!watch || watch.user?.name !== username) {
                 return null;
             }
             return await WatchRepository.findWatchWithMeasurements({ id: watchId });
         } else {
             // Get user's last watch
-            const user = await UserRepository.findUserWithWatches({ id: userId });
+            const user = await UserRepository.findUserWithWatches({ name: username });
             const userWithWatch = user as typeof user & { lastWatch?: { id: string } };
             if (!userWithWatch || !userWithWatch.lastWatch) {
                 return null;
@@ -48,10 +48,17 @@ export class WatchService {
     }
 
     /**
-     * Get all watches for a user
+     * Get all watches for a user id
      */
-    static async getUserWatches(userId: string): Promise<Watch[]> {
+    static async getUserWatchesByUid(userId: string): Promise<Watch[]> {
         return await WatchRepository.findByUserId(userId);
+    }
+
+    /**
+     * Get all watches for a user name
+     */
+    static async getUserWatchesByUname(username: string): Promise<Watch[]> {
+        return await WatchRepository.findByUsername(username);
     }
 
     /**
@@ -87,9 +94,9 @@ export class WatchService {
     /**
      * Check if watch belongs to user
      */
-    static async watchBelongsToUser(watchId: string, userId: string): Promise<boolean> {
+    static async watchBelongsToUser(watchId: string, username: string): Promise<boolean> {
         const watch = await WatchRepository.findUnique({ id: watchId });
-        return watch?.userId === userId;
+        return watch?.user?.name === username;
     }
 
     /**
