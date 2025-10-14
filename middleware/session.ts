@@ -57,6 +57,11 @@ export class Session {
     async sendCookie() {
         await setSignedCookie(this.c, config.COOKIE_NAME, this.sessionId, config.COOKIE_SECRET, defaultCookieOptions);
     }
+    assertSessionUserIsPresent(): void {
+        if (!this.username) {
+            throw new Error("Session: No user present");
+        }
+    }
     /**
      * Deletes the session from the memcached store.
      *

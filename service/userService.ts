@@ -1,7 +1,6 @@
 import { UserRepository } from "../repo/userRepository.ts";
 import { WatchRepository } from "../repo/watchRepository.ts";
 import type { Prisma, User } from "generated-prisma-client";
-import type { Session } from "../lib/memcachedSessionStore.ts";
 
 export class UserService {
     /**
@@ -102,28 +101,5 @@ export class UserService {
      */
     static async countUsers(): Promise<number> {
         return await UserRepository.count();
-    }
-
-    /**
-     * Validate and extract user from session
-     * Ensures user exists in session and has all required fields
-     */
-    static assertSessionUserIsPresent(session: Session): User {
-        const user = session.user;
-        if (!user) {
-            throw new Error("No user in session.");
-        }
-
-        // Check if user has all required fields by comparing with Prisma User model fields
-        const requiredFields = ["id", "name"];
-        for (const field of requiredFields) {
-            if (!(field in user)) {
-                throw new Error(
-                    `Missing key ${field} in user session object for ${user.name || "unknown user"}.`,
-                );
-            }
-        }
-
-        return user as User;
     }
 }
