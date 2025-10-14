@@ -55,7 +55,7 @@ function main() {
     // Error handler
     app.onError((err, c) => {
         console.error(`Error: ${err.message}`);
-        if (config.DENO_ENV === "development") {
+        if (config.isDevelopment) {
             console.error(err);
         }
         const status = (err as Error & { status?: number }).status || 500;

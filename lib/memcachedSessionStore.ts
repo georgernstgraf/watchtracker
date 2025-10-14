@@ -73,13 +73,13 @@ class MemcachedSessionStore {
         try {
             const key = this.getMemcacheKeyFromSessionId(sessionId);
 
-            if (config.DENO_ENV === "development") {
+            if (config.isDevelopment) {
                 console.log(`Destroying session: ${key}`);
             }
 
             await this.memcached.delete(key);
 
-            if (config.DENO_ENV === "development") {
+            if (config.isDevelopment) {
                 console.log(`Session destroyed successfully: ${key}`);
             }
         } catch (err: unknown) {
@@ -98,7 +98,7 @@ class MemcachedSessionStore {
             const success = await this.memcached.set(key, sessionData, this.ttl);
 
             if (success) {
-                if (config.DENO_ENV === "development") {
+                if (config.isDevelopment) {
                     console.log(`Session set successfully: ${key} (expires in ${this.ttl}s)`);
                 }
             } else {
