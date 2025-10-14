@@ -6,4 +6,5 @@ export type renderData = {
     userWatches?: Watch[];
     timeZones?: string[];
     watch?: Watch | null;
+    appPath: string;
 };

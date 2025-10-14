@@ -3,11 +3,11 @@
         <select id='watchSelect'
                 class="form-select text-center border border-2 mb-3 mx-auto w-50"
                 size='{{plusOne userWatches.length}}'
-                hx-get='{{appPath}}/auth/watch/'
+                hx-get='{{appPath}}/watch/'
                 hx-target='#measurements'
                 hx-vals='js:{id: event.target.value}'>
                 {{#each userWatches}}
-                <option value='{{id}}'>{{name}}</option>
+                        <option value='{{id}}'>{{name}}</option>
                 {{/each}}
                 <option>-- your watches --</option>
         </select>
@@ -21,7 +21,7 @@
              class="my-4 justify-content-center gap-3 align-items-baseline"
              style='display:none'>
                 <form id='newWatchSave'
-                      hx-post='{{appPath}}/auth/watch/'
+                      hx-post='{{appPath}}/watch/'
                       hx-target='#allButHeadAndFoot'
                       hx-swap='outerHTML'
                       hx-trigger='trigger'>

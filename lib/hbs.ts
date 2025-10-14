@@ -2,10 +2,14 @@ import hbs from "handlebars";
 import { walk } from "@std/fs";
 import { partialsDir } from "./config.ts";
 import { renderData } from "./types.ts";
+import * as config from "./config.ts";
 // map "template name" => compiled template function
 const map = new Map();
 
-export default function render(templateName: string, renderData: renderData): string {
+const hbs_data = { appPath: config.APP_PATH };
+export { hbs_data as renderData };
+
+export function render(templateName: string, renderData: renderData): string {
     return map.get(templateName)(renderData);
 }
 
@@ -79,8 +83,8 @@ hbs.registerHelper("plusOne", function (val: number) {
 
 try {
     await loadTemplates();
-    console.log("HBS: Templates loaded successfully:", [...map.keys()]);
+    console.log(`HBS: Templates loaded successfully:, ${JSON.stringify([...map.keys()])}`);
 } catch (err) {
-    console.error("HBS: Error loading templates:", err);
+    console.error(`HBS: Error loading templates:`, err);
     Deno.exit(1);
 }

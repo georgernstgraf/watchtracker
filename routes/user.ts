@@ -2,7 +2,7 @@ import { sessionRouter } from "../routers/sessionRouter.ts";
 import { TimeZone } from "../lib/timeZone.ts";
 import { UserService, WatchService } from "../service/index.ts";
 import "../lib/types.ts";
-import render from "../lib/hbs.ts";
+import { render, renderData } from "../lib/hbs.ts";
 
 export default function serve_under_for(path: string, router: typeof sessionRouter) {
     // patch a user
@@ -25,11 +25,14 @@ export default function serve_under_for(path: string, router: typeof sessionRout
         const userWatches = await WatchService.getUserWatchesByUname(username);
         const watch = await WatchService.getUserWatchWithMeasurements(username, body.selectedWatchId as string);
 
-        return c.html(render("body-auth", {
-            user: updatedUser,
-            timeZones: TimeZone.timeZones,
-            userWatches,
-            watch,
-        }));
+        return c.html(render(
+            "body-auth",
+            Object.assign(renderData, {
+                user: updatedUser,
+                timeZones: TimeZone.timeZones,
+                userWatches,
+                watch,
+            }),
+        ));
     });
 }

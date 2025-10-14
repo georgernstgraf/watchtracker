@@ -2,9 +2,7 @@
 <nav id='profile'
      class="mb-2">
     <div class="d-flex justify-content-end align-items-baseline gap-2 mb-2">
-
-        <span id='profileUsername'>
-            User: {{user.name}}
+        <span id='profileUsername'> User: {{user.name}}
         </span>
         <form hx-post='{{appPath}}/logout'
               hx-target='body'>
@@ -24,7 +22,7 @@
          class="justify-content-end align-items-baseline gap-2"
          style="display: none">
         <form onsubmit='return false;'
-              hx-patch='{{appPath}}/auth/user'
+              hx-patch='{{appPath}}/user'
               hx-target='body'
               id='timeZoneSelectForm'
               hx-trigger='trigger'
@@ -37,9 +35,9 @@
             <datalist id='timeZoneList'
                       style='display: none;'>
                 {{#each timeZones}}
-                <option value='{{this}}'>
-                    {{this}}
-                </option>
+                    <option value='{{this}}'>
+                        {{this}}
+                    </option>
                 {{/each}}
             </datalist>
         </form>

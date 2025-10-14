@@ -2,7 +2,7 @@ import { Session } from "../middleware/session.ts";
 import { sessionRouter } from "../routers/sessionRouter.ts";
 import { TimeZone } from "../lib/timeZone.ts";
 import { UserService, WatchService } from "../service/index.ts";
-import render from "../lib/hbs.ts";
+import { render, renderData } from "../lib/hbs.ts";
 
 export default function serve_under_for(path: string, router: typeof sessionRouter) {
     router.get(path, async (c) => {
@@ -13,11 +13,11 @@ export default function serve_under_for(path: string, router: typeof sessionRout
             const user = await UserService.getUserByName(username);
             const userWatches = await WatchService.getUserWatchesByUname(username);
             const watch = await WatchService.getUserWatchWithMeasurements(username);
-            return c.html(render(`index${full}`, { user, watch, userWatches, timeZones: TimeZone.timeZones }));
+            return c.html(render(`index${full}`, Object.assign(renderData, { user, watch, userWatches, timeZones: TimeZone.timeZones })));
         } catch (e: unknown) {
             const error = e as Error;
-            console.log("slash.ts:", error);
+            console.log(`slash.ts: ${error.message} -- rendering login page (sessionid: ${session.sessionId})`);
         }
-        return c.html(render(`login${full}`, {}));
+        return c.html(render(`login${full}`, Object.assign(renderData, {})));
     });
 }

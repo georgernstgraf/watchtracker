@@ -1,7 +1,7 @@
 import { sessionRouter } from "../routers/sessionRouter.ts";
 import { MeasurementService, WatchService } from "../service/index.ts";
 import "../lib/types.ts";
-import render from "../lib/hbs.ts";
+import { render, renderData } from "../lib/hbs.ts";
 
 export default function serve_under_for(path: string, router: typeof sessionRouter) {
     // register a new measurement
@@ -40,7 +40,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
 
         const watchFull = await WatchService.getUserWatchWithMeasurements(username, watchId);
         const watch = watchFull;
-        return c.html(render("measurements", { watch }));
+        return c.html(render("measurements", Object.assign(renderData, { watch })));
     });
 
     router.delete(`${path}/:id`, async (c) => {
@@ -56,7 +56,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
         // Delete the measurement
         await MeasurementService.deleteUserMeasurement(username, measureId);
         const watch = await WatchService.getUserWatchWithMeasurements(username, watchId);
-        return c.html(render("measurements", { watch }));
+        return c.html(render("measurements", Object.assign(renderData, { watch })));
     });
 
     router.patch(`${path}/:id`, async (c) => {
@@ -113,7 +113,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
             }
 
             const watch = await WatchService.getUserWatchWithMeasurements(username, watchId);
-            return c.html(render("measurements", { watch }));
+            return c.html(render("measurements", Object.assign(renderData, { watch })));
         } catch (err) {
             const error = err as Error;
             return c.text(error.message, 500);

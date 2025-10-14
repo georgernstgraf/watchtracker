@@ -1,8 +1,8 @@
-import { Context, Hono } from "hono";
+import { Context } from "hono";
 import { UserService, WatchService } from "../service/index.ts";
 import "../lib/types.ts";
 import { sessionRouter } from "../routers/sessionRouter.ts";
-import render from "../lib/hbs.ts";
+import { render, renderData } from "../lib/hbs.ts";
 
 // This route renders the measurements table incl. headings
 export default function serve_under_for(path: string, router: typeof sessionRouter) {
@@ -24,7 +24,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
             const session = c.get("session");
             const username = session.username;
             const body = await c.req.parseBody();
-            let watch = await WatchService.getUserWatchWithMeasurements(username, c.req.param("id"));
+            const watch = await WatchService.getUserWatchWithMeasurements(username, c.req.param("id"));
 
             if (!watch) {
                 return c.text("This is not your watch", 403);
@@ -37,7 +37,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
 
             const updatedWatch = await WatchService.getUserWatchWithMeasurements(username, c.req.param("id"));
             const userWatches = await WatchService.getUserWatchesByUname(username);
-            return c.html(render("allButHeadAndFoot", { watch: updatedWatch, userWatches }));
+            return c.html(render("allButHeadAndFoot", Object.assign(renderData, { watch: updatedWatch, userWatches })));
         } catch (e: unknown) {
             const error = e as Error;
             console.log("Error in watch patch route:", error.message);
@@ -45,12 +45,12 @@ export default function serve_under_for(path: string, router: typeof sessionRout
         }
     });
 
-    router.post("/", async (c) => {
+    router.post(path, async (c) => {
         try {
             const session = c.get("session");
             const username = session.username;
             const body = await c.req.parseBody();
-            let watch = await WatchService.createWatch({
+            const watch = await WatchService.createWatch({
                 name: body.name as string,
                 comment: body.comment as string,
                 user: { connect: { name: username } },
@@ -58,7 +58,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
             await UserService.setLastWatch(username, watch.id);
             const userWatches = await WatchService.getUserWatchesByUname(username);
             const newWatch = await WatchService.getUserWatchWithMeasurements(username, watch.id);
-            return c.html(render("allButHeadAndFoot", { watch: newWatch, userWatches }));
+            return c.html(render("allButHeadAndFoot", Object.assign(renderData, { watch: newWatch, userWatches })));
         } catch (e: unknown) {
             const error = e as Error;
             if (error.message.includes("session")) {
@@ -68,13 +68,13 @@ export default function serve_under_for(path: string, router: typeof sessionRout
         }
     });
 
-    router.delete("/:id", async (c) => {
+    router.delete(`${path}/:id`, async (c) => {
         try {
             const session = c.get("session");
             const username = session.username;
             await WatchService.deleteWatch(c.req.param("id"), username);
             const userWatches = await WatchService.getUserWatchesByUname(username);
-            return c.html(render("allButHeadAndFoot", { userWatches }));
+            return c.html(render("allButHeadAndFoot", Object.assign(renderData, { userWatches })));
         } catch (e: unknown) {
             const error = e as Error;
             if (error.message.includes("session")) {
@@ -93,7 +93,7 @@ async function handleGet(id: string, c: Context) {
             return c.text("Wrong Watch ID", 403);
         }
         await UserService.setLastWatch(username, watch.id);
-        return c.html(render("measurements", { watch }));
+        return c.html(render("measurements", Object.assign(renderData, { watch })));
     } catch (e: unknown) {
         const error = e as Error;
         console.log("Error in watch route:", error.message);
