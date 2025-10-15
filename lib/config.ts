@@ -10,7 +10,6 @@ export const AUTH_API_URL = Deno.env.get("AUTH_API_URL") || "";
 
 export const COOKIE_NAME = Deno.env.get("COOKIE_NAME") || "session";
 export const COOKIE_SECRET = Deno.env.get("COOKIE_SECRET") || "";
-
 export const COOKIE_MAX_AGE = Deno.env.get("COOKIE_MAX_AGE") || "4 weeks";
 export const COOKIE_MAX_AGE_MS = ms(COOKIE_MAX_AGE);
 export const COOKIE_MAX_AGE_S = Math.floor(COOKIE_MAX_AGE_MS / 1000);
