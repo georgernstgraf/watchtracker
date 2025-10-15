@@ -26,7 +26,7 @@ class MemcachedSessionStore {
     async getSessionDataById(sessionId: string): Promise<string | undefined> {
         try {
             const key = this.getStoreKeyFromSessionId(sessionId);
-            const retrieved_string = await this.memcached.get(key);
+            const retrieved_string = await this.memcached.get(key); // may be null, it does not throw
 
             if (config.isDevelopment) {
                 console.log(`MCDStoreGetting session: ${key} (${retrieved_string ? retrieved_string.length : 0} bytes)`);

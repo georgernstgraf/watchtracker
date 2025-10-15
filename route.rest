@@ -38,7 +38,7 @@ POST http://localhost:16631/watchtracker/logout
 HX-REQUEST: true
 
 ### NEW ENTRY
-POST http://localhost:16631/watchtracker
+POST http://localhost:16631/watchtracker/watch
 Content-Type: application/json
 
 {

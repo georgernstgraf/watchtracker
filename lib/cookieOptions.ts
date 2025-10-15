@@ -1,8 +1,7 @@
-import ms from "ms";
 import * as config from "./config.ts";
 
 export const defaultCookieOptions = {
-    maxAge: ms(config.COOKIE_MAX_AGE),
+    maxAge: config.COOKIE_MAX_AGE_S,
     httpOnly: true,
     secure: config.isProduction,
     sameSite: "strict" as const,
