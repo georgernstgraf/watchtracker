@@ -15,7 +15,7 @@
           style="display: none;"
           class="justify-content-center align-items-baseline gap-3">
         <form id="patchWatch"
-              hx-patch="{{appPath}}/watch/{{watch.id}}"
+              hx-patch="{{appPath}}/auth/watch/{{watch.id}}"
               hx-trigger='trigger'
               hx-target="#allButHeadAndFoot"
               hx-swap="outerHTML">
@@ -33,7 +33,7 @@
         <div class="btn-group">
             <button title="Remove Watch and all Records"
                     class="btn btn-outline-light startStop"
-                    hx-delete="{{appPath}}/watch/{{watch.id}}"
+                    hx-delete="{{appPath}}/auth/watch/{{watch.id}}"
                     hx-target="#allButHeadAndFoot"
                     hx-swap="outerHTML"> 🚮</button>
             <button title="cancel Edit"

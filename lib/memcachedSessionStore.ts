@@ -29,7 +29,7 @@ class MemcachedSessionStore {
             const retrieved_string = await this.memcached.get(key); // may be null, it does not throw
 
             if (config.isDevelopment) {
-                console.log(`MCDStoreGetting session: ${key} (${retrieved_string ? retrieved_string.length : 0} bytes)`);
+                console.log(`MCDStore Getting session (${key.split("-")[3]}) (${retrieved_string ? retrieved_string.length : 0} bytes)`);
             }
             return retrieved_string ?? undefined;
         } catch (err: unknown) {

@@ -6,7 +6,6 @@ import { prisma } from "./lib/db.ts";
 import { sessionRouter } from "./routers/sessionRouter.ts";
 import { authRouter } from "./routers/authRouter.ts";
 import * as config from "./lib/config.ts";
-import { Session } from "./middleware/session.ts";
 import process from "node:process";
 
 function main() {
@@ -33,9 +32,6 @@ function main() {
 
     // Create the Hono app
     const app = new Hono();
-
-    //    app.use("*", session);
-    app.use((c, next) => Session.middleware(c, next));
 
     // Static files - must come before routers to serve files from /watchtracker/static/*
     app.use(

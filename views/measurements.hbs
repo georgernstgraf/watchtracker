@@ -30,7 +30,7 @@
             <th colspan="6">
                 <form id="unsavedMeasurement-form"
                       class="my-3 text-center"
-                      hx-post="{{appPath}}/measure/{{watch.id}}"
+                      hx-post="{{appPath}}/auth/measure/{{watch.id}}"
                       hx-target="closest table"
                       hx-swap="outerHTML"
                       hx-trigger="trigger">
@@ -68,7 +68,7 @@
                 <td colspan="6">
                     <form id="{{id}}-form"
                           class="my-3 text-center"
-                          hx-patch="{{../appPath}}/measure/{{id}}"
+                          hx-patch="{{../appPath}}/auth/measure/{{id}}"
                           hx-target="closest table"
                           hx-swap="outerHTML"
                           hx-trigger="trigger">
@@ -93,7 +93,7 @@
                         <div class="btn-group">
                             <button title="delete Record"
                                     class="btn btn-outline-light"
-                                    hx-delete="{{../appPath}}/measure/{{id}}"
+                                    hx-delete="{{../appPath}}/auth/measure/{{id}}"
                                     hx-target="closest table"
                                     hx-swap="outerHTML"
                                     onclick="event.preventDefault()">🚮</button>
@@ -130,8 +130,8 @@
         <tr>
             {{#if watch.overallMeasure}}
                 <td class="driftSummary text-center text-secondary-emphasis"
-                    colspan="6"> (Duration: {{watch.overallMeasure.durationDays}} Days, Drift:
-                    {{watch.overallMeasure.driftSeks}} Sec => {{watch.overallMeasure.niceDisplay}}) </td>
+                    colspan="6"> (Duration: {{watch.overallMeasure.durationDays}} Days, Drift: {{watch.overallMeasure.driftSeks}} Sec =>
+                    {{watch.overallMeasure.niceDisplay}}) </td>
             {{else}}
                 <td class="driftSummary text-center text-secondary-emphasis"
                     colspan="6">No records yet</td>

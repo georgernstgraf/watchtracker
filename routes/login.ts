@@ -18,7 +18,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
         }
 
         if (errors.length !== 0) {
-            return c.html(render("login-body", Object.assign(renderData, { errors })));
+            return c.html(render("login-body", Object.assign({ errors }, renderData)));
         }
 
         const userName = body.user as string;
@@ -28,12 +28,12 @@ export default function serve_under_for(path: string, router: typeof sessionRout
             await authenticate(userName, passwd);
         } catch (err: unknown) {
             errors.push(`login failed: ${err instanceof Error ? err.message : "unknown error"}`);
-            return c.html(render("login-body", Object.assign(renderData, { errors })));
+            return c.html(render("login-body", Object.assign({ errors }, renderData)));
         }
 
         // registers the session and sends the cookie
         const user = await UserService.ensureUserExists(userName);
-        session.username = user.name; // Store the user data in session
+        session.login(user.name); // Store the user data in session
 
         const userWatches = await WatchService.getUserWatchesByUname(user.name);
         const watch = await WatchService.getUserWatchWithMeasurements(user.id);

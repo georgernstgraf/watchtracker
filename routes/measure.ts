@@ -1,9 +1,9 @@
-import { sessionRouter } from "../routers/sessionRouter.ts";
 import { MeasurementService, WatchService } from "../service/index.ts";
 import "../lib/types.ts";
 import { render, renderData } from "../lib/hbs.ts";
+import { authRouter } from "../routers/authRouter.ts";
 
-export default function serve_under_for(path: string, router: typeof sessionRouter) {
+export default function serve_under_for(path: string, router: typeof authRouter) {
     // register a new measurement
     router.post(`${path}/:id`, async (c) => {
         // this is a watchId here!!
@@ -40,12 +40,12 @@ export default function serve_under_for(path: string, router: typeof sessionRout
 
         const watchFull = await WatchService.getUserWatchWithMeasurements(username, watchId);
         const watch = watchFull;
-        return c.html(render("measurements", Object.assign(renderData, { watch })));
+        return c.html(render("measurements", Object.assign({ watch }, renderData)));
     });
 
     router.delete(`${path}/:id`, async (c) => {
         const session = c.get("session");
-        const username = session.username;
+        const username = session.username!;
         const measureId = c.req.param("id");
         const watchId = await MeasurementService.getWatchIdForUserMeasurement(username, measureId);
 
@@ -56,12 +56,12 @@ export default function serve_under_for(path: string, router: typeof sessionRout
         // Delete the measurement
         await MeasurementService.deleteUserMeasurement(username, measureId);
         const watch = await WatchService.getUserWatchWithMeasurements(username, watchId);
-        return c.html(render("measurements", Object.assign(renderData, { watch })));
+        return c.html(render("measurements", Object.assign({ watch }, renderData)));
     });
 
     router.patch(`${path}/:id`, async (c) => {
         const session = c.get("session");
-        const username = session.username;
+        const username = session.username!;
 
         try {
             const measureId = c.req.param("id");
@@ -113,7 +113,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
             }
 
             const watch = await WatchService.getUserWatchWithMeasurements(username, watchId);
-            return c.html(render("measurements", Object.assign(renderData, { watch })));
+            return c.html(render("measurements", Object.assign({ watch }, renderData)));
         } catch (err) {
             const error = err as Error;
             return c.text(error.message, 500);

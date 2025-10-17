@@ -1,11 +1,11 @@
 import { Context } from "hono";
 import { UserService, WatchService } from "../service/index.ts";
 import "../lib/types.ts";
-import { sessionRouter } from "../routers/sessionRouter.ts";
+import { authRouter } from "../routers/authRouter.ts";
 import { render, renderData } from "../lib/hbs.ts";
 
 // This route renders the measurements table incl. headings
-export default function serve_under_for(path: string, router: typeof sessionRouter) {
+export default function serve_under_for(path: string, router: typeof authRouter) {
     router.get(`${path}/:id`, async (c) => {
         return await handleGet(c.req.param("id"), c);
     });
@@ -22,7 +22,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
     router.patch(`${path}/:id`, async (c) => {
         try {
             const session = c.get("session");
-            const username = session.username;
+            const username = session.username!;
             const body = await c.req.parseBody();
             const watch = await WatchService.getUserWatchWithMeasurements(username, c.req.param("id"));
 
@@ -37,7 +37,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
 
             const updatedWatch = await WatchService.getUserWatchWithMeasurements(username, c.req.param("id"));
             const userWatches = await WatchService.getUserWatchesByUname(username);
-            return c.html(render("allButHeadAndFoot", Object.assign(renderData, { watch: updatedWatch, userWatches })));
+            return c.html(render("allButHeadAndFoot", Object.assign({ watch: updatedWatch, userWatches }, renderData)));
         } catch (e: unknown) {
             const error = e as Error;
             console.log("Error in watch patch route:", error.message);
@@ -48,7 +48,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
     router.post(path, async (c) => {
         try {
             const session = c.get("session");
-            const username = session.username;
+            const username = session.username!;
             const body = await c.req.parseBody();
             const watch = await WatchService.createWatch({
                 name: body.name as string,
@@ -58,7 +58,7 @@ export default function serve_under_for(path: string, router: typeof sessionRout
             await UserService.setLastWatch(username, watch.id);
             const userWatches = await WatchService.getUserWatchesByUname(username);
             const newWatch = await WatchService.getUserWatchWithMeasurements(username, watch.id);
-            return c.html(render("allButHeadAndFoot", Object.assign(renderData, { watch: newWatch, userWatches })));
+            return c.html(render("allButHeadAndFoot", Object.assign({ watch: newWatch, userWatches }, renderData)));
         } catch (e: unknown) {
             const error = e as Error;
             if (error.message.includes("session")) {
@@ -71,10 +71,10 @@ export default function serve_under_for(path: string, router: typeof sessionRout
     router.delete(`${path}/:id`, async (c) => {
         try {
             const session = c.get("session");
-            const username = session.username;
+            const username = session.username!;
             await WatchService.deleteWatch(c.req.param("id"), username);
             const userWatches = await WatchService.getUserWatchesByUname(username);
-            return c.html(render("allButHeadAndFoot", Object.assign(renderData, { userWatches })));
+            return c.html(render("allButHeadAndFoot", Object.assign({ userWatches }, renderData)));
         } catch (e: unknown) {
             const error = e as Error;
             if (error.message.includes("session")) {
@@ -93,7 +93,7 @@ async function handleGet(id: string, c: Context) {
             return c.text("Wrong Watch ID", 403);
         }
         await UserService.setLastWatch(username, watch.id);
-        return c.html(render("measurements", Object.assign(renderData, { watch })));
+        return c.html(render("measurements", Object.assign({ watch }, renderData)));
     } catch (e: unknown) {
         const error = e as Error;
         console.log("Error in watch route:", error.message);

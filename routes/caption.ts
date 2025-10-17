@@ -1,22 +1,21 @@
 import { WatchService } from "../service/index.ts";
 import "../lib/types.ts";
 import { render, renderData } from "../lib/hbs.ts";
-import { sessionRouter } from "../routers/sessionRouter.ts";
-
-export default function serve_under_for(path: string, router: typeof sessionRouter) {
+import { authRouter } from "../routers/authRouter.ts";
+export default function serve_under_for(path: string, router: typeof authRouter) {
     router.get(`${path}/:id`, async (c) => {
         const session = c.get("session");
-        const username = session.username;
+        const username = session.username!;
         const watchId = c.req.param("id");
         // Use WatchService to get the user's watch with ownership validation
         const watch = await WatchService.getUserWatchWithMeasurements(username, watchId);
         if (!watch) {
             return c.text("Wrong Watch ID", 403);
         }
-        return c.html(render("caption", Object.assign(renderData, { watch })));
+        return c.html(render("caption", Object.assign({ watch }, renderData)));
     });
 
     router.get(path, (c) => {
-        return c.html(render("caption", Object.assign(renderData, {})));
+        return c.html(render("caption", Object.assign({}, renderData)));
     });
 }

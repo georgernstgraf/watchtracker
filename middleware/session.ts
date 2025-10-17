@@ -10,144 +10,134 @@ import { defaultCookieOptions, logoutCookieOptions } from "../lib/cookieOptions.
 import * as config from "../lib/config.ts";
 
 export type SessionData = {
+    username?: string;
+};
+export type SessionDataAuth = {
     username: string;
 };
 
-export class Session {
+function shortId(arg: string): string {
+    return arg.split("-")[2];
+}
+
+export class Session<T> {
     c: Context;
-    sessionId: string;
-    #username: string = "";
-    gotLogin = false;
-    gotLogout = false;
-    was_modified = false;
-    idIsFromCookie = false;
-    loadedFromStore = false;
+    #sessionId: string;
+    #data: SessionData | SessionDataAuth = {};
+    #needs_store_save = false;
+    #needs_cookie_send;
+    #cookie_type: "normal" | "logoout" = "normal";
 
     constructor(c: Context, sessionId?: string) {
         if (!sessionId) {
+            this.#needs_cookie_send = true;
             sessionId = uuidv4();
         } else {
-            this.idIsFromCookie = true;
+            this.#needs_cookie_send = false;
         }
-        this.sessionId = sessionId;
+        this.#sessionId = sessionId;
         this.c = c;
     }
 
-    get username(): string {
-        return this.#username;
+    get username(): string | undefined {
+        return this.#data.username;
     }
 
-    set username(username: string) {
-        this.#username = username;
+    get id(): string {
+        return this.#sessionId;
     }
 
-    login(username: string): void {
-        this.username = username;
-        this.gotLogin = true;
+    get shortId(): string {
+        return shortId(this.#sessionId);
+    }
+
+    login(username: string) {
+        this.#data.username = username;
+        this.#needs_store_save = true;
     }
 
     logout(): void {
-        this.gotLogout = true;
+        this.#cookie_type = "logoout";
+        this.#needs_cookie_send = true;
+        this.#needs_store_save = true;
     }
 
-    sessionDataString() {
-        return JSON.stringify({
-            username: this.username,
-        });
+    #sessionDataString() {
+        return JSON.stringify(this.#data);
     }
 
-    async save_to_mcd(): Promise<void> {
-        const id = this.sessionId;
-        await store.persistSessionData(id, this.sessionDataString());
+    async #save_to_mcd(): Promise<void> {
+        await store.persistSessionData(this.#sessionId, this.#sessionDataString());
     }
 
-    async sendCookie() {
-        await setSignedCookie(this.c, config.COOKIE_NAME, this.sessionId, config.COOKIE_SECRET, defaultCookieOptions);
+    async #sendCookie() {
+        const cookie_options = this.#cookie_type == "normal" ? defaultCookieOptions : logoutCookieOptions;
+        await setSignedCookie(this.c, config.COOKIE_NAME, this.#sessionId, config.COOKIE_SECRET, cookie_options);
     }
 
-    assertSessionUserIsPresent(): void {
-        if (!this.username) {
-            throw new Error("Session: No user present");
-        }
+    async #remove_from_store(): Promise<void> {
+        await store.deleteSession(this.#sessionId);
     }
 
-    async remove_from_store(): Promise<void> {
-        await store.deleteSession(this.sessionId);
-    }
-
-    static async load_from_mcd(
+    static async from_mcd(
         id: string,
         c: Context, // id comes from cookie
-    ): Promise<Session> {
+    ): Promise<Session<SessionDataAuth> | null> {
         const sessionData = await store.getSessionDataById(id);
         if (!sessionData) {
-            throw new Error(`Session not found: ${id}`);
+            return null;
         }
         const session = new Session(c, id);
-        Object.assign(session, sessionData);
-        session.loadedFromStore = true;
+        session.#data = JSON.parse(sessionData) as SessionDataAuth;
         return session;
     }
 
     static async middleware(
         c: Context,
         next: () => Promise<void>,
-    ): Promise<void> {
+        enforce_auth: boolean,
+    ) {
         let session = undefined;
         const request_url = `${c.req.method} ${c.req.path}`;
 
         console.log(
-            `Session middleware started: ${request_url}`,
+            `=========== SESSION MW START: ${request_url} ===========`,
         );
         const sessionIdFromCookie = await getSignedCookie(c, config.COOKIE_SECRET, config.COOKIE_NAME);
         // ------- BEFORE REQ --------
         if (sessionIdFromCookie) { // from cookie
-            console.log(`Session: ${request_url} Id from cookie: ${sessionIdFromCookie}`);
-            try {
-                session = await Session.load_from_mcd(
-                    sessionIdFromCookie,
-                    c,
-                );
-                console.log(`Session: ${request_url} loaded from store (${sessionIdFromCookie})`);
-            } catch (e) {
-                console.warn(`Session: ${request_url} WEIRD: sid (${sessionIdFromCookie}) from cookie gone from store (${e})`);
+            console.log(`SESSION: ${request_url} (${shortId(sessionIdFromCookie)}) FROM COOKIE`);
+            session = await Session.from_mcd(
+                sessionIdFromCookie,
+                c,
+            );
+            if (session) {
+                console.log(`SESSION: STORE_FOUND (${session.shortId}) (${request_url})`);
+            } else {
+                console.log(`SESSION: STORE_MISS (${shortId(sessionIdFromCookie)}) (${request_url})`);
                 session = new Session(c, sessionIdFromCookie);
             }
         } else {
             session = new Session(c);
-            console.log(`Session: ${request_url} No Cookie, new id: ${session.sessionId}`);
+            console.log(`SESSION: NO COOKIE (${request_url}) new id: ${session.shortId}`);
+        }
+        if (enforce_auth && !session.username) {
+            return c.text("Unauthorized", 401);
         }
         c.set("session", session);
+        console.log(`    >>>>>>> SESSION NOW NEXT: ${request_url} <<<<<<<`);
         await next();
+        console.log(`    >>>>>>> SESSION AFTER NEXT: ${request_url} <<<<<<<`);
         // ------- AFTER REQ --------
-        if (session.gotLogin) {
-            await session.save_to_mcd();
-            await session.sendCookie();
-            console.log(
-                `Session: ${request_url} LOGIN: saved_to_mcd & cookie sent (${session.sessionId}) with payload: ${session.sessionDataString()}`,
-            );
-            return;
-        }
-        if (session.gotLogout) {
-            await session.remove_from_store();
-            await deleteCookie(session.c, config.COOKIE_NAME, logoutCookieOptions);
-            console.log(
-                `Session: ${request_url} LOGOUT: deleted_from_mcd & cookie removed (${session.sessionId})`,
-            );
-            return;
-        }
-        // there was no login/logout
-        console.log(`Session: ${request_url} no login/logout happened (${session.sessionId})`);
-
-        // I need to send the cookie if it is a new session
-        if (!session.idIsFromCookie) {
-            console.log(`Session: ${request_url} I will send a cookie (${session.sessionId})`);
-            await session.sendCookie();
+        if (session.#needs_cookie_send) {
+            console.log(`SESSION: ${request_url} I will send a cookie (${session.shortId})`);
+            await session.#sendCookie();
         }
 
-        if (session.was_modified) {
-            await session.save_to_mcd();
-            console.log(`Session: ${request_url} modified, storing (${session.sessionId})`);
+        if (session.#needs_store_save) {
+            await session.#save_to_mcd();
+            console.log(`SESSION: ${request_url} modified, storing (${session.shortId})`);
         }
+        console.log(`=========== SESSION MW END: ${request_url} ===========`);
     }
 }
