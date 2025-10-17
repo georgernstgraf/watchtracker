@@ -2,8 +2,8 @@ import { WatchService } from "../service/index.ts";
 import "../lib/types.ts";
 import { render, renderData } from "../lib/hbs.ts";
 import { authRouter } from "../routers/authRouter.ts";
-export default function serve_under_for(path: string, router: typeof authRouter) {
-    router.get(`${path}/:id`, async (c) => {
+export default function serve_under_for(path: string, captionRouter: typeof authRouter) {
+    captionRouter.get(`${path}/:id`, async (c) => {
         const session = c.get("session");
         const username = session.username!;
         const watchId = c.req.param("id");
@@ -15,7 +15,7 @@ export default function serve_under_for(path: string, router: typeof authRouter)
         return c.html(render("caption", Object.assign({ watch }, renderData)));
     });
 
-    router.get(path, (c) => {
+    captionRouter.get(path, (c) => {
         return c.html(render("caption", Object.assign({}, renderData)));
     });
 }

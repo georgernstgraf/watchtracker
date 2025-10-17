@@ -4,9 +4,9 @@ import { UserService, WatchService } from "../service/index.ts";
 import "../lib/types.ts";
 import { render, renderData } from "../lib/hbs.ts";
 
-export default function serve_under_for(path: string, router: typeof authRouter) {
+export default function serve_under_for(path: string, userRouter: typeof authRouter) {
     // patch a user
-    router.patch(path, async (c) => {
+    userRouter.patch(path, async (c) => {
         const session = c.get("session");
         const username = session.username!;
 

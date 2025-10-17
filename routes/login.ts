@@ -4,8 +4,8 @@ import { TimeZone } from "../lib/timeZone.ts";
 import authenticate from "../lib/auth.ts";
 import { render, renderData } from "../lib/hbs.ts";
 
-export default function serve_under_for(path: string, router: typeof sessionRouter) {
-    router.post(path, async (c) => {
+export default function serve_under_for(path: string, loginRouter: typeof sessionRouter) {
+    loginRouter.post(path, async (c) => {
         const session = c.get("session");
         const body = await c.req.parseBody();
         const errors = [];

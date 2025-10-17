@@ -3,9 +3,9 @@ import "../lib/types.ts";
 import { render, renderData } from "../lib/hbs.ts";
 import { authRouter } from "../routers/authRouter.ts";
 
-export default function serve_under_for(path: string, router: typeof authRouter) {
+export default function serve_under_for(path: string, measureRouter: typeof authRouter) {
     // register a new measurement
-    router.post(`${path}/:id`, async (c) => {
+    measureRouter.post(`${path}/:id`, async (c) => {
         // this is a watchId here!!
         const session = c.get("session");
         const watchId = c.req.param("id");
@@ -43,7 +43,7 @@ export default function serve_under_for(path: string, router: typeof authRouter)
         return c.html(render("measurements", Object.assign({ watch }, renderData)));
     });
 
-    router.delete(`${path}/:id`, async (c) => {
+    measureRouter.delete(`${path}/:id`, async (c) => {
         const session = c.get("session");
         const username = session.username!;
         const measureId = c.req.param("id");
@@ -59,7 +59,7 @@ export default function serve_under_for(path: string, router: typeof authRouter)
         return c.html(render("measurements", Object.assign({ watch }, renderData)));
     });
 
-    router.patch(`${path}/:id`, async (c) => {
+    measureRouter.patch(`${path}/:id`, async (c) => {
         const session = c.get("session");
         const username = session.username!;
 

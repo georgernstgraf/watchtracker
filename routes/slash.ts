@@ -3,8 +3,8 @@ import { TimeZone } from "../lib/timeZone.ts";
 import { UserService, WatchService } from "../service/index.ts";
 import { render, renderData } from "../lib/hbs.ts";
 
-export default function serve_under_for(path: string, router: typeof sessionRouter) {
-    router.get(path, async (c) => {
+export default function serve_under_for(path: string, slashRouter: typeof sessionRouter) {
+    slashRouter.get(path, async (c) => {
         const session = c.get("session");
         const username = session.username;
         const full = c.req.header("hx-request") ? "-body" : "-full";
