@@ -5,12 +5,12 @@ import { authRouter } from "../routers/authRouter.ts";
 import { render, renderData } from "../lib/hbs.ts";
 
 // This route renders the measurements table incl. headings
-export default function serve_under_for(path: string, router: typeof authRouter) {
-    router.get(`${path}/:id`, async (c) => {
-        return await handleGet(c.req.param("id"), c);
+export default function serve_under_for(path: string, watchRouter: typeof authRouter) {
+    watchRouter.get(`${path}`, async (c) => {
+        return await handleGet(c.req.param("id") ?? "", c);
     });
 
-    router.get(`${path}/`, async (c) => {
+    watchRouter.get(`${path}/`, async (c) => {
         const id = c.req.query("id");
         if (!id) {
             return c.text("Watch ID required", 400);
@@ -18,8 +18,7 @@ export default function serve_under_for(path: string, router: typeof authRouter)
         return await handleGet(id, c);
     });
 
-    // This route only renders the caption (patching only name and comment)
-    router.patch(`${path}/:id`, async (c) => {
+    watchRouter.patch(`${path}/:id`, async (c) => {
         try {
             const session = c.get("session");
             const username = session.username!;
@@ -45,7 +44,7 @@ export default function serve_under_for(path: string, router: typeof authRouter)
         }
     });
 
-    router.post(path, async (c) => {
+    watchRouter.post(path, async (c) => {
         try {
             const session = c.get("session");
             const username = session.username!;
@@ -68,7 +67,7 @@ export default function serve_under_for(path: string, router: typeof authRouter)
         }
     });
 
-    router.delete(`${path}/:id`, async (c) => {
+    watchRouter.delete(`${path}/:id`, async (c) => {
         try {
             const session = c.get("session");
             const username = session.username!;
@@ -84,6 +83,7 @@ export default function serve_under_for(path: string, router: typeof authRouter)
         }
     });
 }
+
 async function handleGet(id: string, c: Context) {
     try {
         const session = c.get("session");
