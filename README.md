@@ -1,43 +1,15 @@
 # Watch Deviation Tracker
 
-## Route Definitions
+A multi-tenant capable tool for tracking accuracy of mechanical watches
 
-#### GET %/
+## Techstack
 
-- session: render site with watchselector
-- unauth: render login form
+- typescript / deno / prisma / sqlite
+- bootstrap w/ purgecss
+- handlebars templates on the backend
+- htmx in the frontend
 
-#### POST %/login
-
-- valid: render site, set session token
-- invalid: render login form
-
-#### GET %/watch/:id
-
-- valid: render site including details
-- invalid: 401 unauth or 403 forbidden or 404 not found
-
-#### PUT %/watch/
-
-- create a new watch, with comments
-- valid: render details, update selector
-- invalid: 401 unauth or 403 forbidden or 404 not found
-
-#### PATCH %/watch/:id
-
-- valid: render details
-- invalid: 401 unauth or 403 forbidden or 404 not found
-
-#### DELETE %/watch/:id
-
-- valid: render details,
-- invalid: 401 unauth or 403 forbidden or 404 not found
-
-#### ALL %/watch/:watchId/measure/:measID
-
-- manipulate measurements, always return them
-
-## Changelog
+## Changelog (outdated)
 
 - 2023-09-23
 
