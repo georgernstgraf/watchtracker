@@ -1,6 +1,6 @@
 import { authRouter } from "../routers/authRouter.ts";
 import { TimeZone } from "../lib/timeZone.ts";
-import { UserService, WatchService } from "../service/index.ts";
+import { UserService, WatchService, WatchTrackerService } from "../service/index.ts";
 import "../lib/types.ts";
 import { render, renderData } from "../lib/hbs.ts";
 
@@ -23,7 +23,7 @@ export default function serve_under_for(path: string, userRouter: typeof authRou
         });
 
         const userWatches = await WatchService.getUserWatchesByUname(username);
-        const watch = await WatchService.getUserWatchWithMeasurements(username, body.selectedWatchId as string);
+        const watch = await WatchTrackerService.getWatchForDisplay(username, body.selectedWatchId as string);
 
         return c.html(render(
             "body-auth",

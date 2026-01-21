@@ -54,7 +54,13 @@ hbs.registerHelper("eq", function (a: unknown, b: unknown) {
 });
 
 hbs.registerHelper("formatDate", function (dateString: string) {
+    if (!dateString || dateString === "undefined" || dateString === "null") {
+        return "Invalid Date";
+    }
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+        return "Invalid Date";
+    }
     const day = date.getDate();
     const monthNames = [
         "Jan",
