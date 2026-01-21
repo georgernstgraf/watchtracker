@@ -1,22 +1,20 @@
-<p>
-    <em>Path: </em>
-    {{error.path}}
-</p>
-<p>
-    <em>Message</em>
-    {{error.message}}
-</p>
-<p>
-    <em>Stack</em>
-    {{error.stack}}
-</p>
-<p><em>JSON:</em>
-    {{JSONstringify error.message}}
-</p>
+<div class="alert alert-danger">
+    <p>
+        <strong>Error:</strong> {{error.message}}
+    </p>
+    {{#if error.path}}
+        <p>
+            <small><em>Path: </em>{{error.path}}</small>
+        </p>
+    {{/if}}
+    {{#if error.stack}}
+        <pre class="small mt-2" style="max-height: 200px; overflow: auto;">{{error.stack}}</pre>
+    {{/if}}
+</div>
 {{#if errors}}
     {{#each errors}}
-        <p class='error'>
+        <div class="alert alert-warning">
             {{this}}
-        </p>
+        </div>
     {{/each}}
 {{/if}}

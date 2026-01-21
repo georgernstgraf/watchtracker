@@ -1,3 +1,4 @@
+import { HTTPException } from "hono/http-exception";
 import { MeasurementService, WatchService } from "../service/index.ts";
 import "../lib/types.ts";
 import { render, renderData } from "../lib/hbs.ts";
@@ -12,13 +13,13 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
         const username = session.username;
 
         if (!username) {
-            return c.text("Unauthorized", 401);
+            throw new HTTPException(401, { message: "Unauthorized" });
         }
 
         // Verify the watch belongs to the user
         const belongsToUser = await WatchService.watchBelongsToUser(watchId, username);
         if (!belongsToUser) {
-            return c.text("Wrong Watch ID", 403);
+            throw new HTTPException(403, { message: "Wrong Watch ID" });
         }
 
         // Create the measurement using the service
@@ -35,7 +36,7 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
         );
 
         if (!measurement) {
-            return c.text("Failed to create measurement", 403);
+            throw new HTTPException(403, { message: "Failed to create measurement" });
         }
 
         const watch = await WatchService.getWatchForDisplay(username, watchId);
@@ -49,7 +50,7 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
         const watchId = await MeasurementService.getWatchIdForUserMeasurement(username, measureId);
 
         if (!watchId) {
-            return c.text("Wrong Measurement ID", 403);
+            throw new HTTPException(403, { message: "Wrong Measurement ID" });
         }
 
         // Delete the measurement
@@ -62,60 +63,50 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
         const session = c.get("session");
         const username = session.username!;
 
-        try {
-            const measureId = c.req.param("id");
-            const measure = await MeasurementService.getUserMeasurement(username, measureId);
-            if (!measure) {
-                return c.text("Wrong Measurement ID", 403);
-            }
-
-            // Get the watch ID from the measurement
-            const measurementWithWatch = measure as typeof measure & {
-                watch?: { id: string };
-            };
-            const watchId = measurementWithWatch?.watch?.id || measure.watchId;
-
-            const body = await c.req.parseBody();
-
-            if (!body.isStart) {
-                body.isStart = "false";
-            }
-
-            try {
-                // Update the measurement
-                const updateData: {
-                    value?: number;
-                    isStart?: boolean;
-                    comment?: string;
-                    createdAt?: Date;
-                } = {
-                    value: body.value ? parseInt(body.value as string) : undefined,
-                    isStart: body.isStart === "true",
-                    comment: body.comment as string,
-                };
-
-                if (body.createdAt) {
-                    updateData.createdAt = new Date(body.createdAt as string);
-                }
-
-                // Remove undefined values
-                Object.keys(updateData).forEach((key) => {
-                    if (updateData[key as keyof typeof updateData] === undefined) {
-                        delete updateData[key as keyof typeof updateData];
-                    }
-                });
-
-                await MeasurementService.updateMeasurement(measureId, updateData);
-            } catch (e: unknown) {
-                const error = e as Error;
-                return c.text(error.message, 422);
-            }
-
-            const watch = await WatchService.getWatchForDisplay(username, watchId);
-            return c.html(render("measurements", Object.assign({ watch }, renderData)));
-        } catch (err) {
-            const error = err as Error;
-            return c.text(error.message, 500);
+        const measureId = c.req.param("id");
+        const measure = await MeasurementService.getUserMeasurement(username, measureId);
+        if (!measure) {
+            throw new HTTPException(403, { message: "Wrong Measurement ID" });
         }
+
+        // Get the watch ID from the measurement
+        const measurementWithWatch = measure as typeof measure & {
+            watch?: { id: string };
+        };
+        const watchId = measurementWithWatch?.watch?.id || measure.watchId;
+
+        const body = await c.req.parseBody();
+
+        if (!body.isStart) {
+            body.isStart = "false";
+        }
+
+        // Update the measurement
+        const updateData: {
+            value?: number;
+            isStart?: boolean;
+            comment?: string;
+            createdAt?: Date;
+        } = {
+            value: body.value ? parseInt(body.value as string) : undefined,
+            isStart: body.isStart === "true",
+            comment: body.comment as string,
+        };
+
+        if (body.createdAt) {
+            updateData.createdAt = new Date(body.createdAt as string);
+        }
+
+        // Remove undefined values
+        Object.keys(updateData).forEach((key) => {
+            if (updateData[key as keyof typeof updateData] === undefined) {
+                delete updateData[key as keyof typeof updateData];
+            }
+        });
+
+        await MeasurementService.updateMeasurement(measureId, updateData);
+
+        const watch = await WatchService.getWatchForDisplay(username, watchId);
+        return c.html(render("measurements", Object.assign({ watch }, renderData)));
     });
 }

@@ -13,7 +13,8 @@ async function runPrismaGenerate() {
 
     const { success } = await command.spawn().status;
     if (!success) {
-        console.error("❌ Prisma generation failed!");
+        console.error("❌ Prisma generation failed! Exiting.");
+        Deno.exit(1);
     } else {
         console.log("✅ Prisma client ready.");
     }

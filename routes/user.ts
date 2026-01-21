@@ -1,3 +1,4 @@
+import { HTTPException } from "hono/http-exception";
 import { authRouter } from "../routers/authRouter.ts";
 import { TimeZone } from "../lib/timeZone.ts";
 import { UserService, WatchService } from "../service/index.ts";
@@ -13,7 +14,7 @@ export default function serve_under_for(path: string, userRouter: typeof authRou
         const body = await c.req.parseBody();
 
         if ("timeZone" in body && !TimeZone.timeZones.includes(body.timeZone as string)) {
-            return c.text("Unknown / invalid time zone", 422);
+            throw new HTTPException(422, { message: "Unknown / invalid time zone" });
         }
 
         // Update the user

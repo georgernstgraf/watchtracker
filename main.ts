@@ -1,8 +1,10 @@
 "use strict";
 
 import { Hono } from "hono";
+import { ContentfulStatusCode } from "hono/utils/http-status";
 import { serveStatic } from "hono/deno";
 import { prisma } from "./lib/db.ts";
+import { render, renderData } from "./lib/hbs.ts";
 import { sessionRouter } from "./routers/sessionRouter.ts";
 import { authRouter } from "./routers/authRouter.ts";
 import * as config from "./lib/config.ts";
@@ -61,12 +63,30 @@ function main() {
 
     // Error handler
     app.onError((err, c) => {
-        console.error(`Error: ${err.message}`);
-        if (config.isDevelopment) {
-            console.error(err);
-        }
         const status = (err as Error & { status?: number }).status || 500;
-        return c.text(err.message, status as 500);
+        const isHTMX = c.req.header("hx-request") === "true";
+        const path = c.req.path;
+
+        console.error(`Error [${status}] on ${path}: ${err.message}`);
+        if (config.isDevelopment && status === 500) {
+            console.error(err.stack);
+        }
+
+        const errorData = {
+            error: {
+                message: err.message,
+                stack: config.isDevelopment ? err.stack : undefined,
+                path: path,
+            },
+        };
+
+        if (isHTMX) {
+            // Return a partial for HTMX
+            return c.html(render("error", Object.assign(errorData, renderData)), status as ContentfulStatusCode);
+        } else {
+            // Return a full page for normal requests
+            return c.html(render("error-full", Object.assign(errorData, renderData)), status as ContentfulStatusCode);
+        }
     });
 
     // Start server
