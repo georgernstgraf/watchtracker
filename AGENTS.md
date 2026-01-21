@@ -1,5 +1,7 @@
 # AGENTS.md - Repository Guidelines for Coding Agents
 
+> **WARNING**: The `main` branch has diverged from production and is currently under active development. The app may be broken. See issue #68.
+
 ## Project Overview
 
 - **Runtime**: Deno with TypeScript

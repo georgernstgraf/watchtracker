@@ -33,10 +33,21 @@ function main() {
     // Create the Hono app
     const app = new Hono();
 
-    // Static files - must come before routers to serve files from /watchtracker/static/*
+    // Trim trailing slashes - redirect /watchtracker/ to /watchtracker
+    app.use(async (c, next) => {
+        const path = c.req.path;
+        if (path !== "/" && path.endsWith("/")) {
+            const newPath = path.slice(0, -1);
+            const query = c.req.url.includes("?") ? c.req.url.split("?")[1] : "";
+            return c.redirect(query ? `${newPath}?${query}` : newPath, 301);
+        }
+        await next();
+    });
+
+    // Static files - serve from /watchtracker/static/*
     app.use(
-        `${config.APP_PATH}/*`,
-        serveStatic({ root: "./static", rewriteRequestPath: (path) => path.replace(config.APP_PATH, "") }),
+        `${config.APP_PATH}/static/*`,
+        serveStatic({ root: "./static", rewriteRequestPath: (path) => path.replace(`${config.APP_PATH}/static`, "") }),
     );
 
     // Mount routers
