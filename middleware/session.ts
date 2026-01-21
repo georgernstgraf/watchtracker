@@ -3,7 +3,7 @@
  */
 
 import { Context } from "hono";
-import { deleteCookie, getSignedCookie, setSignedCookie } from "hono/cookie";
+import { getSignedCookie, setSignedCookie } from "hono/cookie";
 import { v4 as uuidv4 } from "uuid";
 import store from "../lib/memcachedSessionStore.ts";
 import { defaultCookieOptions, logoutCookieOptions } from "../lib/cookieOptions.ts";
