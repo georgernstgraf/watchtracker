@@ -1,34 +1,27 @@
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { UserService, WatchService } from "../service/index.ts";
+import { validateWatchOwnership } from "../middleware/ownership.ts";
 import "../lib/types.ts";
 import { authRouter } from "../routers/authRouter.ts";
 import { render, renderData } from "../lib/hbs.ts";
 
 // This route renders the measurements table incl. headings
 export default function serve_under_for(path: string, watchRouter: typeof authRouter) {
-    watchRouter.get(`${path}`, async (c) => {
+    watchRouter.get(`${path}`, validateWatchOwnership, async (c) => {
         const id = c.req.query("id") ?? c.req.param("id") ?? "";
         return await handleGet(id, c);
     });
 
-    watchRouter.get(`${path}/`, async (c) => {
-        const id = c.req.query("id");
-        if (!id) {
-            throw new HTTPException(400, { message: "Watch ID required" });
-        }
+    watchRouter.get(`${path}/:id`, validateWatchOwnership, async (c) => {
+        const id = c.req.param("id");
         return await handleGet(id, c);
     });
 
-    watchRouter.patch(`${path}/:id`, async (c) => {
+    watchRouter.patch(`${path}/:id`, validateWatchOwnership, async (c) => {
         const session = c.get("session");
         const username = session.username!;
         const body = await c.req.parseBody();
-        const watch = await WatchService.getUserWatchWithMeasurements(username, c.req.param("id"));
-
-        if (!watch) {
-            throw new HTTPException(403, { message: "This is not your watch" });
-        }
 
         await WatchService.updateWatch(c.req.param("id"), {
             name: body.name as string,
@@ -55,7 +48,7 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
         return c.html(render("allButHeadAndFoot", Object.assign({ watch: newWatch, userWatches }, renderData)));
     });
 
-    watchRouter.delete(`${path}/:id`, async (c) => {
+    watchRouter.delete(`${path}/:id`, validateWatchOwnership, async (c) => {
         const session = c.get("session");
         const username = session.username!;
         await WatchService.deleteWatch(c.req.param("id"), username);

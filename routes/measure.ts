@@ -1,26 +1,17 @@
 import { HTTPException } from "hono/http-exception";
 import { MeasurementService, WatchService } from "../service/index.ts";
+import { validateWatchOwnership, validateMeasurementOwnership } from "../middleware/ownership.ts";
 import "../lib/types.ts";
 import { render, renderData } from "../lib/hbs.ts";
 import { authRouter } from "../routers/authRouter.ts";
 
 export default function serve_under_for(path: string, measureRouter: typeof authRouter) {
     // register a new measurement
-    measureRouter.post(`${path}/:id`, async (c) => {
+    measureRouter.post(`${path}/:id`, validateWatchOwnership, async (c) => {
         // this is a watchId here!!
         const session = c.get("session");
         const watchId = c.req.param("id");
-        const username = session.username;
-
-        if (!username) {
-            throw new HTTPException(401, { message: "Unauthorized" });
-        }
-
-        // Verify the watch belongs to the user
-        const belongsToUser = await WatchService.watchBelongsToUser(watchId, username);
-        if (!belongsToUser) {
-            throw new HTTPException(403, { message: "Wrong Watch ID" });
-        }
+        const username = session.username!;
 
         // Create the measurement using the service
         const body = await c.req.parseBody();
@@ -43,7 +34,7 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
         return c.html(render("measurements", Object.assign({ watch }, renderData)));
     });
 
-    measureRouter.delete(`${path}/:id`, async (c) => {
+    measureRouter.delete(`${path}/:id`, validateMeasurementOwnership, async (c) => {
         const session = c.get("session");
         const username = session.username!;
         const measureId = c.req.param("id");
@@ -59,21 +50,14 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
         return c.html(render("measurements", Object.assign({ watch }, renderData)));
     });
 
-    measureRouter.patch(`${path}/:id`, async (c) => {
+    measureRouter.patch(`${path}/:id`, validateMeasurementOwnership, async (c) => {
         const session = c.get("session");
         const username = session.username!;
 
         const measureId = c.req.param("id");
         const measure = await MeasurementService.getUserMeasurement(username, measureId);
-        if (!measure) {
-            throw new HTTPException(403, { message: "Wrong Measurement ID" });
-        }
-
-        // Get the watch ID from the measurement
-        const measurementWithWatch = measure as typeof measure & {
-            watch?: { id: string };
-        };
-        const watchId = measurementWithWatch?.watch?.id || measure.watchId;
+        // Ownership verified by middleware, so we know it exists and belongs to user
+        const watchId = measure!.watchId;
 
         const body = await c.req.parseBody();
 
