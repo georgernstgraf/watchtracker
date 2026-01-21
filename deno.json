@@ -38,3 +38,5 @@
         "singleQuote": false
     }
 }
+#!/usr/bin/env bash
+ssh murl 'mkvacuumtracker'
