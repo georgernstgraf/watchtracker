@@ -1,4 +1,4 @@
-import { MeasurementService, WatchService, WatchTrackerService } from "../service/index.ts";
+import { MeasurementService, WatchService } from "../service/index.ts";
 import "../lib/types.ts";
 import { render, renderData } from "../lib/hbs.ts";
 import { authRouter } from "../routers/authRouter.ts";
@@ -38,7 +38,7 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
             return c.text("Failed to create measurement", 403);
         }
 
-        const watch = await WatchTrackerService.getWatchForDisplay(username, watchId);
+        const watch = await WatchService.getWatchForDisplay(username, watchId);
         return c.html(render("measurements", Object.assign({ watch }, renderData)));
     });
 
@@ -54,7 +54,7 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
 
         // Delete the measurement
         await MeasurementService.deleteUserMeasurement(username, measureId);
-        const watch = await WatchTrackerService.getWatchForDisplay(username, watchId);
+        const watch = await WatchService.getWatchForDisplay(username, watchId);
         return c.html(render("measurements", Object.assign({ watch }, renderData)));
     });
 
@@ -111,7 +111,7 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
                 return c.text(error.message, 422);
             }
 
-            const watch = await WatchTrackerService.getWatchForDisplay(username, watchId);
+            const watch = await WatchService.getWatchForDisplay(username, watchId);
             return c.html(render("measurements", Object.assign({ watch }, renderData)));
         } catch (err) {
             const error = err as Error;

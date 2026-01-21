@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { UserService, WatchService, WatchTrackerService } from "../service/index.ts";
+import { UserService, WatchService } from "../service/index.ts";
 import "../lib/types.ts";
 import { authRouter } from "../routers/authRouter.ts";
 import { render, renderData } from "../lib/hbs.ts";
@@ -35,7 +35,7 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
                 comment: body.comment as string,
             });
 
-            const updatedWatch = await WatchTrackerService.getWatchForDisplay(username, c.req.param("id"));
+            const updatedWatch = await WatchService.getWatchForDisplay(username, c.req.param("id"));
             const userWatches = await WatchService.getUserWatchesByUname(username);
             return c.html(render("allButHeadAndFoot", Object.assign({ watch: updatedWatch, userWatches }, renderData)));
         } catch (e: unknown) {
@@ -57,7 +57,7 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
             });
             await UserService.setLastWatch(username, watch.id);
             const userWatches = await WatchService.getUserWatchesByUname(username);
-            const newWatch = await WatchTrackerService.getWatchForDisplay(username, watch.id);
+            const newWatch = await WatchService.getWatchForDisplay(username, watch.id);
             return c.html(render("allButHeadAndFoot", Object.assign({ watch: newWatch, userWatches }, renderData)));
         } catch (e: unknown) {
             const error = e as Error;
@@ -89,7 +89,7 @@ async function handleGet(id: string, c: Context) {
     try {
         const session = c.get("session");
         const username = session.username;
-        const watch = await WatchTrackerService.getWatchForDisplay(username, id);
+        const watch = await WatchService.getWatchForDisplay(username, id);
         if (!watch) {
             return c.text("Wrong Watch ID", 403);
         }

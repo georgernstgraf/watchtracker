@@ -1,6 +1,9 @@
 import { WatchRepository } from "../repo/watchRepository.ts";
 import { MeasurementRepository } from "../repo/measurementRepository.ts";
 import { UserRepository } from "../repo/userRepository.ts";
+import { UserService } from "./userService.ts";
+import { MeasurementService } from "./measurementService.ts";
+import { TimeZone } from "../lib/timeZone.ts";
 import type { Measurement, Prisma, Watch } from "generated-prisma-client";
 
 export class WatchService {
@@ -171,5 +174,47 @@ export class WatchService {
      */
     static async watchExists(watchId: string): Promise<boolean> {
         return await WatchRepository.exists({ id: watchId });
+    }
+
+    /**
+     * Get complete watch data for display with measurements and calculated drifts
+     */
+    static async getWatchForDisplay(username: string, watchId?: string) {
+        const watch = await this.getUserWatchWithMeasurements(username, watchId);
+        if (!watch) {
+            return null;
+        }
+
+        // Get user's timezone for date formatting
+        const user = await UserService.getUserByName(username);
+        const timeZone = user?.timeZone || "UTC";
+
+        const watchWithMeasurements = watch as typeof watch & {
+            measurements?: Measurement[];
+        };
+
+        if (watchWithMeasurements.measurements && watchWithMeasurements.measurements.length > 0) {
+            // Enrich measurements with createdAt16 and driftDisplay
+            const measurementsWithDrifts = watchWithMeasurements.measurements.map((m) => {
+                const dateObj = m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt);
+                return {
+                    ...m,
+                    createdAt16: TimeZone.get16(dateObj, timeZone),
+                    driftDisplay: "n/a" as string,
+                    driftMath: undefined as { durationDays: number; driftSeks: number } | undefined,
+                };
+            });
+
+            // Apply drift calculations (mutates array to add driftDisplay)
+            const overallMeasure = MeasurementService.calculateDrifts(measurementsWithDrifts);
+
+            return {
+                ...watchWithMeasurements,
+                measurements: measurementsWithDrifts,
+                overallMeasure,
+            };
+        }
+
+        return watchWithMeasurements;
     }
 }

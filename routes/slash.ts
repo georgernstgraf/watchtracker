@@ -1,6 +1,6 @@
 import { sessionRouter } from "../routers/sessionRouter.ts";
 import { TimeZone } from "../lib/timeZone.ts";
-import { UserService, WatchService, WatchTrackerService } from "../service/index.ts";
+import { UserService, WatchService } from "../service/index.ts";
 import { render, renderData } from "../lib/hbs.ts";
 
 export default function serve_under_for(path: string, slashRouter: typeof sessionRouter) {
@@ -15,7 +15,7 @@ export default function serve_under_for(path: string, slashRouter: typeof sessio
             if (username) {
                 const user = await UserService.getUserByName(username);
                 const userWatches = await WatchService.getUserWatchesByUname(username);
-                const watch = await WatchTrackerService.getWatchForDisplay(username);
+                const watch = await WatchService.getWatchForDisplay(username);
                 return c.html(render(`index${full}`, Object.assign({ user, watch, userWatches, timeZones: TimeZone.timeZones }, renderData)));
             } else {
                 console.log(`slash.ts: No user found -- rendering login page (${session.shortId})`);
