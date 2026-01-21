@@ -1,16 +1,22 @@
 import hbs from "handlebars";
 import { walk } from "@std/fs";
 import { partialsDir } from "./config.ts";
-import { renderData } from "./types.ts";
 import * as config from "./config.ts";
 // map "template name" => compiled template function
-const map = new Map();
+const map = new Map<string, hbs.TemplateDelegate>();
 
 const hbs_data = { appPath: config.APP_PATH };
 export { hbs_data as renderData };
 
-export function render(templateName: string, renderData: renderData): string {
-    return map.get(templateName)(renderData);
+/**
+ * Render a template with typed data
+ */
+export function render<T>(templateName: string, data: T): string {
+    const template = map.get(templateName);
+    if (!template) {
+        throw new Error(`Template not found: ${templateName}`);
+    }
+    return template(data);
 }
 
 async function loadTemplates(): Promise<void> {

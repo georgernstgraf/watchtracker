@@ -1,8 +1,8 @@
 import { sessionRouter } from "../routers/sessionRouter.ts";
 import { UserService, WatchService } from "../service/index.ts";
 import { TimeZone } from "../lib/timeZone.ts";
+import { renderLoginBody, renderBodyAuth } from "../lib/views.ts";
 import authenticate from "../lib/auth.ts";
-import { render, renderData } from "../lib/hbs.ts";
 
 export default function serve_under_for(path: string, loginRouter: typeof sessionRouter) {
     loginRouter.post(path, async (c) => {
@@ -18,7 +18,7 @@ export default function serve_under_for(path: string, loginRouter: typeof sessio
         }
 
         if (errors.length !== 0) {
-            return c.html(render("login-body", Object.assign({ errors }, renderData)));
+            return c.html(renderLoginBody({ errors }));
         }
 
         const userName = body.user as string;
@@ -28,7 +28,7 @@ export default function serve_under_for(path: string, loginRouter: typeof sessio
             await authenticate(userName, passwd);
         } catch (err: unknown) {
             errors.push(`login failed: ${err instanceof Error ? err.message : "unknown error"}`);
-            return c.html(render("login-body", Object.assign({ errors }, renderData)));
+            return c.html(renderLoginBody({ errors }));
         }
 
         // registers the session and sends the cookie
@@ -38,14 +38,11 @@ export default function serve_under_for(path: string, loginRouter: typeof sessio
         const userWatches = await WatchService.getUserWatchesByUname(user.name);
         const watch = await WatchService.getWatchForDisplay(user.name);
 
-        return c.html(render(
-            "body-auth",
-            Object.assign(renderData, {
-                user,
-                userWatches,
-                watch,
-                timeZones: TimeZone.timeZones,
-            }),
-        ));
+        return c.html(renderBodyAuth({
+            user,
+            userWatches,
+            watch,
+            timeZones: TimeZone.timeZones,
+        }));
     });
 }

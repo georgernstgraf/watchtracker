@@ -1,8 +1,7 @@
 import { HTTPException } from "hono/http-exception";
 import { WatchService } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
-import "../lib/types.ts";
-import { render, renderData } from "../lib/hbs.ts";
+import { renderCaption } from "../lib/views.ts";
 import { authRouter } from "../routers/authRouter.ts";
 export default function serve_under_for(path: string, captionRouter: typeof authRouter) {
     captionRouter.get(`${path}/:id`, validateWatchOwnership, async (c) => {
@@ -14,10 +13,10 @@ export default function serve_under_for(path: string, captionRouter: typeof auth
         if (!watch) {
             throw new HTTPException(403, { message: "Wrong Watch ID" });
         }
-        return c.html(render("caption", Object.assign({ watch }, renderData)));
+        return c.html(renderCaption({ watch: watch as any }));
     });
 
     captionRouter.get(path, (c) => {
-        return c.html(render("caption", Object.assign({}, renderData)));
+        return c.html(renderCaption({ watch: null }));
     });
 }

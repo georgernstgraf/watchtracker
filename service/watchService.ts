@@ -5,6 +5,7 @@ import { UserService } from "./userService.ts";
 import { MeasurementService } from "./measurementService.ts";
 import { TimeZone } from "../lib/timeZone.ts";
 import type { Measurement, Prisma, Watch } from "generated-prisma-client";
+import type { EnrichedWatch, EnrichedMeasurement } from "../lib/viewTypes.ts";
 
 export class WatchService {
     /**
@@ -179,7 +180,7 @@ export class WatchService {
     /**
      * Get complete watch data for display with measurements and calculated drifts
      */
-    static async getWatchForDisplay(username: string, watchId?: string) {
+    static async getWatchForDisplay(username: string, watchId?: string): Promise<EnrichedWatch | null> {
         const watch = await this.getUserWatchWithMeasurements(username, watchId);
         if (!watch) {
             return null;
@@ -189,32 +190,43 @@ export class WatchService {
         const user = await UserService.getUserByName(username);
         const timeZone = user?.timeZone || "UTC";
 
-        const watchWithMeasurements = watch as typeof watch & {
-            measurements?: Measurement[];
-        };
+        // Cast to any first to handle the composite type from Prisma
+        const watchWithMeasurements = watch as any;
+        const measurements = (watchWithMeasurements.measurements || []) as Measurement[];
 
-        if (watchWithMeasurements.measurements && watchWithMeasurements.measurements.length > 0) {
+        if (measurements.length > 0) {
             // Enrich measurements with createdAt16 and driftDisplay
-            const measurementsWithDrifts = watchWithMeasurements.measurements.map((m) => {
+            const measurementsWithDrifts = measurements.map((m) => {
                 const dateObj = m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt);
                 return {
                     ...m,
                     createdAt16: TimeZone.get16(dateObj, timeZone),
-                    driftDisplay: "n/a" as string,
-                    driftMath: undefined as { durationDays: number; driftSeks: number } | undefined,
-                };
+                    driftDisplay: "n/a",
+                    driftMath: undefined,
+                } as EnrichedMeasurement;
             });
 
             // Apply drift calculations (mutates array to add driftDisplay)
             const overallMeasure = MeasurementService.calculateDrifts(measurementsWithDrifts);
 
             return {
-                ...watchWithMeasurements,
+                id: watch.id,
+                name: watch.name,
+                userId: watch.userId,
+                lastUserId: watch.lastUserId,
+                comment: watch.comment,
                 measurements: measurementsWithDrifts,
                 overallMeasure,
             };
         }
 
-        return watchWithMeasurements;
+        return {
+            id: watch.id,
+            name: watch.name,
+            userId: watch.userId,
+            lastUserId: watch.lastUserId,
+            comment: watch.comment,
+            measurements: [],
+        };
     }
 }

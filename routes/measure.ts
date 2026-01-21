@@ -1,8 +1,7 @@
 import { HTTPException } from "hono/http-exception";
 import { MeasurementService, WatchService } from "../service/index.ts";
 import { validateWatchOwnership, validateMeasurementOwnership } from "../middleware/ownership.ts";
-import "../lib/types.ts";
-import { render, renderData } from "../lib/hbs.ts";
+import { renderMeasurements } from "../lib/views.ts";
 import { authRouter } from "../routers/authRouter.ts";
 
 export default function serve_under_for(path: string, measureRouter: typeof authRouter) {
@@ -31,7 +30,10 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
         }
 
         const watch = await WatchService.getWatchForDisplay(username, watchId);
-        return c.html(render("measurements", Object.assign({ watch }, renderData)));
+        if (!watch) {
+            throw new HTTPException(403, { message: "Wrong Watch ID" });
+        }
+        return c.html(renderMeasurements({ watch }));
     });
 
     measureRouter.delete(`${path}/:id`, validateMeasurementOwnership, async (c) => {
@@ -47,7 +49,10 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
         // Delete the measurement
         await MeasurementService.deleteUserMeasurement(username, measureId);
         const watch = await WatchService.getWatchForDisplay(username, watchId);
-        return c.html(render("measurements", Object.assign({ watch }, renderData)));
+        if (!watch) {
+            throw new HTTPException(403, { message: "Wrong Watch ID" });
+        }
+        return c.html(renderMeasurements({ watch }));
     });
 
     measureRouter.patch(`${path}/:id`, validateMeasurementOwnership, async (c) => {
@@ -91,6 +96,9 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
         await MeasurementService.updateMeasurement(measureId, updateData);
 
         const watch = await WatchService.getWatchForDisplay(username, watchId);
-        return c.html(render("measurements", Object.assign({ watch }, renderData)));
+        if (!watch) {
+            throw new HTTPException(403, { message: "Wrong Watch ID" });
+        }
+        return c.html(renderMeasurements({ watch }));
     });
 }

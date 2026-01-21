@@ -1,5 +1,4 @@
-import { render, renderData } from "../lib/hbs.ts";
-
+import { renderLoginBody, renderLoginFull } from "../lib/views.ts";
 import { sessionRouter } from "../routers/sessionRouter.ts";
 
 export default function serve_under_for(path: string, logoutRouter: typeof sessionRouter) {
@@ -8,8 +7,8 @@ export default function serve_under_for(path: string, logoutRouter: typeof sessi
         await session.logout();
 
         if (c.req.header("hx-request")) {
-            return c.html(render("login-body", renderData));
+            return c.html(renderLoginBody({}));
         }
-        return c.html(render("login-full", renderData));
+        return c.html(renderLoginFull({}));
     });
 }

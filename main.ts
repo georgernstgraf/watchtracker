@@ -4,7 +4,7 @@ import { Hono } from "hono";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { serveStatic } from "hono/deno";
 import { prisma } from "./lib/db.ts";
-import { render, renderData } from "./lib/hbs.ts";
+import { renderError, renderErrorFull } from "./lib/views.ts";
 import { sessionRouter } from "./routers/sessionRouter.ts";
 import { authRouter } from "./routers/authRouter.ts";
 import * as config from "./lib/config.ts";
@@ -82,10 +82,10 @@ function main() {
 
         if (isHTMX) {
             // Return a partial for HTMX
-            return c.html(render("error", Object.assign(errorData, renderData)), status as ContentfulStatusCode);
+            return c.html(renderError(errorData), status as ContentfulStatusCode);
         } else {
             // Return a full page for normal requests
-            return c.html(render("error-full", Object.assign(errorData, renderData)), status as ContentfulStatusCode);
+            return c.html(renderErrorFull(errorData), status as ContentfulStatusCode);
         }
     });
 

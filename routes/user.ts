@@ -2,8 +2,7 @@ import { HTTPException } from "hono/http-exception";
 import { authRouter } from "../routers/authRouter.ts";
 import { TimeZone } from "../lib/timeZone.ts";
 import { UserService, WatchService } from "../service/index.ts";
-import "../lib/types.ts";
-import { render, renderData } from "../lib/hbs.ts";
+import { renderBodyAuth } from "../lib/views.ts";
 
 export default function serve_under_for(path: string, userRouter: typeof authRouter) {
     // patch a user
@@ -26,14 +25,11 @@ export default function serve_under_for(path: string, userRouter: typeof authRou
         const userWatches = await WatchService.getUserWatchesByUname(username);
         const watch = await WatchService.getWatchForDisplay(username, body.selectedWatchId as string);
 
-        return c.html(render(
-            "body-auth",
-            Object.assign(renderData, {
-                user: updatedUser,
-                timeZones: TimeZone.timeZones,
-                userWatches,
-                watch,
-            }),
-        ));
+        return c.html(renderBodyAuth({
+            user: updatedUser,
+            timeZones: TimeZone.timeZones,
+            userWatches,
+            watch,
+        }));
     });
 }

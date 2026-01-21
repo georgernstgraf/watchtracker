@@ -2,9 +2,8 @@ import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { UserService, WatchService } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
-import "../lib/types.ts";
+import { renderAllButHeadAndFoot, renderMeasurements } from "../lib/views.ts";
 import { authRouter } from "../routers/authRouter.ts";
-import { render, renderData } from "../lib/hbs.ts";
 
 // This route renders the measurements table incl. headings
 export default function serve_under_for(path: string, watchRouter: typeof authRouter) {
@@ -30,7 +29,7 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
 
         const updatedWatch = await WatchService.getWatchForDisplay(username, c.req.param("id"));
         const userWatches = await WatchService.getUserWatchesByUname(username);
-        return c.html(render("allButHeadAndFoot", Object.assign({ watch: updatedWatch, userWatches }, renderData)));
+        return c.html(renderAllButHeadAndFoot({ watch: updatedWatch, userWatches }));
     });
 
     watchRouter.post(path, async (c) => {
@@ -45,7 +44,7 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
         await UserService.setLastWatch(username, watch.id);
         const userWatches = await WatchService.getUserWatchesByUname(username);
         const newWatch = await WatchService.getWatchForDisplay(username, watch.id);
-        return c.html(render("allButHeadAndFoot", Object.assign({ watch: newWatch, userWatches }, renderData)));
+        return c.html(renderAllButHeadAndFoot({ watch: newWatch, userWatches }));
     });
 
     watchRouter.delete(`${path}/:id`, validateWatchOwnership, async (c) => {
@@ -53,7 +52,7 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
         const username = session.username!;
         await WatchService.deleteWatch(c.req.param("id"), username);
         const userWatches = await WatchService.getUserWatchesByUname(username);
-        return c.html(render("allButHeadAndFoot", Object.assign({ userWatches }, renderData)));
+        return c.html(renderAllButHeadAndFoot({ userWatches, watch: null }));
     });
 }
 
@@ -65,5 +64,5 @@ async function handleGet(id: string, c: Context) {
         throw new HTTPException(403, { message: "Wrong Watch ID" });
     }
     await UserService.setLastWatch(username, watch.id);
-    return c.html(render("measurements", Object.assign({ watch }, renderData)));
+    return c.html(renderMeasurements({ watch }));
 }
