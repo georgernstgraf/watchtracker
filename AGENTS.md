@@ -24,7 +24,33 @@ deno task purgecss     # Purge unused CSS from static files
 ### Tool Calls
 
 - **github**: Use the `gh` command, it is authorized.
-- **browser**: Use `agent-browser` command on `http://localhost:8000/watchtracker` to test the application.
+- **browser**: Use `agent-browser` to test the application (see Browser Testing section below).
+
+### Browser Testing with agent-browser
+
+The app is mounted at `/watchtracker` (not at root `/`). The root path returns 404.
+
+**Setup:**
+```bash
+# 1. Start Brave with remote debugging (if not already running)
+brave-browser --remote-debugging-port=9222
+
+# 2. Connect agent-browser to the running browser
+agent-browser connect 9222
+```
+
+**Usage:**
+```bash
+# Open the app (always use /watchtracker path)
+agent-browser open http://127.0.0.1:8000/watchtracker
+
+# Get interactive elements
+agent-browser snapshot -i
+
+# Click, fill, etc.
+agent-browser click @e1
+agent-browser fill @e2 "test"
+```
 
 ### Testing
 
