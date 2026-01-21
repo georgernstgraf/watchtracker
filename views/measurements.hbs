@@ -39,9 +39,8 @@
                            name="createdAt">
                     <input type="number"
                            name="value"
-                           value="0"
-                           style="width: 7ch"
-                           onfocus="this.select()">
+                           placeholder="0"
+                           style="width: 7ch">
                     <input type="checkbox"
                            name="isStart"
                            value="true">
@@ -80,7 +79,8 @@
                                name="value"
                                style="width: 7ch"
                                value="{{value}}"
-                               onfocus="this.select()">
+                               onfocus="this.select()"
+                               onclick="this.select()">
                         <input type="checkbox"
                                name="isStart"
                                value="true"

@@ -27,7 +27,7 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
             username,
             watchId,
             {
-                value: parseInt(body.value as string),
+                value: parseInt(body.value as string) || 0,
                 isStart: body.isStart === "true",
                 comment: body.comment as string,
                 createdAt: body.createdAt ? new Date(body.createdAt as string) : undefined,
