@@ -1,5 +1,5 @@
 import { sessionRouter } from "../routers/sessionRouter.ts";
-import { UserService, WatchService } from "../service/index.ts";
+import { UserService, WatchService, WatchTrackerService } from "../service/index.ts";
 import { TimeZone } from "../lib/timeZone.ts";
 import authenticate from "../lib/auth.ts";
 import { render, renderData } from "../lib/hbs.ts";
@@ -36,7 +36,7 @@ export default function serve_under_for(path: string, loginRouter: typeof sessio
         session.login(user.name); // Store the user data in session
 
         const userWatches = await WatchService.getUserWatchesByUname(user.name);
-        const watch = await WatchService.getUserWatchWithMeasurements(user.id);
+        const watch = await WatchTrackerService.getWatchForDisplay(user.name);
 
         return c.html(render(
             "body-auth",

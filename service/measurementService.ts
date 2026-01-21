@@ -100,7 +100,7 @@ export class MeasurementService {
      * Create a measurement for a user's watch
      */
     static async createMeasurementForWatch(
-        userId: string,
+        username: string,
         watchId: string,
         measurementData: {
             value: number;
@@ -111,7 +111,7 @@ export class MeasurementService {
     ): Promise<Measurement | null> {
         // Verify the watch belongs to the user
         const watch = await WatchRepository.findUnique({ id: watchId });
-        if (!watch || watch.userId !== userId) {
+        if (!watch || watch.user?.name !== username) {
             return null;
         }
 
@@ -149,8 +149,8 @@ export class MeasurementService {
     /**
      * Start timing for a watch
      */
-    static async startTiming(userId: string, watchId: string, value: number, comment?: string): Promise<Measurement | null> {
-        return await this.createMeasurementForWatch(userId, watchId, {
+    static async startTiming(username: string, watchId: string, value: number, comment?: string): Promise<Measurement | null> {
+        return await this.createMeasurementForWatch(username, watchId, {
             value,
             isStart: true,
             comment,
@@ -160,8 +160,8 @@ export class MeasurementService {
     /**
      * Stop timing for a watch
      */
-    static async stopTiming(userId: string, watchId: string, value: number, comment?: string): Promise<Measurement | null> {
-        return await this.createMeasurementForWatch(userId, watchId, {
+    static async stopTiming(username: string, watchId: string, value: number, comment?: string): Promise<Measurement | null> {
+        return await this.createMeasurementForWatch(username, watchId, {
             value,
             isStart: false,
             comment,
@@ -207,25 +207,27 @@ export class MeasurementService {
 
     /**
      * Calculate drifts for measurements (business logic for watch accuracy)
+     * Mutates the measurements array to add driftDisplay property
+     * Returns overallMeasure object with summary statistics
      */
-    static calculateDrifts(measurements: Measurement[]): typeof measurements[0] & { overallMeasure?: unknown } | undefined {
+    static calculateDrifts(measurements: (Measurement & { driftDisplay?: string; driftMath?: { durationDays: number; driftSeks: number } })[]): {
+        durationDays: string;
+        driftSeks: number;
+        niceDisplay: string;
+    } | undefined {
         if (!measurements || measurements.length === 0) return undefined;
 
         // Sort measurements by creation date (newest first)
         const sortedMeasurements = [...measurements].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
         // The last (oldest) measurement is always START
-        const lastMeasurement = sortedMeasurements[sortedMeasurements.length - 1] as typeof sortedMeasurements[0] & {
-            driftDisplay?: string;
-        };
+        const lastMeasurement = sortedMeasurements[sortedMeasurements.length - 1];
         lastMeasurement.isStart = true;
         lastMeasurement.driftDisplay = "n/a";
 
         // Calculate drifts for other measurements
         for (let i = sortedMeasurements.length - 2; i >= 0; i--) {
-            const current = sortedMeasurements[i] as typeof sortedMeasurements[0] & {
-                driftDisplay?: string;
-            };
+            const current = sortedMeasurements[i];
             const previous = sortedMeasurements[i + 1];
 
             if (current.isStart) {
@@ -234,17 +236,45 @@ export class MeasurementService {
             }
 
             const durationMS = new Date(current.createdAt).getTime() - new Date(previous.createdAt).getTime();
-            const driftSecs = current.value - previous.value;
+            const driftSeks = current.value - previous.value;
             const durationDays = durationMS / (24 * 60 * 60 * 1000); // ms to days
 
             if (durationDays > 0) {
-                const driftPerDay = driftSecs / durationDays;
-                current.driftDisplay = `${driftPerDay.toFixed(1)}s/day`;
+                const driftPerDay = driftSeks / durationDays;
+                const driftPerDayDisplay = driftPerDay >= 0 ? `+${driftPerDay.toFixed(1)}` : `${driftPerDay.toFixed(1)}`;
+                const durationHours = Math.round(durationMS / (60 * 60 * 1000));
+                const durationDisplay = durationHours < 72 ? `${durationHours}h` : `${Math.round(durationHours / 24)}d`;
+                current.driftDisplay = `${driftPerDayDisplay} s/d (${durationDisplay})`;
+                current.driftMath = { durationDays, driftSeks };
             } else {
                 current.driftDisplay = "n/a";
             }
         }
 
-        return lastMeasurement;
+        // Calculate overall measure from all driftMath entries
+        const onlyMaths = sortedMeasurements
+            .map((m) => m.driftMath)
+            .filter((m): m is { durationDays: number; driftSeks: number } => !!m);
+
+        if (onlyMaths.length === 0) return undefined;
+
+        const overallMeasure = onlyMaths.reduce(
+            (akku, m) => ({
+                durationDays: akku.durationDays + m.durationDays,
+                driftSeks: akku.driftSeks + m.driftSeks,
+            }),
+            { durationDays: 0, driftSeks: 0 },
+        );
+
+        const driftSeksPerDay = overallMeasure.driftSeks / overallMeasure.durationDays;
+        const niceDisplay = driftSeksPerDay >= 0
+            ? `${driftSeksPerDay.toFixed(1)} s/d fast`
+            : `${(-driftSeksPerDay).toFixed(1)} s/d slow`;
+
+        return {
+            durationDays: overallMeasure.durationDays.toFixed(0),
+            driftSeks: Math.round(overallMeasure.driftSeks),
+            niceDisplay,
+        };
     }
 }

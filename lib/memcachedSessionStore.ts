@@ -9,7 +9,8 @@ import * as config from "./config.ts";
 class MemcachedSessionStore {
     memcached: Memcached;
     prefix = config.MEMCACHE_PREFIX;
-    ttl_secs = config.COOKIE_MAX_AGE_S;
+    // Memcached TTL must be <= 30 days (2592000s), otherwise it's treated as Unix timestamp
+    ttl_secs = Math.min(config.COOKIE_MAX_AGE_S, 2592000);
 
     constructor() { // actually a singleton
         this.memcached = new Memcached({

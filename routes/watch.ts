@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { UserService, WatchService } from "../service/index.ts";
+import { UserService, WatchService, WatchTrackerService } from "../service/index.ts";
 import "../lib/types.ts";
 import { authRouter } from "../routers/authRouter.ts";
 import { render, renderData } from "../lib/hbs.ts";
@@ -7,7 +7,8 @@ import { render, renderData } from "../lib/hbs.ts";
 // This route renders the measurements table incl. headings
 export default function serve_under_for(path: string, watchRouter: typeof authRouter) {
     watchRouter.get(`${path}`, async (c) => {
-        return await handleGet(c.req.param("id") ?? "", c);
+        const id = c.req.query("id") ?? c.req.param("id") ?? "";
+        return await handleGet(id, c);
     });
 
     watchRouter.get(`${path}/`, async (c) => {
@@ -34,7 +35,7 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
                 comment: body.comment as string,
             });
 
-            const updatedWatch = await WatchService.getUserWatchWithMeasurements(username, c.req.param("id"));
+            const updatedWatch = await WatchTrackerService.getWatchForDisplay(username, c.req.param("id"));
             const userWatches = await WatchService.getUserWatchesByUname(username);
             return c.html(render("allButHeadAndFoot", Object.assign({ watch: updatedWatch, userWatches }, renderData)));
         } catch (e: unknown) {
@@ -56,7 +57,7 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
             });
             await UserService.setLastWatch(username, watch.id);
             const userWatches = await WatchService.getUserWatchesByUname(username);
-            const newWatch = await WatchService.getUserWatchWithMeasurements(username, watch.id);
+            const newWatch = await WatchTrackerService.getWatchForDisplay(username, watch.id);
             return c.html(render("allButHeadAndFoot", Object.assign({ watch: newWatch, userWatches }, renderData)));
         } catch (e: unknown) {
             const error = e as Error;
@@ -88,7 +89,7 @@ async function handleGet(id: string, c: Context) {
     try {
         const session = c.get("session");
         const username = session.username;
-        const watch = await WatchService.getUserWatchWithMeasurements(username, id);
+        const watch = await WatchTrackerService.getWatchForDisplay(username, id);
         if (!watch) {
             return c.text("Wrong Watch ID", 403);
         }

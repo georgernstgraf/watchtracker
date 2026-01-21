@@ -178,6 +178,7 @@ views/         # Handlebars templates (.hbs)
 ## Special Notes
 
 - **Prisma Client**: Generated to `prisma/client/`, imported via `generated-prisma-client` alias
+- **Prisma DATABASE_URL**: Prisma resolves relative paths from the `prisma/` folder, NOT the project root. The `DATABASE_URL` in `prisma/.env` uses `file:../watchtracker.db` which resolves to `./watchtracker.db` at project root. The runtime `.env` uses an absolute path for clarity.
 - **Sessions**: Cookie-based with memcached backend (see `lib/memcachedSessionStore.ts`)
 - **Templates**: Handlebars with partials auto-loaded from `views/`
 - **Time Zones**: Use `lib/timeZone.ts` with moment-timezone and luxon for TZ handling
