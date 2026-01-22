@@ -1,3 +1,44 @@
 form>* {
     margin: 0 .5ch;
 }
+
+html,
+body {
+    overflow-x: hidden;
+}
+
+/* Bootstrap CSS Grid support (g-col-* classes) */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0.5rem;
+}
+
+.g-col-1 { grid-column: span 1; }
+.g-col-2 { grid-column: span 2; }
+.g-col-3 { grid-column: span 3; }
+.g-col-4 { grid-column: span 4; }
+.g-col-5 { grid-column: span 5; }
+.g-col-6 { grid-column: span 6; }
+.g-col-7 { grid-column: span 7; }
+.g-col-8 { grid-column: span 8; }
+.g-col-9 { grid-column: span 9; }
+.g-col-10 { grid-column: span 10; }
+.g-col-11 { grid-column: span 11; }
+.g-col-12 { grid-column: span 1 / -1; }
+
+.g-row {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 0.5rem;
+}
+
+/* Striped effect for data rows */
+.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3,
+.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3 ~ .g-col-2,
+.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3 ~ .g-col-2 ~ .g-col-1,
+.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3 ~ .g-col-2 ~ .g-col-1 ~ .g-col-2,
+.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3 ~ .g-col-2 ~ .g-col-1 ~ .g-col-2 ~ .g-col-3,
+.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3 ~ .g-col-2 ~ .g-col-1 ~ .g-col-2 ~ .g-col-3 ~ .g-col-1 {
+    background-color: var(--bs-table-striped-bg);
+}

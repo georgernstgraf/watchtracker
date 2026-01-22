@@ -1,144 +1,138 @@
 <!-- #measurements.hbs -->
-<table class="table table-striped table-sm">
+<div class="grid border border-2 px-1 rounded">
     {{> caption}}
-    <thead>
-        <tr>
-            <th scope="col"
-                style="vertical-align: middle">Entry Date</th>
-            <th scope="col"
-                style="vertical-align: middle"
-                class="text-center">Deviation</th>
-            <th scope="col"
-                style="vertical-align: middle"
-                class="text-center">Type</th>
-            <th scope="col"
-                style="vertical-align: middle"
-                class="text-center">Drift</th>
-            <th scope="col"
-                class="w-25"
-                style="vertical-align: middle">Comment</th>
-            <th scope="rowgroup"
-                style="vertical-align: middle; width: 1em">
-                <button title="New Measurement"
-                        id="newMeasurement"
-                        class="btn btn-outline-light btn-sm"
-                        onclick="showMeasurementCreate()"> ＋ </button>
-            </th>
-        </tr>
-        <tr style="display:none"
-            id="measureCreate">
-            <th colspan="6">
-                <form id="unsavedMeasurement-form"
-                      class="my-3 text-center"
-                      hx-post="{{appPath}}/auth/measure/{{watch.id}}"
-                      hx-target="closest table"
-                      hx-swap="outerHTML"
-                      hx-trigger="trigger">
-                    <input id="measureCreateDateTime"
-                           type="datetime-local"
-                           name="createdAt">
-                    <input type="number"
-                           name="value"
-                           placeholder="0"
-                           style="width: 7ch">
-                    <input type="checkbox"
-                           name="isStart"
-                           value="true">
-                    <input type="text"
-                           name="comment"
-                           placeholder="enter comment">
-                    <div class="btn-group">
-                        <button title="Cancel"
-                                class="btn btn-outline-light"
-                                onclick="event.preventDefault(); hideMeasurementCreate()">❌</button>
-                        <button title="Save Record"
-                                class="btn btn-outline-light"
-                                onclick="event.preventDefault(); htmx.trigger('#unsavedMeasurement-form', 'trigger')">💾</button>
-                    </div>
-                </form>
-            </th>
-        </tr>
-    </thead>
-    <tbody>
-        {{#each watch.measurements}}
-            <tr style="display:none"></tr>
-            <tr style="display:none"
-                id="{{id}}-edit"
-                data-id="{{id}}">
-                <td colspan="6">
-                    <form id="{{id}}-form"
-                          class="my-3 text-center"
-                          hx-patch="{{../appPath}}/auth/measure/{{id}}"
-                          hx-target="closest table"
-                          hx-swap="outerHTML"
-                          hx-trigger="trigger">
-                        <input type="datetime-local"
-                               name="createdAt"
-                               value="{{createdAt16}}">
-                        <input type="number"
-                               name="value"
-                               style="width: 7ch"
-                               value="{{value}}"
-                               onfocus="this.select()"
-                               onclick="this.select()">
-                        <input type="checkbox"
-                               name="isStart"
-                               value="true"
-                               {{#if isStart}}checked{{/if}}>
-                        <input type="text"
-                               name="comment"
-                               {{#if comment}}
-                               value="{{comment}}"
-                               {{else}}
-                               placeholder="enter comment"
-                               {{/if}}>
-                        <div class="btn-group">
-                            <button title="delete Record"
-                                    class="btn btn-outline-light"
-                                    hx-delete="{{../appPath}}/auth/measure/{{id}}"
-                                    hx-target="closest table"
-                                    hx-swap="outerHTML"
-                                    onclick="event.preventDefault()">🚮</button>
-                            <button title="cancel Edit"
-                                    class="btn btn-outline-light"
-                                    onclick="event.preventDefault(); editMode('{{id}}', false)">❌</button>
-                            <button title="Save Record"
-                                    class="btn btn-outline-light"
-                                    onclick="event.preventDefault(); htmx.trigger('#{{id}}-form', 'trigger')">💾</button>
-                        </div>
-                    </form>
-                </td>
-            </tr>
-            <tr id="{{id}}-show"
-                data-id="{{id}}">
-                <td style="vertical-align: middle"> {{formatDate createdAt16}} </td>
-                <td class="text-center"
-                    style="vertical-align: middle"> {{value}}s </td>
-                <td class="text-center"
-                    style="vertical-align: middle"> {{#if isStart}} 🎬 {{else}} ⌛ {{/if}} </td>
-                <td class="sekPerDay ps-2 text-center"
-                    style="vertical-align: middle"> {{driftDisplay}} </td>
-                <td style="vertical-align: middle"> {{comment}} </td>
-                <th scope="row"
-                    style="vertical-align: middle">
-                    <button title="Edit Measurement"
-                            class="btn btn-outline-light btn-sm startStop"
-                            onclick="editMode('{{id}}', true)">✏️</button>
-                </th>
-            </tr>
-        {{/each}}
-    </tbody>
-    <tfoot>
-        <tr>
-            {{#if watch.overallMeasure}}
-                <td class="driftSummary text-center text-secondary-emphasis"
-                    colspan="6"> (Duration: {{watch.overallMeasure.durationDays}} Days, Drift: {{watch.overallMeasure.driftSeks}} Sec =>
-                    {{watch.overallMeasure.niceDisplay}}) </td>
-            {{else}}
-                <td class="driftSummary text-center text-secondary-emphasis"
-                    colspan="6">No records yet</td>
-            {{/if}}
-        </tr>
-    </tfoot>
-</table>
+    
+    <!-- Header Row -->
+    <div class="g-col-3 fw-bold">
+        <span class="d-none d-sm-inline">Entry Date</span>
+        <span class="d-inline d-sm-none">Date</span>
+    </div>
+    <div class="g-col-2 fw-bold text-center">
+        <span class="d-none d-sm-inline">Deviation</span>
+        <span class="d-inline d-sm-none">Dev.</span>
+    </div>
+    <div class="g-col-1 fw-bold text-center">
+        <span class="d-none d-sm-inline">Type</span>
+        <span class="d-inline d-sm-none">T</span>
+    </div>
+    <div class="g-col-2 fw-bold text-center d-none d-sm-block">Drift</div>
+    <div class="g-col-3 fw-bold d-none d-sm-block">Comment</div>
+    <div class="g-col-1 fw-bold text-center">
+        <button title="New Measurement"
+                id="newMeasurement"
+                class="btn btn-outline-light btn-sm"
+                onclick="showMeasurementCreate()"> ＋ </button>
+    </div>
+
+    <!-- Create Form Row -->
+    <div style="display:none"
+         id="measureCreate"
+         class="g-col-12">
+        <form id="unsavedMeasurement-form"
+              class="my-3 text-center"
+              hx-post="{{appPath}}/auth/measure/{{watch.id}}"
+              hx-target="closest .grid"
+              hx-swap="outerHTML"
+              hx-trigger="trigger">
+            <input id="measureCreateDateTime"
+                   type="datetime-local"
+                   name="createdAt">
+            <input type="number"
+                   name="value"
+                   placeholder="0"
+                   style="width: 7ch">
+            <input type="checkbox"
+                   name="isStart"
+                   value="true">
+            <input type="text"
+                   name="comment"
+                   placeholder="enter comment">
+            <div class="btn-group">
+                <button title="Cancel"
+                        class="btn btn-outline-light"
+                        onclick="event.preventDefault(); hideMeasurementCreate()">❌</button>
+                <button title="Save Record"
+                        class="btn btn-outline-light"
+                        onclick="event.preventDefault(); htmx.trigger('#unsavedMeasurement-form', 'trigger')">💾</button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Data Rows -->
+    {{#each watch.measurements}}
+        <div style="display:none"></div>
+        
+        <!-- Edit Form Row -->
+        <div style="display:none"
+             id="{{id}}-edit"
+             data-id="{{id}}"
+             class="g-col-12">
+            <form id="{{id}}-form"
+                  class="my-3 text-center"
+                  hx-patch="{{../appPath}}/auth/measure/{{id}}"
+                  hx-target="closest .grid"
+                  hx-swap="outerHTML"
+                  hx-trigger="trigger">
+                <input type="datetime-local"
+                       name="createdAt"
+                       value="{{createdAt16}}">
+                <input type="number"
+                       name="value"
+                       style="width: 7ch"
+                       value="{{value}}"
+                       onfocus="this.select()"
+                       onclick="this.select()">
+                <input type="checkbox"
+                       name="isStart"
+                       value="true"
+                       {{#if isStart}}checked{{/if}}>
+                <input type="text"
+                       name="comment"
+                       {{#if comment}}
+                       value="{{comment}}"
+                       {{else}}
+                       placeholder="enter comment"
+                       {{/if}}>
+                <div class="btn-group">
+                    <button title="delete Record"
+                            class="btn btn-outline-light"
+                            hx-delete="{{../appPath}}/auth/measure/{{id}}"
+                            hx-target="closest .grid"
+                            hx-swap="outerHTML"
+                            onclick="event.preventDefault()">🚮</button>
+                    <button title="cancel Edit"
+                            class="btn btn-outline-light"
+                            onclick="event.preventDefault(); editMode('{{id}}', false)">❌</button>
+                    <button title="Save Record"
+                            class="btn btn-outline-light"
+                            onclick="event.preventDefault(); htmx.trigger('#{{id}}-form', 'trigger')">💾</button>
+                </div>
+            </form>
+        </div>
+        
+        <!-- Show Row -->
+        <div id="{{id}}-show"
+             data-id="{{id}}"
+             class="g-col-3"> {{formatDate createdAt16}} </div>
+        <div class="g-col-2 text-center"> {{value}}s </div>
+        <div class="g-col-1 text-center"> {{#if isStart}} 🎬 {{else}} ⌛ {{/if}} </div>
+        <div class="g-col-2 sekPerDay ps-2 text-center d-none d-sm-block"> {{driftDisplay}} </div>
+        <div class="g-col-3 d-none d-sm-block"> {{comment}} </div>
+        <div class="g-col-1 text-center">
+            <button title="Edit Measurement"
+                    class="btn btn-outline-light btn-sm startStop"
+                    onclick="editMode('{{id}}', true)">✏️</button>
+        </div>
+    {{/each}}
+
+    <!-- Footer Row -->
+    <div class="g-col-12 driftSummary text-center text-secondary-emphasis mt-2">
+        {{#if watch.overallMeasure}}
+            (Duration: {{watch.overallMeasure.durationDays}} Days, Drift: {{watch.overallMeasure.driftSeks}} Sec =>
+            {{watch.overallMeasure.niceDisplay}})
+        {{else}}
+            No records yet
+        {{/if}}
+    </div>
+</div>
 <!-- /measurements.hbs -->
