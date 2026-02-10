@@ -1,55 +1,49 @@
 <!-- #navProfile.hbs -->
-<nav id='profile'
-     class="mb-2">
-    <div class="d-flex justify-content-end align-items-baseline gap-2 mb-2">
-        <span id='profileUsername'> User: {{user.name}}
-        </span>
-        <form hx-post='{{appPath}}/logout'
-              hx-target='body'>
-            <button id='profileLogoutButton'
-                    class='logout btn btn-outline-light'
-                    title="Log Out">logout</button>
-        </form>
-    </div>
-    <div id='timeZoneDisplay'
-         class="d-flex justify-content-end align-items-baseline gap-2">
-        <p> {{user.timeZone}} </p>
-        <button title='Switch Timezone'
-                class='startStop btn btn-outline-light'
-                onclick='editTimezone()'>✏️</button>
-    </div>
-    <div id='timeZoneEdit'
-         class="justify-content-end align-items-baseline gap-2"
-         style="display: none">
-        <form onsubmit='return false;'
-              hx-patch='{{appPath}}/auth/user'
-              hx-target='body'
-              id='timeZoneSelectForm'
-              hx-trigger='trigger'
-              hx-swap='outerHTML'>
-            <label for='timeZoneSelector'>My Timezone: </label>
-            <input id='timeZoneSelector'
-                   list='timeZoneList'
-                   name='timeZone'
-                   placeholder='{{user.timeZone}}' />
-            <datalist id='timeZoneList'
-                      style='display: none;'>
-                {{#each timeZones}}
-                    <option value='{{this}}'>
-                        {{this}}
-                    </option>
-                {{/each}}
-            </datalist>
-        </form>
-        <div class="btn-group"
-             role="group">
-            <button title='Cancel'
-                    class="btn btn-outline-light"
-                    onclick='editTimezone(false)'>❌</button>
-            <button title='Done'
-                    class="btn btn-outline-light"
-                    class='startStop'
-                    onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)">💾</button>
+<nav id='profile' class="mb-3">
+    <div class="d-flex justify-content-between align-items-center">
+        <h1 class="mb-0">Watchtracker</h1>
+        <div class="d-flex align-items-center gap-3">
+            <span id='profileUsername'>User: {{user.name}}</span>
+            <div id='timeZoneDisplay' class="d-flex align-items-center gap-1">
+                <small>{{user.timeZone}}</small>
+                <button title='Switch Timezone'
+                        class='btn btn-outline-light btn-sm py-0 px-1'
+                        onclick='editTimezone()'>✏️</button>
+            </div>
+            <div id='timeZoneEdit'
+                 class="d-flex align-items-center gap-2"
+                 style="display: none">
+                <form onsubmit='return false;'
+                      hx-patch='{{appPath}}/auth/user'
+                      hx-target='body'
+                      id='timeZoneSelectForm'
+                      hx-trigger='trigger'
+                      hx-swap='outerHTML'>
+                    <input id='timeZoneSelector'
+                           list='timeZoneList'
+                           name='timeZone'
+                           placeholder='{{user.timeZone}}'
+                           class="form-control form-control-sm bg-dark text-light border-secondary"
+                           style="width: 140px;" />
+                    <datalist id='timeZoneList' style='display: none;'>
+                        {{#each timeZones}}
+                            <option value='{{this}}'>{{this}}</option>
+                        {{/each}}
+                    </datalist>
+                </form>
+                <div class="btn-group btn-group-sm" role="group">
+                    <button title='Cancel'
+                            class="btn btn-outline-light py-0"
+                            onclick='editTimezone(false)'>❌</button>
+                    <button title='Done'
+                            class="btn btn-outline-light py-0"
+                            onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)">💾</button>
+                </div>
+            </div>
+            <form hx-post='{{appPath}}/logout' hx-target='body'>
+                <button id='profileLogoutButton'
+                        class='btn btn-outline-light btn-sm'>logout</button>
+            </form>
         </div>
     </div>
 </nav>

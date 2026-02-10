@@ -1,37 +1,35 @@
 <!-- #userwatches.hbs -->
 <div id='userWatches'>
     <!-- Sort Controls -->
-    <div class="d-flex justify-content-end mb-2">
-        <div class="btn-group btn-group-sm" role="group">
-            <button type="button"
-                    class="btn btn-outline-light {{#if (eq sortBy "recent_desc")}}active{{/if}}"
-                    hx-get="{{appPath}}/auth/watches?sort=recent_desc"
-                    hx-target="#userWatches"
-                    hx-swap="outerHTML">
-                Recent ↓
-            </button>
-            <button type="button"
-                    class="btn btn-outline-light {{#if (eq sortBy "recent_asc")}}active{{/if}}"
-                    hx-get="{{appPath}}/auth/watches?sort=recent_asc"
-                    hx-target="#userWatches"
-                    hx-swap="outerHTML">
-                Recent ↑
-            </button>
-            <button type="button"
-                    class="btn btn-outline-light {{#if (eq sortBy "precise_asc")}}active{{/if}}"
-                    hx-get="{{appPath}}/auth/watches?sort=precise_asc"
-                    hx-target="#userWatches"
-                    hx-swap="outerHTML">
-                Precise ↑
-            </button>
-            <button type="button"
-                    class="btn btn-outline-light {{#if (eq sortBy "precise_desc")}}active{{/if}}"
-                    hx-get="{{appPath}}/auth/watches?sort=precise_desc"
-                    hx-target="#userWatches"
-                    hx-swap="outerHTML">
-                Precise ↓
-            </button>
-        </div>
+    <div class="d-flex justify-content-between mb-2">
+        <button type="button"
+                class="btn btn-outline-light btn-sm {{#if (eq sortBy "recent_desc")}}active{{/if}}"
+                hx-get="{{appPath}}/auth/watches?sort=recent_desc"
+                hx-target="#userWatches"
+                hx-swap="outerHTML">
+            Recent ↓
+        </button>
+        <button type="button"
+                class="btn btn-outline-light btn-sm {{#if (eq sortBy "recent_asc")}}active{{/if}}"
+                hx-get="{{appPath}}/auth/watches?sort=recent_asc"
+                hx-target="#userWatches"
+                hx-swap="outerHTML">
+            Recent ↑
+        </button>
+        <button type="button"
+                class="btn btn-outline-light btn-sm {{#if (eq sortBy "precise_asc")}}active{{/if}}"
+                hx-get="{{appPath}}/auth/watches?sort=precise_asc"
+                hx-target="#userWatches"
+                hx-swap="outerHTML">
+            Precise ↑
+        </button>
+        <button type="button"
+                class="btn btn-outline-light btn-sm {{#if (eq sortBy "precise_desc")}}active{{/if}}"
+                hx-get="{{appPath}}/auth/watches?sort=precise_desc"
+                hx-target="#userWatches"
+                hx-swap="outerHTML">
+            Precise ↓
+        </button>
     </div>
     <!-- Watch Cards Grid -->
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mb-3">
