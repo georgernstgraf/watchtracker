@@ -42,3 +42,6 @@ body {
 .grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3 ~ .g-col-2 ~ .g-col-1 ~ .g-col-2 ~ .g-col-3 ~ .g-col-1 {
     background-color: var(--bs-table-striped-bg);
 }
+
+/* Hide elements with x-cloak until Alpine loads */
+[x-cloak] { display: none !important; }

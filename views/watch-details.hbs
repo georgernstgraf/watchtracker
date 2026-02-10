@@ -1,5 +1,74 @@
 <!-- #watch-details.hbs -->
-<div id="watchDetails">
+<div id="watchDetails"
+     x-data="{
+         editing: false,
+         selectedImageFile: null,
+         imagePreview: null,
+         imageError: '',
+         init() {
+             $watch('selectedImageFile', (file) => {
+                 if (file) {
+                     const reader = new FileReader();
+                     reader.onload = (e) => {
+                         const img = new Image();
+                         img.onload = () => {
+                             const tolerance = 0.01;
+                             const ratio = img.width / img.height;
+                             if (Math.abs(ratio - 1) > tolerance) {
+                                 this.imageError = 'Image must be square. Got ' + img.width + 'x' + img.height;
+                                 this.selectedImageFile = null;
+                                 this.imagePreview = null;
+                                 this.$refs.imageInput.value = '';
+                             } else {
+                                 this.imageError = '';
+                                 this.imagePreview = e.target.result;
+                             }
+                         };
+                         img.src = e.target.result;
+                     };
+                     reader.readAsDataURL(file);
+                 }
+             });
+         },
+         clearImagePreview() {
+             this.selectedImageFile = null;
+             this.imagePreview = null;
+             this.imageError = '';
+             this.$refs.imageInput.value = '';
+         },
+         toggleEdit(show) {
+             this.editing = show;
+             if (!show) {
+                 this.clearImagePreview();
+             }
+         },
+         async saveDetails() {
+             const form = this.$refs.watchForm;
+             const formData = new FormData(form);
+             if (this.selectedImageFile) {
+                 formData.set('image', this.selectedImageFile);
+             }
+             try {
+                 const response = await fetch(form.getAttribute('hx-patch'), {
+                     method: 'PATCH',
+                     body: formData
+                 });
+                 if (response.ok) {
+                     const html = await response.text();
+                     const mainContent = document.getElementById('mainContent');
+                     mainContent.innerHTML = html;
+                     mainContent.querySelectorAll('[hx-get], [hx-post], [hx-put], [hx-patch], [hx-delete]').forEach(el => {
+                         htmx.process(el);
+                     });
+                 } else {
+                     const error = await response.text();
+                     this.imageError = error || 'Failed to save';
+                 }
+             } catch (err) {
+                 this.imageError = 'Error: ' + err.message;
+             }
+         }
+     }">
     <!-- Back Button -->
     <div class="mb-3">
         <button class="btn btn-outline-light"
@@ -16,7 +85,7 @@
             <!-- Watch Image -->
             <div class="col-md-4">
                 <!-- Normal View -->
-                <div id="watchImage-normal">
+                <div x-show="!editing">
                     {{#if watch.image}}
                     <img src="data:image/jpeg;base64,{{toBase64 watch.image}}" 
                          class="img-fluid rounded-start" 
@@ -29,30 +98,33 @@
                     </div>
                     {{/if}}
                 </div>
-                <!-- Edit View (hidden) -->
-                <div id="watchImage-edit" style="display: none;">
+                <!-- Edit View -->
+                <div x-show="editing" x-cloak>
                     <div class="position-relative ratio ratio-1x1">
-                        <div id="imagePreview-container" class="d-flex align-items-center justify-content-center bg-secondary rounded-start">
-                            <span class="text-muted" id="imagePreview-placeholder">No image selected</span>
-                            <img id="imagePreview" src="" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
+                        <div class="d-flex align-items-center justify-content-center bg-secondary rounded-start">
+                            <template x-if="!imagePreview">
+                                <span class="text-muted">No image selected</span>
+                            </template>
+                            <template x-if="imagePreview">
+                                <img :src="imagePreview" alt="Preview" class="w-100 h-100" style="object-fit: cover;">
+                            </template>
                         </div>
                     </div>
                     <input type="file" 
-                           id="imageInput" 
-                           name="image" 
+                           x-ref="imageInput"
                            accept="image/jpeg,image/png,image/webp"
-                           class="d-none">
+                           class="d-none"
+                           @change="selectedImageFile = $event.target.files[0]">
                     <div class="mt-2 text-center">
                         <button type="button" 
                                 class="btn btn-outline-light btn-sm"
-                                onclick="document.getElementById('imageInput').click()">
+                                @click="$refs.imageInput.click()">
                             📷 Choose Image
                         </button>
                         <button type="button" 
                                 class="btn btn-outline-warning btn-sm ms-1"
-                                onclick="clearImagePreview()"
-                                id="clearImageBtn"
-                                style="display: none;">
+                                x-show="imagePreview"
+                                @click="clearImagePreview()">
                             ✕ Clear
                         </button>
                     </div>
@@ -63,7 +135,7 @@
             <div class="col-md-8">
                 <div class="card-body">
                     <!-- Normal View -->
-                    <div id="watchInfo-normal">
+                    <div x-show="!editing">
                         <h2 class="card-title text-light">{{watch.name}}</h2>
                         {{#if watch.comment}}
                         <p class="card-text text-muted">{{watch.comment}}</p>
@@ -77,14 +149,14 @@
                         </div>
                         {{/if}}
                         <button class="btn btn-outline-light mt-3" 
-                                onclick="toggleWatchEdit(true)"
+                                @click="toggleEdit(true)"
                                 title="Edit Name, Comment and Image">
                             ✏️ Edit
                         </button>
                     </div>
-                    <!-- Edit View (hidden) -->
-                    <div id="watchInfo-edit" style="display: none;">
-                        <form id="patchWatchDetails"
+                    <!-- Edit View -->
+                    <div x-show="editing" x-cloak>
+                        <form x-ref="watchForm"
                               hx-patch="{{appPath}}/auth/watch/{{watch.id}}"
                               hx-encoding="multipart/form-data"
                               hx-trigger="trigger"
@@ -106,12 +178,12 @@
                         <div class="btn-group mt-2">
                             <button class="btn btn-outline-light"
                                     title="Cancel Edit"
-                                    onclick="toggleWatchEdit(false)">❌ Cancel</button>
+                                    @click="toggleEdit(false)">❌ Cancel</button>
                             <button class="btn btn-outline-light"
                                     title="Save"
-                                    onclick="saveWatchDetails()">💾 Save</button>
+                                    @click="saveDetails()">💾 Save</button>
                         </div>
-                        <div id="imageError" class="alert alert-danger mt-2" style="display: none;"></div>
+                        <div x-show="imageError" class="alert alert-danger mt-2" x-text="imageError"></div>
                     </div>
                 </div>
             </div>
@@ -123,97 +195,4 @@
         {{> measurements}}
     </div>
 </div>
-
-<script>
-let selectedImageFile = null;
-
-function toggleWatchEdit(show) {
-    document.getElementById('watchImage-normal').style.display = show ? 'none' : 'block';
-    document.getElementById('watchImage-edit').style.display = show ? 'block' : 'none';
-    document.getElementById('watchInfo-normal').style.display = show ? 'none' : 'block';
-    document.getElementById('watchInfo-edit').style.display = show ? 'block' : 'none';
-    document.getElementById('imageError').style.display = 'none';
-    
-    if (!show) {
-        clearImagePreview();
-    }
-}
-
-function clearImagePreview() {
-    selectedImageFile = null;
-    document.getElementById('imageInput').value = '';
-    document.getElementById('imagePreview').classList.add('d-none');
-    document.getElementById('imagePreview-placeholder').classList.remove('d-none');
-    document.getElementById('imagePreview-placeholder').textContent = 'No image selected';
-    document.getElementById('clearImageBtn').style.display = 'none';
-}
-
-document.getElementById('imageInput').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const img = new Image();
-    const reader = new FileReader();
-    
-    reader.onload = function(event) {
-        img.src = event.target.result;
-        img.onload = function() {
-            const tolerance = 0.01;
-            const ratio = img.width / img.height;
-            
-            if (Math.abs(ratio - 1) > tolerance) {
-                document.getElementById('imageError').textContent = 
-                    `Image must be square. Got ${img.width}x${img.height}`;
-                document.getElementById('imageError').style.display = 'block';
-                e.target.value = '';
-                return;
-            }
-            
-            document.getElementById('imageError').style.display = 'none';
-            selectedImageFile = file;
-            
-            const preview = document.getElementById('imagePreview');
-            preview.src = event.target.result;
-            preview.classList.remove('d-none');
-            document.getElementById('imagePreview-placeholder').classList.add('d-none');
-            document.getElementById('clearImageBtn').style.display = 'inline-block';
-        };
-    };
-    
-    reader.readAsDataURL(file);
-});
-
-async function saveWatchDetails() {
-    const form = document.getElementById('patchWatchDetails');
-    const formData = new FormData(form);
-    
-    if (selectedImageFile) {
-        formData.set('image', selectedImageFile);
-    }
-    
-    const errorDiv = document.getElementById('imageError');
-    
-    try {
-        const response = await fetch(form.getAttribute('hx-patch'), {
-            method: 'PATCH',
-            body: formData
-        });
-        
-        if (response.ok) {
-            const html = await response.text();
-            const mainContent = document.getElementById('mainContent');
-            mainContent.innerHTML = html;
-            // Process HTMX attributes in the new content
-            htmx.process(mainContent);
-        } else {
-            const error = await response.text();
-            errorDiv.textContent = error || 'Failed to save';
-            errorDiv.style.display = 'block';
-        }
-    } catch (err) {
-        errorDiv.textContent = 'Error: ' + err.message;
-        errorDiv.style.display = 'block';
-    }
-}
-</script>
 <!-- /watch-details.hbs -->
