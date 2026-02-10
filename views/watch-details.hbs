@@ -201,7 +201,10 @@ async function saveWatchDetails() {
         
         if (response.ok) {
             const html = await response.text();
-            document.getElementById('mainContent').innerHTML = html;
+            const mainContent = document.getElementById('mainContent');
+            mainContent.innerHTML = html;
+            // Process HTMX attributes in the new content
+            htmx.process(mainContent);
         } else {
             const error = await response.text();
             errorDiv.textContent = error || 'Failed to save';
