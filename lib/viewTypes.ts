@@ -50,10 +50,6 @@ export interface MeasurementsViewData extends BaseRenderData {
     watch: EnrichedWatch;
 }
 
-export interface CaptionViewData extends BaseRenderData {
-    watch: EnrichedWatch | null;
-}
-
 export interface AllButHeadAndFootData extends BaseRenderData {
     userWatches: Watch[];
     watch: EnrichedWatch | null;

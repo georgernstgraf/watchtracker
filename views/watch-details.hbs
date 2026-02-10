@@ -71,7 +71,7 @@
      }">
     <!-- Back Button -->
     <div class="mb-3">
-        <button class="btn btn-outline-light"
+        <button class="btn btn-outline-light btn-sm"
                 hx-get='{{appPath}}/auth/watches'
                 hx-target='#mainContent'
                 hx-swap='innerHTML'>
@@ -79,120 +79,121 @@
         </button>
     </div>
 
-    <!-- Watch Info Header -->
-    <div class="card bg-dark border-light mb-3">
-        <div class="row g-0">
-            <!-- Watch Image -->
-            <div class="col-md-4">
+    <div class="row g-3">
+        <!-- Left Column: Watch Image (sticky on desktop) -->
+        <div class="col-12 col-md-5 col-lg-5">
+            <div class="position-sticky top-0 pt-2">
                 <!-- Normal View -->
                 <div x-show="!editing">
                     {{#if watch.image}}
-                    <img src="data:image/jpeg;base64,{{toBase64 watch.image}}" 
-                         class="img-fluid rounded-start" 
+                    <img src="data:image/jpeg;base64,{{toBase64 watch.image}}"
+                         class="img-fluid w-100"
                          alt="{{watch.name}}"
-                         style="aspect-ratio: 1/1; object-fit: cover;">
+                         style="max-height: 90vh; object-fit: cover; -webkit-mask-image: radial-gradient(circle, black 50%, transparent 71%); mask-image: radial-gradient(circle, black 50%, transparent 71%);">
                     {{else}}
-                    <div class="d-flex align-items-center justify-content-center h-100 rounded-start"
-                         style="aspect-ratio: 1/1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <div class="d-flex align-items-center justify-content-center"
+                         style="max-height: 90vh; aspect-ratio: 1/1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-mask-image: radial-gradient(circle, black 50%, transparent 71%); mask-image: radial-gradient(circle, black 50%, transparent 71%);">
                         <span class="display-1 text-white fw-bold">{{getInitials watch.name}}</span>
                     </div>
                     {{/if}}
                 </div>
                 <!-- Edit View -->
                 <div x-show="editing" x-cloak>
-                    <div class="position-relative ratio ratio-1x1">
-                        <div class="d-flex align-items-center justify-content-center bg-secondary rounded-start">
+                    <div class="ratio ratio-1x1">
+                        <div class="d-flex align-items-center justify-content-center bg-secondary rounded">
                             <template x-if="!imagePreview">
                                 <span class="text-muted">No image selected</span>
                             </template>
                             <template x-if="imagePreview">
-                                <img :src="imagePreview" alt="Preview" class="w-100 h-100" style="object-fit: cover;">
+                                <img :src="imagePreview" alt="Preview" class="w-100 h-100 rounded" style="object-fit: cover;">
                             </template>
                         </div>
                     </div>
-                    <input type="file" 
+                    <input type="file"
                            x-ref="imageInput"
                            accept="image/jpeg,image/png,image/webp"
                            class="d-none"
                            @change="selectedImageFile = $event.target.files[0]">
                     <div class="mt-2 text-center">
-                        <button type="button" 
+                        <button type="button"
                                 class="btn btn-outline-light btn-sm"
                                 @click="$refs.imageInput.click()">
-                            📷 Choose Image
+                            Choose Image
                         </button>
-                        <button type="button" 
+                        <button type="button"
                                 class="btn btn-outline-warning btn-sm ms-1"
                                 x-show="imagePreview"
                                 @click="clearImagePreview()">
-                            ✕ Clear
+                            Clear
                         </button>
                     </div>
                     <small class="text-muted d-block text-center mt-1">Square image required</small>
                 </div>
             </div>
-            <!-- Watch Info -->
-            <div class="col-md-8">
-                <div class="card-body">
-                    <!-- Normal View -->
-                    <div x-show="!editing">
-                        <h2 class="card-title text-light">{{watch.name}}</h2>
+        </div>
+
+        <!-- Right Column: Watch Info + Measurements -->
+        <div class="col-12 col-md-7 col-lg-7">
+            <!-- Watch Name/Comment Card -->
+            <div class="card bg-dark border-secondary mb-3" x-show="!editing">
+                <div class="card-body py-2">
+                    <h5 class="card-title text-light mb-0">{{watch.name}}</h5>
+                    <div class="d-flex align-items-center gap-2">
                         {{#if watch.comment}}
-                        <p class="card-text text-muted">{{watch.comment}}</p>
+                        <small class="text-muted">{{watch.comment}}</small>
                         {{/if}}
                         {{#if watch.overallMeasure}}
-                        <div class="mt-3">
-                            <span class="badge bg-info">{{watch.overallMeasure.niceDisplay}}</span>
-                            <small class="text-muted ms-2">
-                                Over {{watch.overallMeasure.durationDays}} days
-                            </small>
-                        </div>
+                        <small class="text-muted">{{watch.overallMeasure.durationDays}} days</small>
+                        <small class="text-muted">· {{watch.overallMeasure.niceDisplay}}</small>
                         {{/if}}
-                        <button class="btn btn-outline-light mt-3" 
+                        <button class="btn btn-outline-light btn-sm ms-auto py-0 px-1"
                                 @click="toggleEdit(true)"
                                 title="Edit Name, Comment and Image">
-                            ✏️ Edit
+                            ✏️
                         </button>
-                    </div>
-                    <!-- Edit View -->
-                    <div x-show="editing" x-cloak>
-                        <form x-ref="watchForm"
-                              hx-patch="{{appPath}}/auth/watch/{{watch.id}}"
-                              hx-encoding="multipart/form-data"
-                              hx-trigger="trigger"
-                              hx-target="#mainContent"
-                              hx-swap="innerHTML">
-                            <input type="text"
-                                   name="name"
-                                   value="{{watch.name}}"
-                                   class="form-control bg-dark text-light border-light mb-2">
-                            <input type="text"
-                                   name="comment"
-                                   {{#if watch.comment}}
-                                   value="{{watch.comment}}"
-                                   {{else}}
-                                   placeholder="Enter comment"
-                                   {{/if}}
-                                   class="form-control bg-dark text-light border-light mb-2">
-                        </form>
-                        <div class="btn-group mt-2">
-                            <button class="btn btn-outline-light"
-                                    title="Cancel Edit"
-                                    @click="toggleEdit(false)">❌ Cancel</button>
-                            <button class="btn btn-outline-light"
-                                    title="Save"
-                                    @click="saveDetails()">💾 Save</button>
-                        </div>
-                        <div x-show="imageError" class="alert alert-danger mt-2" x-text="imageError"></div>
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 
-    <!-- Measurements Section -->
-    <div id="measurements" class="border border-2 px-1 rounded">
-        {{> measurements}}
+            <!-- Edit Card -->
+            <div class="card bg-dark border-secondary mb-3" x-show="editing" x-cloak>
+                <div class="card-body">
+                    <form x-ref="watchForm"
+                          hx-patch="{{appPath}}/auth/watch/{{watch.id}}"
+                          hx-encoding="multipart/form-data"
+                          hx-trigger="trigger"
+                          hx-target="#mainContent"
+                          hx-swap="innerHTML">
+                        <input type="text"
+                               name="name"
+                               value="{{watch.name}}"
+                               class="form-control form-control-sm bg-dark text-light border-light mb-2">
+                        <input type="text"
+                               name="comment"
+                               {{#if watch.comment}}
+                               value="{{watch.comment}}"
+                               {{else}}
+                               placeholder="Enter comment"
+                               {{/if}}
+                               class="form-control form-control-sm bg-dark text-light border-light mb-2">
+                    </form>
+                    <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-light"
+                                title="Cancel Edit"
+                                @click="toggleEdit(false)">Cancel</button>
+                        <button class="btn btn-outline-light"
+                                title="Save"
+                                @click="saveDetails()">Save</button>
+                    </div>
+                    <div x-show="imageError" class="alert alert-danger mt-2 py-1" x-text="imageError"></div>
+                </div>
+            </div>
+
+            <!-- Measurements Section -->
+            <div id="measurements">
+                {{> measurements}}
+            </div>
+        </div>
     </div>
 </div>
 <!-- /watch-details.hbs -->

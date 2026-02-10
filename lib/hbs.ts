@@ -112,6 +112,22 @@ hbs.registerHelper("toBase64", function (bytes: Uint8Array | null | undefined) {
     return btoa(binary);
 });
 
+hbs.registerHelper("deviationColor", function (value: number) {
+    if (value > 0) return "text-success";
+    if (value < 0) return "text-danger";
+    return "text-light";
+});
+
+hbs.registerHelper("deviationArrow", function (value: number) {
+    if (value > 0) return new hbs.SafeString("&#8593;"); // ↑
+    if (value < 0) return new hbs.SafeString("&#8595;"); // ↓
+    return "";
+});
+
+hbs.registerHelper("abs", function (value: number) {
+    return Math.abs(value);
+});
+
 try {
     await loadTemplates();
     console.log(`HBS: Templates loaded successfully:, ${JSON.stringify([...map.keys()])}`);

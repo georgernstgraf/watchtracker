@@ -39,10 +39,6 @@ export function renderMeasurements(data: ViewInput<types.MeasurementsViewData>):
     return render<types.MeasurementsViewData>("measurements", merge(data));
 }
 
-export function renderCaption(data: ViewInput<types.CaptionViewData>): string {
-    return render<types.CaptionViewData>("caption", merge(data));
-}
-
 export function renderAllButHeadAndFoot(data: ViewInput<types.AllButHeadAndFootData>): string {
     return render<types.AllButHeadAndFootData>("allButHeadAndFoot", merge(data));
 }

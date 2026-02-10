@@ -2,8 +2,7 @@ form>* {
     margin: 0 .5ch;
 }
 
-html,
-body {
+html {
     overflow-x: hidden;
 }
 

@@ -43,29 +43,7 @@ function editMode(eltId, on = false) {
         show$.style.display = "";
     }
 }
-function captionStyle(style) {
-    const normal$ = document.getElementById("caption-normal");
-    const edit$ = document.getElementById("caption-edit");
-    switch (style) {
-        case "normal": {
-            normal$.style.display = "";
-            normal$.classList.add("d-flex");
-            edit$.style.display = "none";
-            edit$.classList.remove("d-flex");
-            break;
-        }
-        case "edit": {
-            normal$.style.display = "none";
-            normal$.classList.remove("d-flex");
-            edit$.style.display = "";
-            edit$.classList.add("d-flex");
-            break;
-        }
-        default: {
-            throw new Error("this caption Style not implemented");
-        }
-    }
-}
+
 function watchCreateDisplay(yes = true) {
     const btn$ = document.getElementById('watchCreateBtn');
     const form$ = document.getElementById('watchCreateForm');
