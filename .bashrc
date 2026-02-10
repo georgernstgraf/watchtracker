@@ -1,2 +1,0 @@
-alias prisma='npx prisma'
-

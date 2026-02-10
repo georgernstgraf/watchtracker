@@ -11,13 +11,14 @@ WatchTracker is a Deno-based web application using Hono, Prisma, and HTMX. The p
 - **Deno Adoption:** Modern use of Deno with built-in task management and TypeScript support.
 - **Data Safety:** Ownership verification (checking if a watch belongs to a user before operations) is consistently applied.
 
-## Recent Fixes (Issues #68, #54, #69, #70)
+## Recent Fixes (Issues #68, #54, #69, #70, #85)
 
 - **Routing & Static Files:** Fixed critical bugs in middleware path matching and static asset serving.
 - **Session Management:** Fixed a Memcached TTL bug that caused sessions to expire prematurely.
 - **UX Improvements:** Optimized the deviation input field with a placeholder-based approach, avoiding "0" prepending issues.
 - **Data Enrichment:** Fixed "NaN" date display bugs by ensuring consistent enrichment of database records with human-readable timestamps (`createdAt16`) before rendering.
 - **Watch Selector:** Restored functionality by ensuring the correct watch data is fetched and enriched during selector-triggered requests.
+- **Watch Grid Sorting (Issue #85):** Added sortable watch grid with options: Recent (asc/desc), Precise (asc/desc). Watch cards now display precision, days measured, and last used date.
 
 ## Areas for Improvement
 
@@ -46,4 +47,4 @@ WatchTracker is a Deno-based web application using Hono, Prisma, and HTMX. The p
 3. **Enhance `deno.json`:** Add more exhaustive linting rules and potentially a `test` task once unit tests are implemented.
 
 ---
-*Review conducted on 2026-01-22*
+*Review conducted on 2026-01-22, updated 2026-02-10*
