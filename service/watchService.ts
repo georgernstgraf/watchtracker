@@ -7,10 +7,11 @@ import { TimeZone } from "../lib/timeZone.ts";
 import type { Measurement, Prisma, Watch } from "generated-prisma-client";
 import type { EnrichedWatch, EnrichedMeasurement } from "../lib/viewTypes.ts";
 
-// Type for Watch with measurements included from Prisma queries
 interface WatchWithMeasurements extends Watch {
     measurements: Measurement[];
 }
+
+export type SortOption = "recent" | "precise_asc" | "precise_desc";
 
 export class WatchService {
     /**
@@ -68,6 +69,54 @@ export class WatchService {
      */
     static async getUserWatchesByUname(username: string): Promise<Watch[]> {
         return await WatchRepository.findByUsername(username);
+    }
+
+    /**
+     * Get all watches for a user name with sorting
+     */
+    static async getUserWatchesSorted(username: string, sortBy: SortOption = "recent"): Promise<Watch[]> {
+        const watches = await WatchRepository.findByUsernameWithAllMeasurements(username);
+        const watchesWithMeasurements = watches as WatchWithMeasurements[];
+
+        switch (sortBy) {
+            case "recent":
+                return watchesWithMeasurements.sort((a, b) => {
+                    const aLatest = a.measurements.length > 0
+                        ? new Date(a.measurements[a.measurements.length - 1].createdAt).getTime()
+                        : 0;
+                    const bLatest = b.measurements.length > 0
+                        ? new Date(b.measurements[b.measurements.length - 1].createdAt).getTime()
+                        : 0;
+                    return bLatest - aLatest;
+                });
+            case "precise_asc":
+            case "precise_desc":
+                return watchesWithMeasurements.sort((a, b) => {
+                    const aDrift = this.calculateAbsoluteDrift(a);
+                    const bDrift = this.calculateAbsoluteDrift(b);
+                    return sortBy === "precise_asc" ? aDrift - bDrift : bDrift - aDrift;
+                });
+            default:
+                return watches;
+        }
+    }
+
+    /**
+     * Calculate the absolute overall drift for a watch
+     */
+    private static calculateAbsoluteDrift(watch: WatchWithMeasurements): number {
+        const measurements = watch.measurements;
+        if (measurements.length < 2) return Infinity;
+
+        const enrichedMeasurements = measurements.map((m) => ({
+            ...m,
+            createdAt16: "",
+            driftDisplay: "n/a",
+            driftMath: undefined,
+        })) as EnrichedMeasurement[];
+
+        const overallMeasure = MeasurementService.calculateDrifts(enrichedMeasurements);
+        return overallMeasure ? Math.abs(overallMeasure.driftSeks) : Infinity;
     }
 
     /**

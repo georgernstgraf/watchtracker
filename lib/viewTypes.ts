@@ -76,6 +76,7 @@ export interface NavProfileData extends BaseRenderData {
 // UserWatchesData - for userwatches.hbs
 export interface UserWatchesData extends BaseRenderData {
     userWatches: Watch[];
+    sortBy?: string;
 }
 
 // WatchDetailsViewData - for watch-details.hbs

@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer";
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { UserService, WatchService } from "../service/index.ts";
+import { UserService, WatchService, type SortOption } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
 import { renderAllButHeadAndFoot, renderWatchDetails, renderUserWatches } from "../lib/views.ts";
 import { authRouter } from "../routers/authRouter.ts";
@@ -13,8 +13,9 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
     watchRouter.get(`/watches`, async (c) => {
         const session = c.get("session");
         const username = session.username!;
-        const userWatches = await WatchService.getUserWatchesByUname(username);
-        return c.html(renderUserWatches({ userWatches }));
+        const sortBy = (c.req.query("sort") as SortOption) || "recent";
+        const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
+        return c.html(renderUserWatches({ userWatches, sortBy }));
     });
 
     // GET /auth/watch - Legacy route with query param

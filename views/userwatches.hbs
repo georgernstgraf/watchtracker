@@ -1,5 +1,31 @@
 <!-- #userwatches.hbs -->
 <div id='userWatches'>
+    <!-- Sort Controls -->
+    <div class="d-flex justify-content-end mb-2">
+        <div class="btn-group btn-group-sm" role="group">
+            <button type="button"
+                    class="btn btn-outline-light {{#if (eq sortBy "recent")}}active{{/if}}"
+                    hx-get="{{appPath}}/auth/watches?sort=recent"
+                    hx-target="#userWatches"
+                    hx-swap="outerHTML">
+                Recent
+            </button>
+            <button type="button"
+                    class="btn btn-outline-light {{#if (eq sortBy "precise_asc")}}active{{/if}}"
+                    hx-get="{{appPath}}/auth/watches?sort=precise_asc"
+                    hx-target="#userWatches"
+                    hx-swap="outerHTML">
+                Precise ↑
+            </button>
+            <button type="button"
+                    class="btn btn-outline-light {{#if (eq sortBy "precise_desc")}}active{{/if}}"
+                    hx-get="{{appPath}}/auth/watches?sort=precise_desc"
+                    hx-target="#userWatches"
+                    hx-swap="outerHTML">
+                Precise ↓
+            </button>
+        </div>
+    </div>
     <!-- Watch Cards Grid -->
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mb-3">
         {{#each userWatches}}

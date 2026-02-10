@@ -129,6 +129,24 @@ export class WatchRepository {
     }
 
     /**
+     * Find watches by user name with all measurements for sorting
+     */
+    static async findByUsernameWithAllMeasurements(name: string): Promise<Watch[]> {
+        return await prisma.watch.findMany({
+            where: {
+                user: {
+                    name,
+                },
+            },
+            include: {
+                measurements: {
+                    orderBy: { createdAt: "asc" },
+                },
+            },
+        });
+    }
+
+    /**
      * Find watches by user name
      */
     static async findByUsername(name: string): Promise<Watch[]> {
