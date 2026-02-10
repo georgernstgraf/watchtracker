@@ -2,7 +2,6 @@
 CREATE TABLE "User" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "name" TEXT NOT NULL,
-    "tzOffset" INTEGER NOT NULL DEFAULT 120,
     "timeZone" TEXT NOT NULL DEFAULT 'UTC'
 );
 
@@ -22,7 +21,7 @@ CREATE TABLE "Measurement" (
     "id" TEXT NOT NULL PRIMARY KEY,
     "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "value" INTEGER NOT NULL,
-    "isStart" BOOLEAN NOT NULL,
+    "isStart" BOOLEAN NOT NULL DEFAULT false,
     "comment" TEXT,
     "watchId" TEXT NOT NULL,
     CONSTRAINT "Measurement_watchId_fkey" FOREIGN KEY ("watchId") REFERENCES "Watch" ("id") ON DELETE CASCADE ON UPDATE CASCADE

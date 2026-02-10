@@ -1,9 +1,10 @@
 {
     "tasks": {
         "bastel": "deno run --inspect bastel.ts",
-        "p_g": "deno -A prisma generate",
-        "p_m": "deno -A prisma migrate",
+        "pg": "deno -A prisma generate",
         "pms": "deno -A prisma migrate status",
+        "pmd": "deno -A prisma migrate dev",
+        "pmr": "deno -A prisma migrate reset",
         "lint": "deno lint lib/*.ts middleware/*.ts routes/*.ts routers/*.ts service/*.ts repo/*.ts main.ts",
         "check": "deno check --all lib/*.ts middleware/*.ts routes/*.ts routers/*.ts service/*.ts repo/*.ts main.ts",
         "start": "deno run --env-file --allow-env --allow-read --allow-ffi --allow-net main.ts",

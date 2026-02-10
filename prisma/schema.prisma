@@ -4,25 +4,23 @@ datasource db {
 }
 
 generator client {
-    provider = "prisma-client"
-    output   = "client"
-    runtime  = "deno"
+    provider = "prisma-client-js"
 }
 
 model User {
     id        String  @id @default(cuid())
     name      String  @unique
     timeZone  String  @default("UTC")
-    watches   Watch[] @relation(name: "userWatches")
-    lastWatch Watch?  @relation(name: "lastWatch")
+    watches   Watch[] @relation("userWatches")
+    lastWatch Watch?  @relation("lastWatch")
 }
 
 model Watch {
     id           String        @id @default(cuid())
     name         String
-    user         User          @relation(name: "userWatches", fields: [userId], references: [id], onDelete: Cascade)
+    user         User          @relation("userWatches", fields: [userId], references: [id], onDelete: Cascade)
     userId       String
-    lastUser     User?         @relation(name: "lastWatch", fields: [lastUserId], references: [id], onDelete: Cascade)
+    lastUser     User?         @relation("lastWatch", fields: [lastUserId], references: [id], onDelete: Cascade)
     lastUserId   String?       @unique
     measurements Measurement[]
     comment      String?
