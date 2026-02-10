@@ -50,3 +50,23 @@ export function renderAllButHeadAndFoot(data: ViewInput<types.AllButHeadAndFootD
 export function renderBodyAuth(data: ViewInput<types.UserWatchData>): string {
     return render<types.UserWatchData>("body-auth", merge(data));
 }
+
+export function renderHead(data: ViewInput<types.HeadData>): string {
+    return render<types.HeadData>("head", merge(data));
+}
+
+export function renderFooter(data: ViewInput<types.FooterData>): string {
+    return render<types.FooterData>("footer", merge(data));
+}
+
+export function renderMainHeading(data: ViewInput<types.MainHeadingData>): string {
+    return render<types.MainHeadingData>("mainHeading", merge(data));
+}
+
+export function renderNavProfile(data: ViewInput<types.NavProfileData>): string {
+    return render<types.NavProfileData>("navProfile", merge(data));
+}
+
+export function renderUserWatches(data: ViewInput<types.UserWatchesData>): string {
+    return render<types.UserWatchesData>("userwatches", merge(data));
+}

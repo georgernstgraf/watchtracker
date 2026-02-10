@@ -51,3 +51,29 @@ export interface AllButHeadAndFootData extends BaseRenderData {
     userWatches: Watch[];
     watch: EnrichedWatch | null;
 }
+
+// HeadData - for head.hbs (HTML head section)
+export interface HeadData extends BaseRenderData {
+    // Only needs appPath from BaseRenderData
+}
+
+// FooterData - for footer.hbs
+export interface FooterData extends BaseRenderData {
+    // Only needs appPath from BaseRenderData
+}
+
+// MainHeadingData - for mainHeading.hbs
+export interface MainHeadingData extends BaseRenderData {
+    // Only needs appPath from BaseRenderData
+}
+
+// NavProfileData - for navProfile.hbs
+export interface NavProfileData extends BaseRenderData {
+    user: User;
+    timeZones: string[];
+}
+
+// UserWatchesData - for userwatches.hbs
+export interface UserWatchesData extends BaseRenderData {
+    userWatches: Watch[];
+}
