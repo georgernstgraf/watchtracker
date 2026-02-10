@@ -15,33 +15,104 @@
         <div class="row g-0">
             <!-- Watch Image -->
             <div class="col-md-4">
-                {{#if watch.image}}
-                <img src="data:image/jpeg;base64,{{toBase64 watch.image}}" 
-                     class="img-fluid rounded-start" 
-                     alt="{{watch.name}}"
-                     style="aspect-ratio: 1/1; object-fit: cover;">
-                {{else}}
-                <div class="d-flex align-items-center justify-content-center h-100"
-                     style="aspect-ratio: 1/1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-                    <span class="display-1 text-white fw-bold">{{getInitials watch.name}}</span>
+                <!-- Normal View -->
+                <div id="watchImage-normal">
+                    {{#if watch.image}}
+                    <img src="data:image/jpeg;base64,{{toBase64 watch.image}}" 
+                         class="img-fluid rounded-start" 
+                         alt="{{watch.name}}"
+                         style="aspect-ratio: 1/1; object-fit: cover;">
+                    {{else}}
+                    <div class="d-flex align-items-center justify-content-center h-100 rounded-start"
+                         style="aspect-ratio: 1/1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <span class="display-1 text-white fw-bold">{{getInitials watch.name}}</span>
+                    </div>
+                    {{/if}}
                 </div>
-                {{/if}}
+                <!-- Edit View (hidden) -->
+                <div id="watchImage-edit" style="display: none;">
+                    <div class="position-relative ratio ratio-1x1">
+                        <div id="imagePreview-container" class="d-flex align-items-center justify-content-center bg-secondary rounded-start">
+                            <span class="text-muted" id="imagePreview-placeholder">No image selected</span>
+                            <img id="imagePreview" src="" alt="Preview" class="d-none w-100 h-100" style="object-fit: cover;">
+                        </div>
+                    </div>
+                    <input type="file" 
+                           id="imageInput" 
+                           name="image" 
+                           accept="image/jpeg,image/png,image/webp"
+                           class="d-none">
+                    <div class="mt-2 text-center">
+                        <button type="button" 
+                                class="btn btn-outline-light btn-sm"
+                                onclick="document.getElementById('imageInput').click()">
+                            📷 Choose Image
+                        </button>
+                        <button type="button" 
+                                class="btn btn-outline-warning btn-sm ms-1"
+                                onclick="clearImagePreview()"
+                                id="clearImageBtn"
+                                style="display: none;">
+                            ✕ Clear
+                        </button>
+                    </div>
+                    <small class="text-muted d-block text-center mt-1">Square image required</small>
+                </div>
             </div>
             <!-- Watch Info -->
             <div class="col-md-8">
                 <div class="card-body">
-                    <h2 class="card-title text-light">{{watch.name}}</h2>
-                    {{#if watch.comment}}
-                    <p class="card-text text-muted">{{watch.comment}}</p>
-                    {{/if}}
-                    {{#if watch.overallMeasure}}
-                    <div class="mt-3">
-                        <span class="badge bg-info">{{watch.overallMeasure.niceDisplay}}</span>
-                        <small class="text-muted ms-2">
-                            Over {{watch.overallMeasure.durationDays}} days
-                        </small>
+                    <!-- Normal View -->
+                    <div id="watchInfo-normal">
+                        <h2 class="card-title text-light">{{watch.name}}</h2>
+                        {{#if watch.comment}}
+                        <p class="card-text text-muted">{{watch.comment}}</p>
+                        {{/if}}
+                        {{#if watch.overallMeasure}}
+                        <div class="mt-3">
+                            <span class="badge bg-info">{{watch.overallMeasure.niceDisplay}}</span>
+                            <small class="text-muted ms-2">
+                                Over {{watch.overallMeasure.durationDays}} days
+                            </small>
+                        </div>
+                        {{/if}}
+                        <button class="btn btn-outline-light mt-3" 
+                                onclick="toggleWatchEdit(true)"
+                                title="Edit Name, Comment and Image">
+                            ✏️ Edit
+                        </button>
                     </div>
-                    {{/if}}
+                    <!-- Edit View (hidden) -->
+                    <div id="watchInfo-edit" style="display: none;">
+                        <form id="patchWatchDetails"
+                              hx-patch="{{appPath}}/auth/watch/{{watch.id}}"
+                              hx-encoding="multipart/form-data"
+                              hx-trigger="trigger"
+                              hx-target="#mainContent"
+                              hx-swap="innerHTML">
+                            <input type="text"
+                                   name="name"
+                                   value="{{watch.name}}"
+                                   class="form-control bg-dark text-light border-light mb-2">
+                            <input type="text"
+                                   name="comment"
+                                   {{#if watch.comment}}
+                                   value="{{watch.comment}}"
+                                   {{else}}
+                                   placeholder="Enter comment"
+                                   {{/if}}
+                                   class="form-control bg-dark text-light border-light mb-2">
+                        </form>
+                        <div class="btn-group mt-2">
+                            <button class="btn btn-outline-light"
+                                    title="Cancel Edit"
+                                    onclick="toggleWatchEdit(false)">❌ Cancel</button>
+                            <button class="btn btn-outline-light"
+                                    title="Save"
+                                    onclick="saveWatchDetails()">💾 Save</button>
+                        </div>
+                        <div id="imageError" class="alert alert-danger mt-2" style="display: none;"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -52,4 +123,94 @@
         {{> measurements}}
     </div>
 </div>
+
+<script>
+let selectedImageFile = null;
+
+function toggleWatchEdit(show) {
+    document.getElementById('watchImage-normal').style.display = show ? 'none' : 'block';
+    document.getElementById('watchImage-edit').style.display = show ? 'block' : 'none';
+    document.getElementById('watchInfo-normal').style.display = show ? 'none' : 'block';
+    document.getElementById('watchInfo-edit').style.display = show ? 'block' : 'none';
+    document.getElementById('imageError').style.display = 'none';
+    
+    if (!show) {
+        clearImagePreview();
+    }
+}
+
+function clearImagePreview() {
+    selectedImageFile = null;
+    document.getElementById('imageInput').value = '';
+    document.getElementById('imagePreview').classList.add('d-none');
+    document.getElementById('imagePreview-placeholder').classList.remove('d-none');
+    document.getElementById('imagePreview-placeholder').textContent = 'No image selected';
+    document.getElementById('clearImageBtn').style.display = 'none';
+}
+
+document.getElementById('imageInput').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const img = new Image();
+    const reader = new FileReader();
+    
+    reader.onload = function(event) {
+        img.src = event.target.result;
+        img.onload = function() {
+            const tolerance = 0.01;
+            const ratio = img.width / img.height;
+            
+            if (Math.abs(ratio - 1) > tolerance) {
+                document.getElementById('imageError').textContent = 
+                    `Image must be square. Got ${img.width}x${img.height}`;
+                document.getElementById('imageError').style.display = 'block';
+                e.target.value = '';
+                return;
+            }
+            
+            document.getElementById('imageError').style.display = 'none';
+            selectedImageFile = file;
+            
+            const preview = document.getElementById('imagePreview');
+            preview.src = event.target.result;
+            preview.classList.remove('d-none');
+            document.getElementById('imagePreview-placeholder').classList.add('d-none');
+            document.getElementById('clearImageBtn').style.display = 'inline-block';
+        };
+    };
+    
+    reader.readAsDataURL(file);
+});
+
+async function saveWatchDetails() {
+    const form = document.getElementById('patchWatchDetails');
+    const formData = new FormData(form);
+    
+    if (selectedImageFile) {
+        formData.set('image', selectedImageFile);
+    }
+    
+    const errorDiv = document.getElementById('imageError');
+    
+    try {
+        const response = await fetch(form.getAttribute('hx-patch'), {
+            method: 'PATCH',
+            body: formData
+        });
+        
+        if (response.ok) {
+            const html = await response.text();
+            document.getElementById('mainContent').innerHTML = html;
+        } else {
+            const error = await response.text();
+            errorDiv.textContent = error || 'Failed to save';
+            errorDiv.style.display = 'block';
+        }
+    } catch (err) {
+        errorDiv.textContent = 'Error: ' + err.message;
+        errorDiv.style.display = 'block';
+    }
+}
+</script>
 <!-- /watch-details.hbs -->

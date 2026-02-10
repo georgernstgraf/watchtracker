@@ -1,9 +1,12 @@
+import { Buffer } from "node:buffer";
 import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { UserService, WatchService } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
 import { renderAllButHeadAndFoot, renderWatchDetails, renderUserWatches } from "../lib/views.ts";
 import { authRouter } from "../routers/authRouter.ts";
+import { resizeImage, validateSquareImage } from "../lib/imageUtils.ts";
+import type { Prisma } from "generated-prisma-client";
 
 export default function serve_under_for(path: string, watchRouter: typeof authRouter) {
     // GET /auth/watches - Return watch cards for back navigation
@@ -29,16 +32,37 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
     watchRouter.patch(`${path}/:id`, validateWatchOwnership, async (c) => {
         const session = c.get("session");
         const username = session.username!;
+        const watchId = c.req.param("id");
         const body = await c.req.parseBody();
 
-        await WatchService.updateWatch(c.req.param("id"), {
+        const updateData: Prisma.WatchUpdateInput = {
             name: body.name as string,
             comment: body.comment as string,
-        });
+        };
 
-        const updatedWatch = await WatchService.getWatchForDisplay(username, c.req.param("id"));
+        // Handle image upload
+        if (body.image && body.image instanceof File) {
+            const imageBuffer = await body.image.arrayBuffer();
+            const uint8Array = new Uint8Array(imageBuffer);
+
+            // Validate square image
+            const validation = await validateSquareImage(uint8Array);
+            if (!validation.valid) {
+                throw new HTTPException(422, { message: validation.error });
+            }
+
+            // Resize and store
+            updateData.image = Buffer.from(await resizeImage(uint8Array));
+        }
+
+        await WatchService.updateWatch(watchId, updateData);
+
+        const updatedWatch = await WatchService.getWatchForDisplay(username, watchId);
+        if (!updatedWatch) {
+            throw new HTTPException(404, { message: "Watch not found" });
+        }
         const userWatches = await WatchService.getUserWatchesByUname(username);
-        return c.html(renderAllButHeadAndFoot({ watch: updatedWatch, userWatches }));
+        return c.html(renderWatchDetails({ watch: updatedWatch, userWatches }));
     });
 
     watchRouter.post(path, async (c) => {
