@@ -1,48 +1,83 @@
 <!-- #userwatches.hbs -->
 <div id='userWatches'>
-        <select id='watchSelect'
-                class="form-select text-center border border-2 mb-3 mx-auto w-50"
-                size='{{plusOne userWatches.length}}'
-                hx-get='{{appPath}}/auth/watch'
-                hx-target='#measurements'
-                hx-vals='js:{id: event.target.value}'>
-                {{#each userWatches}}
-                        <option value='{{id}}'>{{name}}</option>
-                {{/each}}
-                <option>-- your watches --</option>
-        </select>
-        <div class="my-2 d-flex justify-content-around"
-             id='watchCreateBtn'>
-                <button title='Add a new Watch to track'
-                        onclick="watchCreateDisplay()"
-                        class="btn btn-outline-light">Add new Watch to track</button>
-        </div>
-        <div id='watchCreateForm'
-             class="my-4 justify-content-center gap-3 align-items-baseline"
-             style='display:none'>
-                <form id='newWatchSave'
-                      hx-post='{{appPath}}/auth/watch'
-                      hx-target='#allButHeadAndFoot'
-                      hx-swap='outerHTML'
-                      hx-trigger='trigger'>
-                        <input type='text'
-                               name='name'
-                               value=''
-                               placeholder='enter Name' />
-                        <input type='text'
-                               name='comment'
-                               value=''
-                               placeholder='enter Comment' />
-                </form>
-                <div class="btn-group">
-                        <button class="btn btn-outline-light"
-                                title='Cancel Edit'
-                                onclick="watchCreateDisplay(false)">❌</button>
-                        <button title='Save'
-                                class="btn btn-outline-light"
-                                type='button'
-                                onclick="htmx.trigger('#newWatchSave', 'trigger')">💾</button>
+    <!-- Watch Cards Grid -->
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mb-3">
+        {{#each userWatches}}
+        <div class="col">
+            <div class="card h-100 bg-dark border-light"
+                 style="cursor: pointer;"
+                 hx-get='{{../appPath}}/auth/watch/{{id}}'
+                 hx-target='#mainContent'
+                 hx-swap='innerHTML'>
+                <!-- Square Image Area -->
+                <div class="position-relative ratio ratio-1x1">
+                    {{#if image}}
+                    <img src="data:image/jpeg;base64,{{toBase64 image}}" 
+                         class="card-img-top" 
+                         alt="{{name}}"
+                         style="object-fit: cover;">
+                    {{else}}
+                    <div class="d-flex align-items-center justify-content-center w-100 h-100"
+                         style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                        <span class="display-4 text-white fw-bold">{{getInitials name}}</span>
+                        <!-- Upload Indicator -->
+                        <div class="position-absolute bottom-0 end-0 m-2">
+                            <span class="badge bg-light text-dark">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+                                    <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-1.002v-1h-2v1H5.002v-1h-2v1zm13 12H1.002V6.5l2.5-3 3.5 4.5 2.5-3 4 5V13z"/>
+                                </svg>
+                            </span>
+                        </div>
+                    </div>
+                    {{/if}}
                 </div>
+                <!-- Card Body -->
+                <div class="card-body text-center">
+                    <h5 class="card-title text-light mb-1">{{name}}</h5>
+                    {{#if comment}}
+                    <p class="card-text text-muted small mb-0">{{comment}}</p>
+                    {{/if}}
+                </div>
+            </div>
         </div>
+        {{/each}}
+    </div>
+
+    <!-- Add Watch Button -->
+    <div class="my-2 d-flex justify-content-around" id='watchCreateBtn'>
+        <button title='Add a new Watch to track'
+                onclick="watchCreateDisplay()"
+                class="btn btn-outline-light">Add new Watch to track</button>
+    </div>
+
+    <!-- Create Watch Form -->
+    <div id='watchCreateForm'
+         class="my-4 justify-content-center gap-3 align-items-baseline"
+         style='display:none'>
+        <form id='newWatchSave'
+              hx-post='{{appPath}}/auth/watch'
+              hx-target='#allButHeadAndFoot'
+              hx-swap='outerHTML'
+              hx-trigger='trigger'>
+            <input type='text'
+                   name='name'
+                   value=''
+                   placeholder='enter Name' />
+            <input type='text'
+                   name='comment'
+                   value=''
+                   placeholder='enter Comment' />
+        </form>
+        <div class="btn-group">
+            <button class="btn btn-outline-light"
+                    title='Cancel Edit'
+                    onclick="watchCreateDisplay(false)">❌</button>
+            <button title='Save'
+                    class="btn btn-outline-light"
+                    type='button'
+                    onclick="htmx.trigger('#newWatchSave', 'trigger')">💾</button>
+        </div>
+    </div>
 </div>
 <!-- /userwatches.hbs -->

@@ -70,3 +70,7 @@ export function renderNavProfile(data: ViewInput<types.NavProfileData>): string 
 export function renderUserWatches(data: ViewInput<types.UserWatchesData>): string {
     return render<types.UserWatchesData>("userwatches", merge(data));
 }
+
+export function renderWatchDetails(data: ViewInput<types.WatchDetailsViewData>): string {
+    return render<types.WatchDetailsViewData>("watch-details", merge(data));
+}

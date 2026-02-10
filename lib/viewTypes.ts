@@ -77,3 +77,9 @@ export interface NavProfileData extends BaseRenderData {
 export interface UserWatchesData extends BaseRenderData {
     userWatches: Watch[];
 }
+
+// WatchDetailsViewData - for watch-details.hbs
+export interface WatchDetailsViewData extends BaseRenderData {
+    watch: EnrichedWatch;
+    userWatches: Watch[];
+}

@@ -2,19 +2,28 @@ import { Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { UserService, WatchService } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
-import { renderAllButHeadAndFoot, renderMeasurements } from "../lib/views.ts";
+import { renderAllButHeadAndFoot, renderWatchDetails, renderUserWatches } from "../lib/views.ts";
 import { authRouter } from "../routers/authRouter.ts";
 
-// This route renders the measurements table incl. headings
 export default function serve_under_for(path: string, watchRouter: typeof authRouter) {
-    watchRouter.get(`${path}`, validateWatchOwnership, async (c) => {
-        const id = c.req.query("id") ?? c.req.param("id") ?? "";
-        return await handleGet(id, c);
+    // GET /auth/watches - Return watch cards for back navigation
+    watchRouter.get(`/watches`, async (c) => {
+        const session = c.get("session");
+        const username = session.username!;
+        const userWatches = await WatchService.getUserWatchesByUname(username);
+        return c.html(renderUserWatches({ userWatches }));
     });
 
+    // GET /auth/watch - Legacy route with query param
+    watchRouter.get(`${path}`, validateWatchOwnership, async (c) => {
+        const id = c.req.query("id") ?? c.req.param("id") ?? "";
+        return await handleGetDetails(id, c);
+    });
+
+    // GET /auth/watch/:id - Return watch details for card click
     watchRouter.get(`${path}/:id`, validateWatchOwnership, async (c) => {
         const id = c.req.param("id");
-        return await handleGet(id, c);
+        return await handleGetDetails(id, c);
     });
 
     watchRouter.patch(`${path}/:id`, validateWatchOwnership, async (c) => {
@@ -56,7 +65,7 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
     });
 }
 
-async function handleGet(id: string, c: Context) {
+async function handleGetDetails(id: string, c: Context) {
     const session = c.get("session");
     const username = session.username;
     const watch = await WatchService.getWatchForDisplay(username, id);
@@ -64,5 +73,6 @@ async function handleGet(id: string, c: Context) {
         throw new HTTPException(403, { message: "Wrong Watch ID" });
     }
     await UserService.setLastWatch(username, watch.id);
-    return c.html(renderMeasurements({ watch }));
+    const userWatches = await WatchService.getUserWatchesByUname(username);
+    return c.html(renderWatchDetails({ watch, userWatches }));
 }

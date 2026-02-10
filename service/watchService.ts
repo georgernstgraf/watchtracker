@@ -220,6 +220,7 @@ export class WatchService {
                 userId: watch.userId,
                 lastUserId: watch.lastUserId,
                 comment: watch.comment,
+                image: watch.image,
                 measurements: measurementsWithDrifts,
                 overallMeasure,
             };
@@ -231,6 +232,7 @@ export class WatchService {
             userId: watch.userId,
             lastUserId: watch.lastUserId,
             comment: watch.comment,
+            image: watch.image,
             measurements: [],
         };
     }

@@ -1,0 +1,55 @@
+<!-- #watch-details.hbs -->
+<div id="watchDetails">
+    <!-- Back Button -->
+    <div class="mb-3">
+        <button class="btn btn-outline-light"
+                hx-get='{{appPath}}/auth/watches'
+                hx-target='#mainContent'
+                hx-swap='innerHTML'>
+            ← Back to Watches
+        </button>
+    </div>
+
+    <!-- Watch Info Header -->
+    <div class="card bg-dark border-light mb-3">
+        <div class="row g-0">
+            <!-- Watch Image -->
+            <div class="col-md-4">
+                {{#if watch.image}}
+                <img src="data:image/jpeg;base64,{{toBase64 watch.image}}" 
+                     class="img-fluid rounded-start" 
+                     alt="{{watch.name}}"
+                     style="aspect-ratio: 1/1; object-fit: cover;">
+                {{else}}
+                <div class="d-flex align-items-center justify-content-center h-100"
+                     style="aspect-ratio: 1/1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                    <span class="display-1 text-white fw-bold">{{getInitials watch.name}}</span>
+                </div>
+                {{/if}}
+            </div>
+            <!-- Watch Info -->
+            <div class="col-md-8">
+                <div class="card-body">
+                    <h2 class="card-title text-light">{{watch.name}}</h2>
+                    {{#if watch.comment}}
+                    <p class="card-text text-muted">{{watch.comment}}</p>
+                    {{/if}}
+                    {{#if watch.overallMeasure}}
+                    <div class="mt-3">
+                        <span class="badge bg-info">{{watch.overallMeasure.niceDisplay}}</span>
+                        <small class="text-muted ms-2">
+                            Over {{watch.overallMeasure.durationDays}} days
+                        </small>
+                    </div>
+                    {{/if}}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Measurements Section -->
+    <div id="measurements" class="border border-2 px-1 rounded">
+        {{> measurements}}
+    </div>
+</div>
+<!-- /watch-details.hbs -->

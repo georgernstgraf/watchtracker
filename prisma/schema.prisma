@@ -26,6 +26,7 @@ model Watch {
     lastUserId   String?       @unique
     measurements Measurement[]
     comment      String?
+    image        Bytes?
 
     @@unique([name, userId])
 }

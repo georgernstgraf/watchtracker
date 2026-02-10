@@ -93,6 +93,25 @@ hbs.registerHelper("plusOne", function (val: number) {
     return val;
 });
 
+hbs.registerHelper("getInitials", function (name: string) {
+    if (!name || typeof name !== "string") return "??";
+    const words = name.trim().split(/\s+/);
+    if (words.length === 1) {
+        return words[0].substring(0, 2).toUpperCase();
+    }
+    return words.slice(0, 2).map((w) => w.charAt(0).toUpperCase()).join("");
+});
+
+hbs.registerHelper("toBase64", function (bytes: Uint8Array | null | undefined) {
+    if (!bytes) return "";
+    let binary = "";
+    const len = bytes.byteLength;
+    for (let i = 0; i < len; i++) {
+        binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
+});
+
 try {
     await loadTemplates();
     console.log(`HBS: Templates loaded successfully:, ${JSON.stringify([...map.keys()])}`);
