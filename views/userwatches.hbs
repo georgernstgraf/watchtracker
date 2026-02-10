@@ -4,11 +4,18 @@
     <div class="d-flex justify-content-end mb-2">
         <div class="btn-group btn-group-sm" role="group">
             <button type="button"
-                    class="btn btn-outline-light {{#if (eq sortBy "recent")}}active{{/if}}"
-                    hx-get="{{appPath}}/auth/watches?sort=recent"
+                    class="btn btn-outline-light {{#if (eq sortBy "recent_desc")}}active{{/if}}"
+                    hx-get="{{appPath}}/auth/watches?sort=recent_desc"
                     hx-target="#userWatches"
                     hx-swap="outerHTML">
-                Recent
+                Recent ↓
+            </button>
+            <button type="button"
+                    class="btn btn-outline-light {{#if (eq sortBy "recent_asc")}}active{{/if}}"
+                    hx-get="{{appPath}}/auth/watches?sort=recent_asc"
+                    hx-target="#userWatches"
+                    hx-swap="outerHTML">
+                Recent ↑
             </button>
             <button type="button"
                     class="btn btn-outline-light {{#if (eq sortBy "precise_asc")}}active{{/if}}"

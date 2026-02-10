@@ -14,7 +14,7 @@ export default function serve_under_for(path: string, slashRouter: typeof sessio
             const full = c.req.header("hx-request") ? "-body" : "-full";
             if (username) {
                 const user = await UserService.getUserByName(username);
-                const userWatches = await WatchService.getUserWatchesSorted(username, "recent");
+                const userWatches = await WatchService.getUserWatchesSorted(username, "recent_desc");
                 const watch = await WatchService.getWatchForDisplay(username);
                 
                 const data = { user, watch, userWatches, timeZones: TimeZone.timeZones };

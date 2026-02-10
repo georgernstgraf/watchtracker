@@ -11,7 +11,7 @@ interface WatchWithMeasurements extends Watch {
     measurements: Measurement[];
 }
 
-export type SortOption = "recent" | "precise_asc" | "precise_desc";
+export type SortOption = "recent_asc" | "recent_desc" | "precise_asc" | "precise_desc";
 
 export class WatchService {
     /**
@@ -74,7 +74,7 @@ export class WatchService {
     /**
      * Get all watches for a user name with sorting and stats
      */
-    static async getUserWatchesSorted(username: string, sortBy: SortOption = "recent"): Promise<WatchCard[]> {
+    static async getUserWatchesSorted(username: string, sortBy: SortOption = "recent_desc"): Promise<WatchCard[]> {
         const watches = await WatchRepository.findByUsernameWithAllMeasurements(username);
         const watchesWithMeasurements = watches as WatchWithMeasurements[];
         const user = await UserRepository.findByName(username);
@@ -83,11 +83,12 @@ export class WatchService {
         const enriched = watchesWithMeasurements.map((w) => this.enrichWatchCard(w, timeZone));
 
         switch (sortBy) {
-            case "recent":
+            case "recent_asc":
+            case "recent_desc":
                 return enriched.sort((a, b) => {
-                    const aLatest = a.lastUsed ? new Date(a.lastUsed).getTime() : 0;
-                    const bLatest = b.lastUsed ? new Date(b.lastUsed).getTime() : 0;
-                    return bLatest - aLatest;
+                    const aLatest = a.lastUsedDate ? a.lastUsedDate.getTime() : 0;
+                    const bLatest = b.lastUsedDate ? b.lastUsedDate.getTime() : 0;
+                    return sortBy === "recent_asc" ? aLatest - bLatest : bLatest - aLatest;
                 });
             case "precise_asc":
             case "precise_desc":
@@ -129,6 +130,7 @@ export class WatchService {
                 ? lastMeasurement.createdAt
                 : new Date(lastMeasurement.createdAt);
             card.lastUsed = TimeZone.getShort(lastDate, timeZone);
+            card.lastUsedDate = lastDate;
         }
 
         return card;

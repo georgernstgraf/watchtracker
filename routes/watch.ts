@@ -13,7 +13,7 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
     watchRouter.get(`/watches`, async (c) => {
         const session = c.get("session");
         const username = session.username!;
-        const sortBy = (c.req.query("sort") as SortOption) || "recent";
+        const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
         const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
         return c.html(renderUserWatches({ userWatches, sortBy }));
     });
