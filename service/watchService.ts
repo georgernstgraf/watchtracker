@@ -5,7 +5,7 @@ import { UserService } from "./userService.ts";
 import { MeasurementService } from "./measurementService.ts";
 import { TimeZone } from "../lib/timeZone.ts";
 import type { Measurement, Prisma, Watch } from "generated-prisma-client";
-import type { EnrichedWatch, EnrichedMeasurement } from "../lib/viewTypes.ts";
+import type { EnrichedWatch, EnrichedMeasurement, WatchCard } from "../lib/viewTypes.ts";
 
 interface WatchWithMeasurements extends Watch {
     measurements: Measurement[];
@@ -72,51 +72,76 @@ export class WatchService {
     }
 
     /**
-     * Get all watches for a user name with sorting
+     * Get all watches for a user name with sorting and stats
      */
-    static async getUserWatchesSorted(username: string, sortBy: SortOption = "recent"): Promise<Watch[]> {
+    static async getUserWatchesSorted(username: string, sortBy: SortOption = "recent"): Promise<WatchCard[]> {
         const watches = await WatchRepository.findByUsernameWithAllMeasurements(username);
         const watchesWithMeasurements = watches as WatchWithMeasurements[];
+        const user = await UserRepository.findByName(username);
+        const timeZone = user?.timeZone || "UTC";
+
+        const enriched = watchesWithMeasurements.map((w) => this.enrichWatchCard(w, timeZone));
 
         switch (sortBy) {
             case "recent":
-                return watchesWithMeasurements.sort((a, b) => {
-                    const aLatest = a.measurements.length > 0
-                        ? new Date(a.measurements[a.measurements.length - 1].createdAt).getTime()
-                        : 0;
-                    const bLatest = b.measurements.length > 0
-                        ? new Date(b.measurements[b.measurements.length - 1].createdAt).getTime()
-                        : 0;
+                return enriched.sort((a, b) => {
+                    const aLatest = a.lastUsed ? new Date(a.lastUsed).getTime() : 0;
+                    const bLatest = b.lastUsed ? new Date(b.lastUsed).getTime() : 0;
                     return bLatest - aLatest;
                 });
             case "precise_asc":
             case "precise_desc":
-                return watchesWithMeasurements.sort((a, b) => {
-                    const aDrift = this.calculateAbsoluteDrift(a);
-                    const bDrift = this.calculateAbsoluteDrift(b);
+                return enriched.sort((a, b) => {
+                    const aDrift = this.calculateAbsoluteDriftFromCard(a);
+                    const bDrift = this.calculateAbsoluteDriftFromCard(b);
                     return sortBy === "precise_asc" ? aDrift - bDrift : bDrift - aDrift;
                 });
             default:
-                return watches;
+                return enriched;
         }
     }
 
     /**
-     * Calculate the absolute overall drift for a watch
+     * Enrich a watch with card display stats
      */
-    private static calculateAbsoluteDrift(watch: WatchWithMeasurements): number {
+    private static enrichWatchCard(watch: WatchWithMeasurements, timeZone: string): WatchCard {
         const measurements = watch.measurements;
-        if (measurements.length < 2) return Infinity;
+        const card: WatchCard = { ...watch };
 
-        const enrichedMeasurements = measurements.map((m) => ({
-            ...m,
-            createdAt16: "",
-            driftDisplay: "n/a",
-            driftMath: undefined,
-        })) as EnrichedMeasurement[];
+        if (measurements.length >= 2) {
+            const enrichedMeasurements = measurements.map((m) => ({
+                ...m,
+                createdAt16: "",
+                driftDisplay: "n/a",
+                driftMath: undefined,
+            })) as EnrichedMeasurement[];
 
-        const overallMeasure = MeasurementService.calculateDrifts(enrichedMeasurements);
-        return overallMeasure ? Math.abs(overallMeasure.driftSeks) : Infinity;
+            const overallMeasure = MeasurementService.calculateDrifts(enrichedMeasurements);
+            if (overallMeasure) {
+                card.precision = overallMeasure.niceDisplay;
+                card.daysMeasured = overallMeasure.durationDays;
+            }
+        }
+
+        if (measurements.length > 0) {
+            const lastMeasurement = measurements[measurements.length - 1];
+            const lastDate = lastMeasurement.createdAt instanceof Date
+                ? lastMeasurement.createdAt
+                : new Date(lastMeasurement.createdAt);
+            card.lastUsed = TimeZone.getShort(lastDate, timeZone);
+        }
+
+        return card;
+    }
+
+    /**
+     * Calculate the absolute overall drift for a watch card
+     */
+    private static calculateAbsoluteDriftFromCard(card: WatchCard): number {
+        if (!card.precision) return Infinity;
+        const match = card.precision.match(/([+-]?\d+(?:\.\d+)?)\s*s\/d/);
+        if (!match) return Infinity;
+        return Math.abs(parseFloat(match[1]));
     }
 
     /**

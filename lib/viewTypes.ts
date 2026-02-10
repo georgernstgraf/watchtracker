@@ -15,6 +15,12 @@ export interface EnrichedWatch extends Watch {
     };
 }
 
+export interface WatchCard extends Watch {
+    precision?: string;
+    daysMeasured?: string;
+    lastUsed?: string;
+}
+
 export interface BaseRenderData {
     appPath: string;
 }
@@ -75,7 +81,7 @@ export interface NavProfileData extends BaseRenderData {
 
 // UserWatchesData - for userwatches.hbs
 export interface UserWatchesData extends BaseRenderData {
-    userWatches: Watch[];
+    userWatches: WatchCard[];
     sortBy?: string;
 }
 

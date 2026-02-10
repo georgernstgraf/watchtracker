@@ -15,18 +15,24 @@ export class TimeZone {
         return idxes.map((i) => [i, TimeZone.timeZones[i]]);
     }
     static get16(date: Date, tz: string): string {
-        // tz not string or tz not in timeZones
         try {
             const dt = luxon.DateTime.fromJSDate(date, { zone: tz });
             const iso = dt.toISO();
             if (!iso) {
-                // Fallback if toISO returns null
                 return luxon.DateTime.fromJSDate(date, { zone: "UTC" }).toISO()?.substring(0, 16) ?? "Invalid Date";
             }
             return iso.substring(0, 16);
         } catch (_e) {
             const fallback = luxon.DateTime.fromJSDate(date, { zone: "UTC" }).toISO();
             return fallback?.substring(0, 16) ?? "Invalid Date";
+        }
+    }
+    static getShort(date: Date, tz: string): string {
+        try {
+            const dt = luxon.DateTime.fromJSDate(date, { zone: tz });
+            return dt.toFormat("d MMM");
+        } catch (_e) {
+            return luxon.DateTime.fromJSDate(date, { zone: "UTC" }).toFormat("d MMM");
         }
     }
     static from16(str: string, tz: string) {
