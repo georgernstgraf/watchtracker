@@ -9,6 +9,7 @@
         "check": "deno check --all lib/*.ts middleware/*.ts routes/*.ts routers/*.ts service/*.ts repo/*.ts main.ts",
         "start": "deno run --env-file --allow-env --allow-ffi --allow-read --allow-write --allow-net main.ts",
         "copydb": "rm -rf /tmp/watchtracker.db && cat scripts/copydb.sql | sqlite3 watchtracker.db",
+        "pulldb": "scripts/pulldb.sh",
         "watch": "deno run --env-file --allow-env --allow-read --allow-run --allow-ffi --allow-net --watch=main.ts,lib/,routes/,service/,views/,static/,prisma/schema.prisma --watch-exclude=prisma/client/ scripts/dev.ts",
         "purgecss": "purgecss --config purgecss.config.js"
     },

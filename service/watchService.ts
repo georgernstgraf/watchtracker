@@ -7,6 +7,11 @@ import { TimeZone } from "../lib/timeZone.ts";
 import type { Measurement, Prisma, Watch } from "generated-prisma-client";
 import type { EnrichedWatch, EnrichedMeasurement } from "../lib/viewTypes.ts";
 
+// Type for Watch with measurements included from Prisma queries
+interface WatchWithMeasurements extends Watch {
+    measurements: Measurement[];
+}
+
 export class WatchService {
     /**
      * Create a new watch for a user
@@ -190,9 +195,9 @@ export class WatchService {
         const user = await UserService.getUserByName(username);
         const timeZone = user?.timeZone || "UTC";
 
-        // Cast to any first to handle the composite type from Prisma
-        const watchWithMeasurements = watch as any;
-        const measurements = (watchWithMeasurements.measurements || []) as Measurement[];
+        // Cast to WatchWithMeasurements to handle the composite type from Prisma
+        const watchWithMeasurements = watch as WatchWithMeasurements;
+        const measurements = watchWithMeasurements.measurements || [];
 
         if (measurements.length > 0) {
             // Enrich measurements with createdAt16 and driftDisplay

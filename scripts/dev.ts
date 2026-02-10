@@ -6,7 +6,7 @@
 async function runPrismaGenerate() {
     console.log("🛠️ Verifying Prisma client...");
     const command = new Deno.Command("deno", {
-        args: ["task", "p_g"],
+        args: ["task", "pg"],
         stdout: "inherit",
         stderr: "inherit",
     });
