@@ -4,6 +4,7 @@
         "pg": "rm -rf prisma/client && deno -A prisma generate",
         "pms": "deno -A prisma migrate status",
         "pmd": "deno -A prisma migrate dev",
+        "pmD": "deno -A prisma migrate deploy",
         "pmr": "deno -A prisma migrate reset",
         "lint": "deno lint lib/*.ts middleware/*.ts routes/*.ts routers/*.ts service/*.ts repo/*.ts main.ts",
         "check": "deno check --all lib/*.ts middleware/*.ts routes/*.ts routers/*.ts service/*.ts repo/*.ts main.ts",
