@@ -1,13 +1,13 @@
 {
     "tasks": {
         "bastel": "deno run --inspect bastel.ts",
-        "pg": "deno -A prisma generate",
+        "pg": "rm -rf prisma/client && deno -A prisma generate",
         "pms": "deno -A prisma migrate status",
         "pmd": "deno -A prisma migrate dev",
         "pmr": "deno -A prisma migrate reset",
         "lint": "deno lint lib/*.ts middleware/*.ts routes/*.ts routers/*.ts service/*.ts repo/*.ts main.ts",
         "check": "deno check --all lib/*.ts middleware/*.ts routes/*.ts routers/*.ts service/*.ts repo/*.ts main.ts",
-        "start": "deno run --env-file --allow-env --allow-read --allow-ffi --allow-net main.ts",
+        "start": "deno run --env-file --allow-env --allow-ffi --allow-read --allow-write --allow-net main.ts",
         "dev": "deno run --env-file --allow-env --allow-read --allow-run --allow-ffi --allow-net scripts/dev.ts",
         "watch": "deno run --env-file --allow-env --allow-read --allow-run --allow-ffi --allow-net --watch=main.ts,lib/,routes/,service/,views/,static/,prisma/schema.prisma --watch-exclude=prisma/client/ scripts/dev.ts",
         "purgecss": "purgecss --config purgecss.config.js"

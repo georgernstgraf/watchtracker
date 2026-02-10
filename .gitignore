@@ -5,7 +5,7 @@ yarn-error.log
 debug.js
 playground.mongodb.js
 static/htmx.*
-**/*.db
+**/*.db*
 *.rest
 tmp
 README.pdf
