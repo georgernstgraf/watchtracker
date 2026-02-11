@@ -4,7 +4,7 @@
     <div class="d-flex justify-content-end mb-2">
         <button title="New Measurement"
                 id="newMeasurement"
-                class="btn btn-outline-light btn-sm"
+                class="btn btn-outline-secondary btn-sm"
                 onclick="showMeasurementCreate()"> + New </button>
     </div>
 
@@ -12,7 +12,7 @@
     <div style="display:none"
          id="measureCreate"
          class="mb-3">
-        <div class="card bg-dark border-secondary">
+        <div class="card border-secondary">
             <div class="card-body py-2">
                 <form id="unsavedMeasurement-form"
                       class="text-center"
@@ -23,14 +23,14 @@
                     <input id="measureCreateDateTime"
                            type="datetime-local"
                            name="createdAt"
-                           class="form-control form-control-sm bg-dark text-light border-secondary d-inline-block mb-1"
+                           class="form-control form-control-sm d-inline-block mb-1"
                            style="width: auto;">
                     <input type="number"
                            name="value"
                            placeholder="0"
-                           class="form-control form-control-sm bg-dark text-light border-secondary d-inline-block mb-1"
+                           class="form-control form-control-sm d-inline-block mb-1"
                            style="width: 7ch;">
-                    <label class="text-muted mb-1">
+                    <label class="text-body-secondary mb-1">
                         <input type="checkbox"
                                name="isStart"
                                value="true"> Start
@@ -38,14 +38,14 @@
                     <input type="text"
                            name="comment"
                            placeholder="comment"
-                           class="form-control form-control-sm bg-dark text-light border-secondary d-inline-block mb-1"
+                           class="form-control form-control-sm d-inline-block mb-1"
                            style="width: auto;">
                     <div class="btn-group btn-group-sm mt-1">
                         <button title="Cancel"
-                                class="btn btn-outline-light"
+                                class="btn btn-outline-secondary"
                                 onclick="event.preventDefault(); hideMeasurementCreate()">Cancel</button>
                         <button title="Save Record"
-                                class="btn btn-outline-light"
+                                class="btn btn-outline-secondary"
                                 onclick="event.preventDefault(); htmx.trigger('#unsavedMeasurement-form', 'trigger')">Save</button>
                     </div>
                 </form>
@@ -55,7 +55,7 @@
 
     <!-- Measurement Cards -->
     {{#each watch.measurements}}
-    <div class="card bg-dark border-secondary mb-2">
+    <div class="card border-secondary mb-2">
         <!-- Edit Form (hidden by default) -->
         <div style="display:none"
              id="{{id}}-edit"
@@ -70,7 +70,7 @@
                     <input type="datetime-local"
                            name="createdAt"
                            value="{{createdAt16}}"
-                           class="form-control form-control-sm bg-dark text-light border-secondary d-inline-block mb-1"
+                           class="form-control form-control-sm d-inline-block mb-1"
                            style="width: auto;">
                     <input type="number"
                            name="value"
@@ -78,8 +78,8 @@
                            value="{{value}}"
                            onfocus="this.select()"
                            onclick="this.select()"
-                           class="form-control form-control-sm bg-dark text-light border-secondary d-inline-block mb-1">
-                    <label class="text-muted mb-1">
+                           class="form-control form-control-sm d-inline-block mb-1">
+                    <label class="text-body-secondary mb-1">
                         <input type="checkbox"
                                name="isStart"
                                value="true"
@@ -92,7 +92,7 @@
                            {{else}}
                            placeholder="comment"
                            {{/if}}
-                           class="form-control form-control-sm bg-dark text-light border-secondary d-inline-block mb-1"
+                           class="form-control form-control-sm d-inline-block mb-1"
                            style="width: auto;">
                     <div class="btn-group btn-group-sm mt-1">
                         <button title="Delete Record"
@@ -102,10 +102,10 @@
                                 hx-swap="outerHTML"
                                 onclick="event.preventDefault()">Delete</button>
                         <button title="Cancel Edit"
-                                class="btn btn-outline-light"
+                                class="btn btn-outline-secondary"
                                 onclick="event.preventDefault(); editMode('{{id}}', false)">Cancel</button>
                         <button title="Save Record"
-                                class="btn btn-outline-light"
+                                class="btn btn-outline-secondary"
                                 onclick="event.preventDefault(); htmx.trigger('#{{id}}-form', 'trigger')">Save</button>
                     </div>
                 </form>
@@ -120,34 +120,34 @@
             <div class="card-body py-2 px-3">
                 <div class="row align-items-center gx-2">
                     <div class="col-auto">
-                        <small class="text-muted d-block">Deviation</small>
+                        <small class="text-body-secondary d-block">Deviation</small>
                         <span class="{{deviationColor value}} fw-bold">
                             {{{deviationArrow value}}} {{abs value}}s
                         </span>
                     </div>
-                    <div class="col-auto border-start border-secondary ps-2">
-                        <small class="text-muted d-block">Type</small>
+                    <div class="col-auto border-start ps-2">
+                        <small class="text-body-secondary d-block">Type</small>
                         {{#if isStart}} 🎬 {{else}} ⌛ {{/if}}
                     </div>
-                    <div class="col-auto border-start border-secondary ps-2">
-                        <small class="text-muted d-block">Drift</small>
+                    <div class="col-auto border-start ps-2">
+                        <small class="text-body-secondary d-block">Drift</small>
                         <span>⏱ {{driftDisplay}}</span>
                     </div>
                     {{#if comment}}
-                    <div class="col border-start border-secondary ps-2 d-none d-sm-block">
-                        <small class="text-muted d-block">Comment</small>
+                    <div class="col border-start ps-2 d-none d-sm-block">
+                        <small class="text-body-secondary d-block">Comment</small>
                         <span>{{comment}}</span>
                     </div>
                     {{/if}}
                     <div class="col-auto ms-auto">
                         <button title="Edit Measurement"
-                                class="btn btn-outline-light btn-sm"
+                                class="btn btn-outline-secondary btn-sm"
                                 onclick="editMode('{{id}}', true)">Edit</button>
                     </div>
                 </div>
                 {{#if comment}}
                 <div class="d-block d-sm-none mt-1">
-                    <small class="text-muted">{{comment}}</small>
+                    <small class="text-body-secondary">{{comment}}</small>
                 </div>
                 {{/if}}
             </div>

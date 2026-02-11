@@ -3,12 +3,12 @@
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center">
         <h1 class="mb-2 mb-sm-0">Watchtracker</h1>
         <div class="d-flex align-items-center gap-3">
-            <div id='timeZoneDisplay' class="d-flex align-items-center gap-1">
-                <small>{{user.timeZone}}</small>
-                <button title='Switch Timezone'
-                        class='btn btn-outline-light btn-sm py-0 px-1'
-                        onclick='editTimezone()'>✏️</button>
-            </div>
+            <button id='timeZoneButton'
+                    title='Switch Timezone'
+                    class='btn btn-outline-secondary btn-sm py-0 px-2'
+                    onclick='editTimezone()'>
+                {{user.timeZone}}
+            </button>
             <div id='timeZoneEdit'
                  class="align-items-center gap-2"
                  style="display: none">
@@ -32,17 +32,25 @@
                 </form>
                 <div class="btn-group btn-group-sm" role="group">
                     <button title='Cancel'
-                            class="btn btn-outline-light py-0"
+                            class="btn btn-outline-secondary py-0"
                             onclick='editTimezone(false)'>❌</button>
                     <button title='Done'
-                            class="btn btn-outline-light py-0"
+                            class="btn btn-outline-secondary py-0"
                             onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)">💾</button>
                 </div>
             </div>
-            <span id='profileUsername'>User: {{user.name}}</span>
+            <button id='themeToggle'
+                    class='btn btn-outline-secondary btn-sm py-0 px-1'
+                    title='Toggle theme'
+                    onclick='toggleTheme()'>
+                <span id='themeIcon'>🌙</span>
+            </button>
             <form hx-post='{{appPath}}/logout' hx-target='body'>
                 <button id='profileLogoutButton'
-                        class='btn btn-outline-light btn-sm'>logout</button>
+                        class='btn btn-outline-secondary btn-sm'
+                        title='Log out {{user.name}}'>
+                    logout {{user.name}}
+                </button>
             </form>
         </div>
     </div>

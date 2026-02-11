@@ -1,3 +1,16 @@
+// Initialize theme on page load
+(function() {
+    const theme = localStorage.getItem('wt-theme') || 'dark';
+    document.documentElement.setAttribute('data-bs-theme', theme);
+    // Set initial icon
+    document.addEventListener('DOMContentLoaded', function() {
+        const icon = document.getElementById('themeIcon');
+        if (icon) {
+            icon.textContent = theme === 'dark' ? '🌙' : '☀️';
+        }
+    });
+})();
+
 htmx.config.logAll = true;
 // login if a 401 occurs
 document
@@ -71,21 +84,19 @@ function watchCreateDisplay(yes = true) {
 }
 function editTimezone(really = true) {
     const edit$ = document.getElementById('timeZoneEdit');
-    const disp$ = document.getElementById('timeZoneDisplay');
+    const btn$ = document.getElementById('timeZoneButton');
     switch (really) {
         case true: {
             // show edit
             edit$.style.display = "";
             edit$.classList.add("d-flex");
-            // hide normal
-            disp$.classList.remove("d-flex");
-            disp$.style.display = "none";
+            // hide button
+            btn$.style.display = "none";
             break;
         }
         case false: {
-            // show normal
-            disp$.style.display = "";
-            disp$.classList.add("d-flex");
+            // show button
+            btn$.style.display = "";
             // hide edit
             edit$.classList.remove("d-flex");
             edit$.style.display = "none";
@@ -94,5 +105,18 @@ function editTimezone(really = true) {
         default: {
             throw new Error("not implemented");
         }
+    }
+}
+
+function toggleTheme() {
+    const html = document.documentElement;
+    const currentTheme = html.getAttribute('data-bs-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-bs-theme', newTheme);
+    localStorage.setItem('wt-theme', newTheme);
+    // Update icon
+    const icon = document.getElementById('themeIcon');
+    if (icon) {
+        icon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
     }
 }

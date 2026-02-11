@@ -71,7 +71,7 @@
      }">
     <!-- Back Button -->
     <div class="mb-3">
-        <button class="btn btn-outline-light btn-sm"
+        <button class="btn btn-outline-secondary btn-sm"
                 hx-get='{{appPath}}/auth/watches'
                 hx-target='#mainContent'
                 hx-swap='innerHTML'>
@@ -116,7 +116,7 @@
                            @change="selectedImageFile = $event.target.files[0]">
                     <div class="mt-2 text-center">
                         <button type="button"
-                                class="btn btn-outline-light btn-sm"
+                                class="btn btn-outline-secondary btn-sm"
                                 @click="$refs.imageInput.click()">
                             Choose Image
                         </button>
@@ -127,7 +127,7 @@
                             Clear
                         </button>
                     </div>
-                    <small class="text-muted d-block text-center mt-1">Square image required</small>
+                    <small class="text-body-secondary d-block text-center mt-1">Square image required</small>
                 </div>
             </div>
         </div>
@@ -135,18 +135,18 @@
         <!-- Right Column: Watch Info + Measurements -->
         <div class="col-12 col-md-7 col-lg-7">
             <!-- Watch Name/Comment Card -->
-            <div class="card bg-dark border-secondary mb-3" x-show="!editing">
+            <div class="card border-secondary mb-3" x-show="!editing">
                 <div class="card-body py-2">
-                    <h5 class="card-title text-light mb-0">{{watch.name}}</h5>
+                    <h5 class="card-title mb-0">{{watch.name}}</h5>
                     <div class="d-flex align-items-center gap-2">
                         {{#if watch.comment}}
-                        <small class="text-muted">{{watch.comment}}</small>
+                        <small class="text-body-secondary">{{watch.comment}}</small>
                         {{/if}}
                         {{#if watch.overallMeasure}}
-                        <small class="text-muted">{{watch.overallMeasure.durationDays}} days</small>
-                        <small class="text-muted">· {{watch.overallMeasure.niceDisplay}}</small>
+                        <small class="text-body-secondary">{{watch.overallMeasure.durationDays}} days</small>
+                        <small class="text-body-secondary">· {{watch.overallMeasure.niceDisplay}}</small>
                         {{/if}}
-                        <button class="btn btn-outline-light btn-sm ms-auto py-0 px-1"
+                        <button class="btn btn-outline-secondary btn-sm ms-auto py-0 px-1"
                                 @click="toggleEdit(true)"
                                 title="Edit Name, Comment and Image">
                             ✏️
@@ -156,7 +156,7 @@
             </div>
 
             <!-- Edit Card -->
-            <div class="card bg-dark border-secondary mb-3" x-show="editing" x-cloak>
+            <div class="card border-secondary mb-3" x-show="editing" x-cloak>
                 <div class="card-body">
                     <form x-ref="watchForm"
                           hx-patch="{{appPath}}/auth/watch/{{watch.id}}"
@@ -167,7 +167,7 @@
                         <input type="text"
                                name="name"
                                value="{{watch.name}}"
-                               class="form-control form-control-sm bg-dark text-light border-light mb-2">
+                               class="form-control form-control-sm mb-2">
                         <input type="text"
                                name="comment"
                                {{#if watch.comment}}
@@ -175,13 +175,13 @@
                                {{else}}
                                placeholder="Enter comment"
                                {{/if}}
-                               class="form-control form-control-sm bg-dark text-light border-light mb-2">
+                               class="form-control form-control-sm mb-2">
                     </form>
                     <div class="btn-group btn-group-sm">
-                        <button class="btn btn-outline-light"
+                        <button class="btn btn-outline-secondary"
                                 title="Cancel Edit"
                                 @click="toggleEdit(false)">Cancel</button>
-                        <button class="btn btn-outline-light"
+                        <button class="btn btn-outline-secondary"
                                 title="Save"
                                 @click="saveDetails()">Save</button>
                     </div>

@@ -1,46 +1,129 @@
+/* Bootstrap Color Overrides - Matching design/watchdetails.jpg */
+:root,
+[data-bs-theme="dark"] {
+    /* Background colors */
+    --bs-body-bg: #0f0f1a;
+    --bs-body-bg-rgb: 15, 15, 26;
+
+    /* Card colors */
+    --bs-dark: #1e1e2e;
+    --bs-dark-rgb: 30, 30, 46;
+    --bs-secondary-bg: #2d2d3d;
+
+    /* Card component colors */
+    --bs-card-bg: #1e1e2e;
+    --bs-card-cap-bg: #252536;
+    --bs-card-color: #e2e8f0;
+    --bs-card-border-color: #3d3d52;
+
+    /* Form control colors */
+    --bs-form-bg: #1e1e2e;
+    --bs-form-color: #e2e8f0;
+    --bs-form-border-color: #3d3d52;
+
+    /* Text colors */
+    --bs-body-color: #e2e8f0;
+    --bs-body-color-rgb: 226, 232, 240;
+    --bs-secondary-color: #94a3b8;
+
+    /* Border */
+    --bs-border-color: #3d3d52;
+
+    /* Success - green for fast/up */
+    --bs-success: #4ade80;
+    --bs-success-rgb: 74, 222, 128;
+
+    /* Danger - red for slow/down */
+    --bs-danger: #fb7185;
+    --bs-danger-rgb: 251, 113, 133;
+
+    /* Light/white for buttons */
+    --bs-light: #e2e8f0;
+    --bs-light-rgb: 226, 232, 240;
+    --bs-dark-text-emphasis: #e2e8f0;
+}
+
+[data-bs-theme="light"] {
+    /* Background colors */
+    --bs-body-bg: #f8f9fa;
+    --bs-body-bg-rgb: 248, 249, 250;
+
+    /* Card colors */
+    --bs-dark: #e9ecef;
+    --bs-dark-rgb: 233, 236, 239;
+    --bs-secondary-bg: #e9ecef;
+
+    /* Card component colors */
+    --bs-card-bg: #ffffff;
+    --bs-card-cap-bg: #f8f9fa;
+    --bs-card-color: #212529;
+    --bs-card-border-color: #dee2e6;
+
+    /* Form control colors */
+    --bs-form-bg: #ffffff;
+    --bs-form-color: #212529;
+    --bs-form-border-color: #dee2e6;
+
+    /* Text colors */
+    --bs-body-color: #212529;
+    --bs-body-color-rgb: 33, 37, 41;
+    --bs-secondary-color: #6c757d;
+
+    /* Border */
+    --bs-border-color: #dee2e6;
+
+    /* Success - darker green for light mode */
+    --bs-success: #198754;
+    --bs-success-rgb: 25, 135, 84;
+
+    /* Danger - darker red for light mode */
+    --bs-danger: #dc3545;
+    --bs-danger-rgb: 220, 53, 69;
+
+    /* Light/dark for buttons */
+    --bs-light: #212529;
+    --bs-light-rgb: 33, 37, 41;
+    --bs-dark-text-emphasis: #212529;
+}
+
+/* Form element spacing */
 form>* {
     margin: 0 .5ch;
 }
 
+/* Prevent horizontal scroll */
 html {
     overflow-x: hidden;
 }
 
-/* Bootstrap CSS Grid support (g-col-* classes) */
-.grid {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 0.5rem;
-}
-
-.g-col-1 { grid-column: span 1; }
-.g-col-2 { grid-column: span 2; }
-.g-col-3 { grid-column: span 3; }
-.g-col-4 { grid-column: span 4; }
-.g-col-5 { grid-column: span 5; }
-.g-col-6 { grid-column: span 6; }
-.g-col-7 { grid-column: span 7; }
-.g-col-8 { grid-column: span 8; }
-.g-col-9 { grid-column: span 9; }
-.g-col-10 { grid-column: span 10; }
-.g-col-11 { grid-column: span 11; }
-.g-col-12 { grid-column: span 1 / -1; }
-
-.g-row {
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 0.5rem;
-}
-
-/* Striped effect for data rows */
-.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3,
-.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3 ~ .g-col-2,
-.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3 ~ .g-col-2 ~ .g-col-1,
-.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3 ~ .g-col-2 ~ .g-col-1 ~ .g-col-2,
-.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3 ~ .g-col-2 ~ .g-col-1 ~ .g-col-2 ~ .g-col-3,
-.grid > .g-col-3:nth-of-type(6n+7) ~ .g-col-3 ~ .g-col-2 ~ .g-col-1 ~ .g-col-2 ~ .g-col-3 ~ .g-col-1 {
-    background-color: var(--bs-table-striped-bg);
-}
-
 /* Hide elements with x-cloak until Alpine loads */
 [x-cloak] { display: none !important; }
+
+/* Card styling using custom properties */
+.card {
+    background-color: var(--bs-card-bg);
+    border-color: var(--bs-card-border-color);
+}
+
+.card-header {
+    background-color: var(--bs-card-cap-bg);
+    color: var(--bs-card-color);
+}
+
+.card-body,
+.card-title,
+.card-text {
+    color: var(--bs-card-color);
+}
+
+/* Form control styling using custom properties */
+.form-control {
+    background-color: var(--bs-form-bg);
+    color: var(--bs-form-color);
+    border-color: var(--bs-form-border-color);
+}
+
+.form-control:focus {
+    background-color: var(--bs-form-bg);
+    color: var(--bs-form-color);
+}

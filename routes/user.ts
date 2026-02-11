@@ -23,7 +23,10 @@ export default function serve_under_for(path: string, userRouter: typeof authRou
         });
 
         const userWatches = await WatchService.getUserWatchesByUname(username);
-        const watch = await WatchService.getWatchForDisplay(username, body.selectedWatchId as string);
+        let watch = null;
+        if (body.selectedWatchId) {
+            watch = await WatchService.getWatchForDisplay(username, body.selectedWatchId as string);
+        }
 
         return c.html(renderBodyAuth({
             user: updatedUser,

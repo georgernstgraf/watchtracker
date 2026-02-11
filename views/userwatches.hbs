@@ -3,28 +3,28 @@
     <!-- Sort Controls -->
     <div class="d-flex justify-content-between mb-2">
         <button type="button"
-                class="btn btn-outline-light btn-sm {{#if (eq sortBy "recent_desc")}}active{{/if}}"
+                class="btn btn-outline-secondary btn-sm {{#if (eq sortBy "recent_desc")}}active{{/if}}"
                 hx-get="{{appPath}}/auth/watches?sort=recent_desc"
                 hx-target="#userWatches"
                 hx-swap="outerHTML">
             Recent ↓
         </button>
         <button type="button"
-                class="btn btn-outline-light btn-sm {{#if (eq sortBy "recent_asc")}}active{{/if}}"
+                class="btn btn-outline-secondary btn-sm {{#if (eq sortBy "recent_asc")}}active{{/if}}"
                 hx-get="{{appPath}}/auth/watches?sort=recent_asc"
                 hx-target="#userWatches"
                 hx-swap="outerHTML">
             Recent ↑
         </button>
         <button type="button"
-                class="btn btn-outline-light btn-sm {{#if (eq sortBy "precise_asc")}}active{{/if}}"
+                class="btn btn-outline-secondary btn-sm {{#if (eq sortBy "precise_asc")}}active{{/if}}"
                 hx-get="{{appPath}}/auth/watches?sort=precise_asc"
                 hx-target="#userWatches"
                 hx-swap="outerHTML">
             Precise ↑
         </button>
         <button type="button"
-                class="btn btn-outline-light btn-sm {{#if (eq sortBy "precise_desc")}}active{{/if}}"
+                class="btn btn-outline-secondary btn-sm {{#if (eq sortBy "precise_desc")}}active{{/if}}"
                 hx-get="{{appPath}}/auth/watches?sort=precise_desc"
                 hx-target="#userWatches"
                 hx-swap="outerHTML">
@@ -35,7 +35,7 @@
     <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mb-3">
         {{#each userWatches}}
         <div class="col">
-            <div class="card h-100 bg-dark border-light"
+            <div class="card h-100 border-secondary"
                  style="cursor: pointer;"
                  hx-get='{{../appPath}}/auth/watch/{{id}}'
                  hx-target='#mainContent'
@@ -53,7 +53,7 @@
                         <span class="display-4 text-white fw-bold">{{getInitials name}}</span>
                         <!-- Upload Indicator -->
                         <div class="position-absolute bottom-0 end-0 m-2">
-                            <span class="badge bg-light text-dark">
+                            <span class="badge bg-secondary">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                                     <path d="M6.002 5.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
                                     <path d="M2.002 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2h-1.002v-1h-2v1H5.002v-1h-2v1zm13 12H1.002V6.5l2.5-3 3.5 4.5 2.5-3 4 5V13z"/>
@@ -65,14 +65,14 @@
                 </div>
                 <!-- Card Body -->
                 <div class="card-body text-center py-2">
-                    <h5 class="card-title text-light mb-1">{{name}}</h5>
+                    <h5 class="card-title mb-1">{{name}}</h5>
                     {{#if comment}}
-                    <p class="card-text text-muted small mb-1">{{comment}}</p>
+                    <p class="card-text small mb-1">{{comment}}</p>
                     {{/if}}
-                    <div class="d-flex justify-content-around small text-secondary mt-1">
+                    <div class="d-flex justify-content-around small mt-1">
                         {{#if precision}}<span title="Precision">{{precision}}</span>{{else}}<span>-</span>{{/if}}
                     </div>
-                    <div class="d-flex justify-content-around small text-secondary">
+                    <div class="d-flex justify-content-around small">
                         {{#if daysMeasured}}<span title="Days measured">{{daysMeasured}}d</span>{{else}}<span>-</span>{{/if}}
                         {{#if lastUsed}}<span title="Last used">{{lastUsed}}</span>{{else}}<span>-</span>{{/if}}
                     </div>
@@ -86,7 +86,7 @@
     <div class="my-2 d-flex justify-content-around" id='watchCreateBtn'>
         <button title='Add a new Watch to track'
                 onclick="watchCreateDisplay()"
-                class="btn btn-outline-light">Add new Watch to track</button>
+                class="btn btn-outline-secondary">Add new Watch to track</button>
     </div>
 
     <!-- Create Watch Form -->
@@ -108,11 +108,11 @@
                    placeholder='enter Comment' />
         </form>
         <div class="btn-group">
-            <button class="btn btn-outline-light"
+            <button class="btn btn-outline-secondary"
                     title='Cancel Edit'
                     onclick="watchCreateDisplay(false)">❌</button>
             <button title='Save'
-                    class="btn btn-outline-light"
+                    class="btn btn-outline-secondary"
                     type='button'
                     onclick="htmx.trigger('#newWatchSave', 'trigger')">💾</button>
         </div>
