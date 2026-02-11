@@ -1,2 +1,3 @@
-#!/bin/bash
-fuser watchtracker.db >/dev/null 2>&1 && echo 'DB IN USE' || scp murl:/tmp/watchtracker.db .
+#!/usr/bin/env bash
+set -v
+ssh georg@murl 'mkvacuumtracker' && scp georg@murl:/tmp/vacuum.db .

@@ -11,6 +11,12 @@ document
 document.querySelector('body').addEventListener('keyup', (event) => {
     if (event.key == 'Escape') htmx.ajax('GET', '/watchtracker/'); // TODO FIXME
 });
+// Close timezone edit on HTMX content swaps
+document.querySelector('body').addEventListener('htmx:afterSwap', (event) => {
+    if (event.detail.target.id === 'mainContent') {
+        editTimezone(false);
+    }
+});
 function getCurrentDateTime() {
     const now = new Date();
     const month = (now.getMonth() + 1).toString().padStart(2, '0');

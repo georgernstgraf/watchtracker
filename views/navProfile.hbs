@@ -3,7 +3,6 @@
     <div class="d-flex justify-content-between align-items-center">
         <h1 class="mb-0">Watchtracker</h1>
         <div class="d-flex align-items-center gap-3">
-            <span id='profileUsername'>User: {{user.name}}</span>
             <div id='timeZoneDisplay' class="d-flex align-items-center gap-1">
                 <small>{{user.timeZone}}</small>
                 <button title='Switch Timezone'
@@ -40,6 +39,7 @@
                             onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)">💾</button>
                 </div>
             </div>
+            <span id='profileUsername'>User: {{user.name}}</span>
             <form hx-post='{{appPath}}/logout' hx-target='body'>
                 <button id='profileLogoutButton'
                         class='btn btn-outline-light btn-sm'>logout</button>
