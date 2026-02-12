@@ -8,7 +8,7 @@ import { getSession } from "../middleware/session.ts";
 const userRouter = new Hono();
 
 // PATCH /user - Update user settings
-userRouter.patch("/", async (c) => {
+userRouter.patch("/user", async (c) => {
     const session = getSession(c);
     const username = session.get("username")!;
 
