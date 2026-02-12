@@ -7,12 +7,13 @@ import { renderAllButHeadAndFoot, renderWatchDetails, renderUserWatches } from "
 import { authRouter } from "../routers/authRouter.ts";
 import { resizeImage, validateSquareImage } from "../lib/imageUtils.ts";
 import type { Prisma } from "generated-prisma-client";
+import { getSession } from "../middleware/session.ts";
 
 export default function serve_under_for(path: string, watchRouter: typeof authRouter) {
     // GET /auth/watches - Return watch cards for back navigation
     watchRouter.get(`/watches`, async (c) => {
-        const session = c.get("session");
-        const username = session.username!;
+        const session = getSession(c);
+        const username = session.get("username")!;
         const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
         const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
         return c.html(renderUserWatches({ userWatches, sortBy }));
@@ -31,8 +32,8 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
     });
 
     watchRouter.patch(`${path}/:id`, validateWatchOwnership, async (c) => {
-        const session = c.get("session");
-        const username = session.username!;
+        const session = getSession(c);
+        const username = session.get("username")!;
         const watchId = c.req.param("id");
         const body = await c.req.parseBody();
 
@@ -67,8 +68,8 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
     });
 
     watchRouter.post(path, async (c) => {
-        const session = c.get("session");
-        const username = session.username!;
+        const session = getSession(c);
+        const username = session.get("username")!;
         const body = await c.req.parseBody();
         const watch = await WatchService.createWatch({
             name: body.name as string,
@@ -82,8 +83,8 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
     });
 
     watchRouter.delete(`${path}/:id`, validateWatchOwnership, async (c) => {
-        const session = c.get("session");
-        const username = session.username!;
+        const session = getSession(c);
+        const username = session.get("username")!;
         await WatchService.deleteWatch(c.req.param("id"), username);
         const userWatches = await WatchService.getUserWatchesByUname(username);
         return c.html(renderAllButHeadAndFoot({ userWatches, watch: null }));
@@ -91,8 +92,11 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
 }
 
 async function handleGetDetails(id: string, c: Context) {
-    const session = c.get("session");
-    const username = session.username;
+    const session = getSession(c);
+    const username = session.get("username");
+    if (!username) {
+        throw new HTTPException(401, { message: "Unauthorized" });
+    }
     const watch = await WatchService.getWatchForDisplay(username, id);
     if (!watch) {
         throw new HTTPException(403, { message: "Wrong Watch ID" });

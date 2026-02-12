@@ -3,10 +3,11 @@ import { UserService, WatchService } from "../service/index.ts";
 import { TimeZone } from "../lib/timeZone.ts";
 import { renderLoginBody, renderBodyAuth } from "../lib/views.ts";
 import authenticate from "../lib/auth.ts";
+import { getSession } from "../middleware/session.ts";
 
 export default function serve_under_for(path: string, loginRouter: typeof sessionRouter) {
     loginRouter.post(path, async (c) => {
-        const session = c.get("session");
+        const session = getSession(c);
         const body = await c.req.parseBody();
         const errors = [];
 

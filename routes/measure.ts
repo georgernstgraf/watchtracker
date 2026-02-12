@@ -3,14 +3,15 @@ import { MeasurementService, WatchService } from "../service/index.ts";
 import { validateWatchOwnership, validateMeasurementOwnership } from "../middleware/ownership.ts";
 import { renderMeasurements } from "../lib/views.ts";
 import { authRouter } from "../routers/authRouter.ts";
+import { getSession } from "../middleware/session.ts";
 
 export default function serve_under_for(path: string, measureRouter: typeof authRouter) {
     // register a new measurement
     measureRouter.post(`${path}/:id`, validateWatchOwnership, async (c) => {
         // this is a watchId here!!
-        const session = c.get("session");
+        const session = getSession(c);
         const watchId = c.req.param("id");
-        const username = session.username!;
+        const username = session.get("username")!;
 
         // Create the measurement using the service
         const body = await c.req.parseBody();
@@ -37,8 +38,8 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
     });
 
     measureRouter.delete(`${path}/:id`, validateMeasurementOwnership, async (c) => {
-        const session = c.get("session");
-        const username = session.username!;
+        const session = getSession(c);
+        const username = session.get("username")!;
         const measureId = c.req.param("id");
         const watchId = await MeasurementService.getWatchIdForUserMeasurement(username, measureId);
 
@@ -56,8 +57,8 @@ export default function serve_under_for(path: string, measureRouter: typeof auth
     });
 
     measureRouter.patch(`${path}/:id`, validateMeasurementOwnership, async (c) => {
-        const session = c.get("session");
-        const username = session.username!;
+        const session = getSession(c);
+        const username = session.get("username")!;
 
         const measureId = c.req.param("id");
         const measure = await MeasurementService.getUserMeasurement(username, measureId);

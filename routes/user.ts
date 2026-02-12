@@ -3,12 +3,13 @@ import { authRouter } from "../routers/authRouter.ts";
 import { TimeZone } from "../lib/timeZone.ts";
 import { UserService, WatchService } from "../service/index.ts";
 import { renderBodyAuth } from "../lib/views.ts";
+import { getSession } from "../middleware/session.ts";
 
 export default function serve_under_for(path: string, userRouter: typeof authRouter) {
     // patch a user
     userRouter.patch(path, async (c) => {
-        const session = c.get("session");
-        const username = session.username!;
+        const session = getSession(c);
+        const username = session.get("username")!;
 
         const body = await c.req.parseBody();
 

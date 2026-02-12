@@ -1,143 +1,106 @@
-/*
- Session Class
+/**
+ * Session Middleware using hono-sessions
  */
-
-import { Context } from "hono";
-import { getSignedCookie, setSignedCookie } from "hono/cookie";
-import { v4 as uuidv4 } from "uuid";
-import store from "../lib/memcachedSessionStore.ts";
-import { defaultCookieOptions, logoutCookieOptions } from "../lib/cookieOptions.ts";
+import type { Context, MiddlewareHandler } from "hono";
+import { sessionMiddleware, type Session as HonoSession } from "@jcs224/hono-sessions";
+import store from "../lib/honoMemcachedStore.ts";
 import * as config from "../lib/config.ts";
 
 export type SessionData = {
     username?: string;
+    createdAt: number;
 };
+
 export type SessionDataAuth = {
     username: string;
+    createdAt: number;
 };
 
-function shortId(arg: string): string {
-    return arg.split("-")[2];
+// Extend the Hono session type with our methods
+declare module "@jcs224/hono-sessions" {
+    interface Session {
+        login(username: string): void;
+        logout(): void;
+    }
 }
 
-export class Session<T> {
-    c: Context;
-    #sessionId: string;
-    #data: SessionData | SessionDataAuth = {};
-    #needs_store_save = false;
-    #needs_cookie_send;
-    #cookie_type: "normal" | "logoout" = "normal";
+// Helper to get session from context
+export function getSession(c: Context): HonoSession<SessionData> {
+    return c.get("session") as HonoSession<SessionData>;
+}
 
-    constructor(c: Context, sessionId?: string) {
-        if (!sessionId) {
-            this.#needs_cookie_send = true;
-            sessionId = uuidv4();
-        } else {
-            this.#needs_cookie_send = false;
-        }
-        this.#sessionId = sessionId;
-        this.c = c;
-    }
+// Create the session middleware with rolling logic
+export function createSessionMiddleware(enforceAuth: boolean): MiddlewareHandler {
+    return async (c, next) => {
+        const requestUrl = `${c.req.method} ${c.req.path}`;
+        console.log(`=========== SESSION MW START: ${requestUrl} ===========`);
 
-    get username(): string | undefined {
-        return this.#data.username;
-    }
+        // Track if auth check failed
+        let authFailed = false;
 
-    get id(): string {
-        return this.#sessionId;
-    }
+        // Apply hono-sessions middleware
+        // Cast to unknown first to avoid Context type mismatch between jsr:@hono/hono and npm:hono
+        const middleware = sessionMiddleware({
+            store,
+            encryptionKey: config.COOKIE_SECRET,
+            expireAfterSeconds: config.COOKIE_MAX_AGE_S,
+            autoExtendExpiration: true,
+            sessionCookieName: config.COOKIE_NAME,
+            cookieOptions: {
+                path: config.APP_PATH || "/",
+                httpOnly: true,
+                secure: config.isProduction,
+                sameSite: "strict",
+                maxAge: config.COOKIE_MAX_AGE_S,
+            },
+        }) as unknown as MiddlewareHandler;
 
-    get shortId(): string {
-        return shortId(this.#sessionId);
-    }
+        await middleware(c, async () => {
+            const session = getSession(c);
+            const now = Date.now();
 
-    login(username: string) {
-        this.#data.username = username;
-        this.#needs_store_save = true;
-    }
+            // Check if session needs refresh (older than 1 week)
+            const createdAt = session.get("createdAt") as number | undefined;
+            const username = session.get("username") as string | undefined;
 
-    logout(): void {
-        this.#cookie_type = "logoout";
-        this.#needs_cookie_send = true;
-        this.#needs_store_save = true;
-    }
-
-    #sessionDataString() {
-        return JSON.stringify(this.#data);
-    }
-
-    async #save_to_mcd(): Promise<void> {
-        await store.persistSessionData(this.#sessionId, this.#sessionDataString());
-    }
-
-    async #sendCookie() {
-        const cookie_options = this.#cookie_type === "normal" ? defaultCookieOptions : logoutCookieOptions;
-        await setSignedCookie(this.c, config.COOKIE_NAME, this.#sessionId, config.COOKIE_SECRET, cookie_options);
-    }
-
-    async #remove_from_store(): Promise<void> {
-        await store.deleteSession(this.#sessionId);
-    }
-
-    static async from_mcd(
-        id: string,
-        c: Context, // id comes from cookie
-    ): Promise<Session<SessionDataAuth> | null> {
-        const sessionData = await store.getSessionDataById(id);
-        if (!sessionData) {
-            return null;
-        }
-        const session = new Session(c, id);
-        session.#data = JSON.parse(sessionData) as SessionDataAuth;
-        return session;
-    }
-
-    static async middleware(
-        c: Context,
-        next: () => Promise<void>,
-        enforce_auth: boolean,
-    ) {
-        let session = undefined;
-        const request_url = `${c.req.method} ${c.req.path}`;
-
-        console.log(
-            `=========== SESSION MW START: ${request_url} ===========`,
-        );
-        const sessionIdFromCookie = await getSignedCookie(c, config.COOKIE_SECRET, config.COOKIE_NAME);
-        // ------- BEFORE REQ --------
-        if (sessionIdFromCookie) { // from cookie
-            console.log(`SESSION: ${request_url} (${shortId(sessionIdFromCookie)}) FROM COOKIE`);
-            session = await Session.from_mcd(
-                sessionIdFromCookie,
-                c,
-            );
-            if (session) {
-                console.log(`SESSION: STORE_FOUND (${session.shortId}) (${request_url})`);
-            } else {
-                console.log(`SESSION: STORE_MISS (${shortId(sessionIdFromCookie)}) (${request_url})`);
-                session = new Session(c, sessionIdFromCookie);
+            if (createdAt && now - createdAt > config.SESSION_REFRESH_THRESHOLD_MS) {
+                console.log(`SESSION: ${requestUrl} session needs refresh (age: ${Math.floor((now - createdAt) / 1000 / 60 / 60)}h)`);
+                // Note: hono-sessions doesn't have regenerate(), so we just update the createdAt
+                // The session will be naturally rotated on next login
+                session.set("createdAt", now);
             }
-        } else {
-            session = new Session(c);
-            console.log(`SESSION: NO COOKIE (${request_url}) new id: ${session.shortId}`);
-        }
-        if (enforce_auth && !session.username) {
+
+            // Add helper methods to session
+            session.login = (username: string) => {
+                session.set("username", username);
+                session.set("createdAt", Date.now());
+            };
+
+            session.logout = () => {
+                session.deleteSession();
+            };
+
+            // Check auth if required
+            if (enforceAuth && !username) {
+                console.log(`SESSION: ${requestUrl} unauthorized`);
+                authFailed = true;
+                return;
+            }
+
+            console.log(`    >>>>>>> SESSION NOW NEXT: ${requestUrl} <<<<<<<`);
+            await next();
+            console.log(`    >>>>>>> SESSION AFTER NEXT: ${requestUrl} <<<<<<<`);
+        });
+
+        // Handle auth failure after middleware completes
+        if (authFailed) {
             return c.text("Unauthorized", 401);
         }
-        c.set("session", session);
-        console.log(`    >>>>>>> SESSION NOW NEXT: ${request_url} <<<<<<<`);
-        await next();
-        console.log(`    >>>>>>> SESSION AFTER NEXT: ${request_url} <<<<<<<`);
-        // ------- AFTER REQ --------
-        if (session.#needs_cookie_send) {
-            console.log(`SESSION: ${request_url} I will send a cookie (${session.shortId})`);
-            await session.#sendCookie();
-        }
 
-        if (session.#needs_store_save) {
-            await session.#save_to_mcd();
-            console.log(`SESSION: ${request_url} modified, storing (${session.shortId})`);
-        }
-        console.log(`=========== SESSION MW END: ${request_url} ===========`);
-    }
+        console.log(`=========== SESSION MW END: ${requestUrl} ===========`);
+    };
 }
+
+// Convenience middlewares
+export const sessionMiddlewarePublic = createSessionMiddleware(false);
+export const sessionMiddlewareProtected = createSessionMiddleware(true);

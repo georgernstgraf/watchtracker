@@ -1,10 +1,11 @@
 import { Context, Next } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { WatchService, MeasurementService } from "../service/index.ts";
+import { getSession } from "./session.ts";
 
 export const validateWatchOwnership = async (c: Context, next: Next) => {
-    const session = c.get("session");
-    const username = session?.username;
+    const session = getSession(c);
+    const username = session?.get("username");
     const watchId = c.req.param("id") || c.req.query("id");
 
     if (!username) {
@@ -25,8 +26,8 @@ export const validateWatchOwnership = async (c: Context, next: Next) => {
 };
 
 export const validateMeasurementOwnership = async (c: Context, next: Next) => {
-    const session = c.get("session");
-    const username = session?.username;
+    const session = getSession(c);
+    const username = session?.get("username");
     const measureId = c.req.param("id");
 
     if (!username) {
@@ -44,7 +45,7 @@ export const validateMeasurementOwnership = async (c: Context, next: Next) => {
     }
 
     // Attach the measure to context to avoid re-fetching in the route if needed
-    // c.set("measurement", measure); 
-    
+    // c.set("measurement", measure);
+
     await next();
 };
