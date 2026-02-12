@@ -4,6 +4,7 @@ import { UserRepository } from "../repo/userRepository.ts";
 import { UserService } from "./userService.ts";
 import { MeasurementService } from "./measurementService.ts";
 import { TimeZone } from "../lib/timeZone.ts";
+import { ForbiddenError } from "../lib/errors.ts";
 import type { Measurement, Prisma, Watch } from "generated-prisma-client";
 import type { EnrichedWatch, EnrichedMeasurement, WatchCard } from "../lib/viewTypes.ts";
 
@@ -170,7 +171,7 @@ export class WatchService {
         // Verify ownership before deletion
         const watch = await WatchRepository.findUnique({ id: watchId });
         if (!watch || watch.userId !== userId) {
-            throw new Error("Watch not found or access denied");
+            throw new ForbiddenError("Watch not found or access denied");
         }
 
         return await WatchRepository.delete({ id: watchId });
@@ -233,7 +234,7 @@ export class WatchService {
         // Verify the watch belongs to the user
         const belongsToUser = await this.watchBelongsToUser(watchId, userId);
         if (!belongsToUser) {
-            throw new Error("Watch not found or access denied");
+            throw new ForbiddenError("Watch not found or access denied");
         }
 
         await UserRepository.update({

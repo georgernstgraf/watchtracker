@@ -1,5 +1,6 @@
 import { UserRepository } from "../repo/userRepository.ts";
 import { WatchRepository } from "../repo/watchRepository.ts";
+import { NotFoundError } from "../lib/errors.ts";
 import type { Prisma, User } from "generated-prisma-client";
 
 export class UserService {
@@ -23,7 +24,7 @@ export class UserService {
     static async getUserByName(name: string): Promise<User> {
         const user = await UserRepository.findByName(name);
         if (!user) {
-            throw new Error("User not found");
+            throw new NotFoundError("User not found");
         }
         return user;
     }

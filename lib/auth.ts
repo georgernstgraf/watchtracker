@@ -1,3 +1,4 @@
+import { UnauthorizedError } from "./errors.ts";
 import * as config from "./config.ts";
 import { testsaslauthd } from "./testsaslauthd.ts";
 
@@ -42,7 +43,7 @@ async function authenticate(user: string, passwd: string) {
 
     // auth (bool) und user (string)
     if (!(await authResp.json()).auth) {
-        throw new Error("invalid credentials");
+        throw new UnauthorizedError("invalid credentials");
     }
 }
 

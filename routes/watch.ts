@@ -6,6 +6,7 @@ import { validateWatchOwnership } from "../middleware/ownership.ts";
 import { renderAllButHeadAndFoot, renderWatchDetails, renderUserWatches } from "../lib/views.ts";
 import { authRouter } from "../routers/authRouter.ts";
 import { resizeImage, validateSquareImage } from "../lib/imageUtils.ts";
+import { ForbiddenError } from "../lib/errors.ts";
 import type { Prisma } from "generated-prisma-client";
 import { getSession } from "../middleware/session.ts";
 
@@ -85,7 +86,14 @@ export default function serve_under_for(path: string, watchRouter: typeof authRo
     watchRouter.delete(`${path}/:id`, validateWatchOwnership, async (c) => {
         const session = getSession(c);
         const username = session.get("username")!;
-        await WatchService.deleteWatch(c.req.param("id"), username);
+        try {
+            await WatchService.deleteWatch(c.req.param("id"), username);
+        } catch (err) {
+            if (err instanceof ForbiddenError) {
+                throw new HTTPException(403, { message: err.message });
+            }
+            throw err;
+        }
         const userWatches = await WatchService.getUserWatchesByUname(username);
         return c.html(renderAllButHeadAndFoot({ userWatches, watch: null }));
     });
