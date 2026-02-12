@@ -71,7 +71,7 @@ export class Session<T> {
     }
 
     async #sendCookie() {
-        const cookie_options = this.#cookie_type == "normal" ? defaultCookieOptions : logoutCookieOptions;
+        const cookie_options = this.#cookie_type === "normal" ? defaultCookieOptions : logoutCookieOptions;
         await setSignedCookie(this.c, config.COOKIE_NAME, this.#sessionId, config.COOKIE_SECRET, cookie_options);
     }
 

@@ -89,7 +89,7 @@ hbs.registerHelper("formatDate", function (dateString: string) {
 });
 
 hbs.registerHelper("plusOne", function (val: number) {
-    if (val == 0) return 1;
+    if (val === 0) return 1;
     return val;
 });
 

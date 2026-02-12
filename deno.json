@@ -39,5 +39,13 @@
         "indentWidth": 4,
         "semiColons": true,
         "singleQuote": false
+    },
+    "lint": {
+        "rules": {
+            "include": [
+                "eqeqeq",
+                "no-explicit-any"
+            ]
+        }
     }
 }
