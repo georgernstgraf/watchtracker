@@ -8,7 +8,7 @@ import { getSession } from "../middleware/session.ts";
 const measureRouter = new Hono();
 
 // POST /measure/:id - Create a new measurement for a watch
-measureRouter.post("/:id", validateWatchOwnership, async (c) => {
+measureRouter.post("/measure/:id", validateWatchOwnership, async (c) => {
     // this is a watchId here!!
     const session = getSession(c);
     const watchId = c.req.param("id");
@@ -38,7 +38,7 @@ measureRouter.post("/:id", validateWatchOwnership, async (c) => {
     return c.html(renderMeasurements({ watch }));
 });
 
-measureRouter.delete("/:id", validateMeasurementOwnership, async (c) => {
+measureRouter.delete("/measure/:id", validateMeasurementOwnership, async (c) => {
     const session = getSession(c);
     const username = session.get("username")!;
     const measureId = c.req.param("id");
@@ -57,7 +57,7 @@ measureRouter.delete("/:id", validateMeasurementOwnership, async (c) => {
     return c.html(renderMeasurements({ watch }));
 });
 
-measureRouter.patch("/:id", validateMeasurementOwnership, async (c) => {
+measureRouter.patch("/measure/:id", validateMeasurementOwnership, async (c) => {
     const session = getSession(c);
     const username = session.get("username")!;
 

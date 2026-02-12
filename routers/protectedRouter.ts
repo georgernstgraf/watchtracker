@@ -11,7 +11,7 @@ export const protectedRouter = new Hono<{ Variables: { session: HonoSession<Sess
 // Apply protected session middleware (requires authentication)
 protectedRouter.use(sessionMiddlewareProtected);
 
-// Protected routes
-protectedRouter.route("/watch", watch);
-protectedRouter.route("/measure", measure);
-protectedRouter.route("/user", user);
+// Protected routes - mounted at root to preserve URL structure
+protectedRouter.route("/", watch);
+protectedRouter.route("/", measure);
+protectedRouter.route("/", user);

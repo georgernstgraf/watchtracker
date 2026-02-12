@@ -1,5 +1,5 @@
 import { Buffer } from "node:buffer";
-import { Hono } from "hono";
+import { Hono, type Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { UserService, WatchService, type SortOption } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
@@ -21,18 +21,18 @@ watchRouter.get("/watches", async (c) => {
 });
 
 // GET /watch - Legacy route with query param
-watchRouter.get("/", validateWatchOwnership, async (c) => {
+watchRouter.get("/watch", validateWatchOwnership, async (c) => {
     const id = c.req.query("id") ?? "";
     return await handleGetDetails(id, c);
 });
 
 // GET /watch/:id - Return watch details for card click
-watchRouter.get("/:id", validateWatchOwnership, async (c) => {
+watchRouter.get("/watch/:id", validateWatchOwnership, async (c) => {
     const id = c.req.param("id");
     return await handleGetDetails(id, c);
 });
 
-watchRouter.patch("/:id", validateWatchOwnership, async (c) => {
+watchRouter.patch("/watch/:id", validateWatchOwnership, async (c) => {
     const session = getSession(c);
     const username = session.get("username")!;
     const watchId = c.req.param("id");
@@ -68,7 +68,7 @@ watchRouter.patch("/:id", validateWatchOwnership, async (c) => {
     return c.html(renderWatchDetails({ watch: updatedWatch, userWatches }));
 });
 
-watchRouter.post("/", async (c) => {
+watchRouter.post("/watch", async (c) => {
     const session = getSession(c);
     const username = session.get("username")!;
     const body = await c.req.parseBody();
@@ -83,7 +83,7 @@ watchRouter.post("/", async (c) => {
     return c.html(renderAllButHeadAndFoot({ watch: newWatch, userWatches }));
 });
 
-watchRouter.delete("/:id", validateWatchOwnership, async (c) => {
+watchRouter.delete("/watch/:id", validateWatchOwnership, async (c) => {
     const session = getSession(c);
     const username = session.get("username")!;
     try {
