@@ -16,7 +16,7 @@
             <div class="card-body py-2">
                 <form id="unsavedMeasurement-form"
                       class="text-center"
-                      hx-post="{{appPath}}/auth/measure/{{watch.id}}"
+                      hx-post="{{appPath}}/measure/{{watch.id}}"
                       hx-target="closest .measurements-container"
                       hx-swap="outerHTML"
                       hx-trigger="trigger">
@@ -63,7 +63,7 @@
             <div class="card-body py-2">
                 <form id="{{id}}-form"
                       class="text-center"
-                      hx-patch="{{../appPath}}/auth/measure/{{id}}"
+                      hx-patch="{{../appPath}}/measure/{{id}}"
                       hx-target="closest .measurements-container"
                       hx-swap="outerHTML"
                       hx-trigger="trigger">
@@ -97,7 +97,7 @@
                     <div class="btn-group btn-group-sm mt-1">
                         <button title="Delete Record"
                                 class="btn btn-outline-danger"
-                                hx-delete="{{../appPath}}/auth/measure/{{id}}"
+                                hx-delete="{{../appPath}}/measure/{{id}}"
                                 hx-target="closest .measurements-container"
                                 hx-swap="outerHTML"
                                 onclick="event.preventDefault()">Delete</button>

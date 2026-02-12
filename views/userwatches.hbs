@@ -4,28 +4,28 @@
     <div class="d-flex justify-content-between mb-2">
         <button type="button"
                 class="btn btn-outline-secondary btn-sm {{#if (eq sortBy "recent_desc")}}active{{/if}}"
-                hx-get="{{appPath}}/auth/watches?sort=recent_desc"
+                hx-get="{{appPath}}/watches?sort=recent_desc"
                 hx-target="#userWatches"
                 hx-swap="outerHTML">
             Recent ↓
         </button>
         <button type="button"
                 class="btn btn-outline-secondary btn-sm {{#if (eq sortBy "recent_asc")}}active{{/if}}"
-                hx-get="{{appPath}}/auth/watches?sort=recent_asc"
+                hx-get="{{appPath}}/watches?sort=recent_asc"
                 hx-target="#userWatches"
                 hx-swap="outerHTML">
             Recent ↑
         </button>
         <button type="button"
                 class="btn btn-outline-secondary btn-sm {{#if (eq sortBy "precise_asc")}}active{{/if}}"
-                hx-get="{{appPath}}/auth/watches?sort=precise_asc"
+                hx-get="{{appPath}}/watches?sort=precise_asc"
                 hx-target="#userWatches"
                 hx-swap="outerHTML">
             Precise ↑
         </button>
         <button type="button"
                 class="btn btn-outline-secondary btn-sm {{#if (eq sortBy "precise_desc")}}active{{/if}}"
-                hx-get="{{appPath}}/auth/watches?sort=precise_desc"
+                hx-get="{{appPath}}/watches?sort=precise_desc"
                 hx-target="#userWatches"
                 hx-swap="outerHTML">
             Precise ↓
@@ -37,7 +37,7 @@
         <div class="col">
             <div class="card h-100 border-secondary"
                  style="cursor: pointer;"
-                 hx-get='{{../appPath}}/auth/watch/{{id}}'
+                 hx-get='{{../appPath}}/watch/{{id}}'
                  hx-target='#mainContent'
                  hx-swap='innerHTML'>
                 <!-- Square Image Area -->
@@ -94,7 +94,7 @@
          class="my-4 justify-content-center gap-3 align-items-baseline"
          style='display:none'>
         <form id='newWatchSave'
-              hx-post='{{appPath}}/auth/watch'
+              hx-post='{{appPath}}/watch'
               hx-target='#allButHeadAndFoot'
               hx-swap='outerHTML'
               hx-trigger='trigger'>

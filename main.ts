@@ -5,8 +5,8 @@ import { ContentfulStatusCode } from "hono/utils/http-status";
 import { serveStatic } from "hono/deno";
 import { prisma } from "./lib/db.ts";
 import { renderError, renderErrorFull } from "./lib/views.ts";
-import { sessionRouter } from "./routers/sessionRouter.ts";
-import { authRouter } from "./routers/authRouter.ts";
+import { publicRouter } from "./routers/publicRouter.ts";
+import { protectedRouter } from "./routers/protectedRouter.ts";
 import * as config from "./lib/config.ts";
 import process from "node:process";
 
@@ -53,8 +53,8 @@ function main() {
     );
 
     // Mount routers
-    app.route(config.APP_PATH, sessionRouter);
-    app.route(`${config.APP_PATH}/auth`, authRouter);
+    app.route(config.APP_PATH, publicRouter);
+    app.route(config.APP_PATH, protectedRouter);
 
     // 404 handler
     app.notFound((c) => {

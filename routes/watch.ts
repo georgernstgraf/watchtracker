@@ -1,103 +1,102 @@
 import { Buffer } from "node:buffer";
-import { Context } from "hono";
+import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { UserService, WatchService, type SortOption } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
 import { renderAllButHeadAndFoot, renderWatchDetails, renderUserWatches } from "../lib/views.ts";
-import { authRouter } from "../routers/authRouter.ts";
 import { resizeImage, validateSquareImage } from "../lib/imageUtils.ts";
 import { ForbiddenError } from "../lib/errors.ts";
 import type { Prisma } from "generated-prisma-client";
 import { getSession } from "../middleware/session.ts";
 
-export default function serve_under_for(path: string, watchRouter: typeof authRouter) {
-    // GET /auth/watches - Return watch cards for back navigation
-    watchRouter.get(`/watches`, async (c) => {
-        const session = getSession(c);
-        const username = session.get("username")!;
-        const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
-        const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
-        return c.html(renderUserWatches({ userWatches, sortBy }));
-    });
+const watchRouter = new Hono();
 
-    // GET /auth/watch - Legacy route with query param
-    watchRouter.get(`${path}`, validateWatchOwnership, async (c) => {
-        const id = c.req.query("id") ?? c.req.param("id") ?? "";
-        return await handleGetDetails(id, c);
-    });
+// GET /watches - Return watch cards for back navigation
+watchRouter.get("/watches", async (c) => {
+    const session = getSession(c);
+    const username = session.get("username")!;
+    const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
+    const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
+    return c.html(renderUserWatches({ userWatches, sortBy }));
+});
 
-    // GET /auth/watch/:id - Return watch details for card click
-    watchRouter.get(`${path}/:id`, validateWatchOwnership, async (c) => {
-        const id = c.req.param("id");
-        return await handleGetDetails(id, c);
-    });
+// GET /watch - Legacy route with query param
+watchRouter.get("/", validateWatchOwnership, async (c) => {
+    const id = c.req.query("id") ?? "";
+    return await handleGetDetails(id, c);
+});
 
-    watchRouter.patch(`${path}/:id`, validateWatchOwnership, async (c) => {
-        const session = getSession(c);
-        const username = session.get("username")!;
-        const watchId = c.req.param("id");
-        const body = await c.req.parseBody();
+// GET /watch/:id - Return watch details for card click
+watchRouter.get("/:id", validateWatchOwnership, async (c) => {
+    const id = c.req.param("id");
+    return await handleGetDetails(id, c);
+});
 
-        const updateData: Prisma.WatchUpdateInput = {
-            name: body.name as string,
-            comment: body.comment as string,
-        };
+watchRouter.patch("/:id", validateWatchOwnership, async (c) => {
+    const session = getSession(c);
+    const username = session.get("username")!;
+    const watchId = c.req.param("id");
+    const body = await c.req.parseBody();
 
-        // Handle image upload
-        if (body.image && body.image instanceof File) {
-            const imageBuffer = await body.image.arrayBuffer();
-            const uint8Array = new Uint8Array(imageBuffer);
+    const updateData: Prisma.WatchUpdateInput = {
+        name: body.name as string,
+        comment: body.comment as string,
+    };
 
-            // Validate square image
-            const validation = await validateSquareImage(uint8Array);
-            if (!validation.valid) {
-                throw new HTTPException(422, { message: validation.error });
-            }
+    // Handle image upload
+    if (body.image && body.image instanceof File) {
+        const imageBuffer = await body.image.arrayBuffer();
+        const uint8Array = new Uint8Array(imageBuffer);
 
-            // Resize and store
-            updateData.image = Buffer.from(await resizeImage(uint8Array));
+        // Validate square image
+        const validation = await validateSquareImage(uint8Array);
+        if (!validation.valid) {
+            throw new HTTPException(422, { message: validation.error });
         }
 
-        await WatchService.updateWatch(watchId, updateData);
+        // Resize and store
+        updateData.image = Buffer.from(await resizeImage(uint8Array));
+    }
 
-        const updatedWatch = await WatchService.getWatchForDisplay(username, watchId);
-        if (!updatedWatch) {
-            throw new HTTPException(404, { message: "Watch not found" });
+    await WatchService.updateWatch(watchId, updateData);
+
+    const updatedWatch = await WatchService.getWatchForDisplay(username, watchId);
+    if (!updatedWatch) {
+        throw new HTTPException(404, { message: "Watch not found" });
+    }
+    const userWatches = await WatchService.getUserWatchesByUname(username);
+    return c.html(renderWatchDetails({ watch: updatedWatch, userWatches }));
+});
+
+watchRouter.post("/", async (c) => {
+    const session = getSession(c);
+    const username = session.get("username")!;
+    const body = await c.req.parseBody();
+    const watch = await WatchService.createWatch({
+        name: body.name as string,
+        comment: body.comment as string,
+        user: { connect: { name: username } },
+    });
+    await UserService.setLastWatch(username, watch.id);
+    const userWatches = await WatchService.getUserWatchesByUname(username);
+    const newWatch = await WatchService.getWatchForDisplay(username, watch.id);
+    return c.html(renderAllButHeadAndFoot({ watch: newWatch, userWatches }));
+});
+
+watchRouter.delete("/:id", validateWatchOwnership, async (c) => {
+    const session = getSession(c);
+    const username = session.get("username")!;
+    try {
+        await WatchService.deleteWatch(c.req.param("id"), username);
+    } catch (err) {
+        if (err instanceof ForbiddenError) {
+            throw new HTTPException(403, { message: err.message });
         }
-        const userWatches = await WatchService.getUserWatchesByUname(username);
-        return c.html(renderWatchDetails({ watch: updatedWatch, userWatches }));
-    });
-
-    watchRouter.post(path, async (c) => {
-        const session = getSession(c);
-        const username = session.get("username")!;
-        const body = await c.req.parseBody();
-        const watch = await WatchService.createWatch({
-            name: body.name as string,
-            comment: body.comment as string,
-            user: { connect: { name: username } },
-        });
-        await UserService.setLastWatch(username, watch.id);
-        const userWatches = await WatchService.getUserWatchesByUname(username);
-        const newWatch = await WatchService.getWatchForDisplay(username, watch.id);
-        return c.html(renderAllButHeadAndFoot({ watch: newWatch, userWatches }));
-    });
-
-    watchRouter.delete(`${path}/:id`, validateWatchOwnership, async (c) => {
-        const session = getSession(c);
-        const username = session.get("username")!;
-        try {
-            await WatchService.deleteWatch(c.req.param("id"), username);
-        } catch (err) {
-            if (err instanceof ForbiddenError) {
-                throw new HTTPException(403, { message: err.message });
-            }
-            throw err;
-        }
-        const userWatches = await WatchService.getUserWatchesByUname(username);
-        return c.html(renderAllButHeadAndFoot({ userWatches, watch: null }));
-    });
-}
+        throw err;
+    }
+    const userWatches = await WatchService.getUserWatchesByUname(username);
+    return c.html(renderAllButHeadAndFoot({ userWatches, watch: null }));
+});
 
 async function handleGetDetails(id: string, c: Context) {
     const session = getSession(c);
@@ -113,3 +112,5 @@ async function handleGetDetails(id: string, c: Context) {
     const userWatches = await WatchService.getUserWatchesByUname(username);
     return c.html(renderWatchDetails({ watch, userWatches }));
 }
+
+export default watchRouter;
