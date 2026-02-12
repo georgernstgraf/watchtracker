@@ -1,4 +1,5 @@
 import * as config from "./config.ts";
+import { testsaslauthd } from "./testsaslauthd.ts";
 
 // Test users for non-production environments
 const TEST_USERS = [
@@ -21,6 +22,11 @@ function isTestUser(user: string, passwd: string): boolean {
 async function authenticate(user: string, passwd: string) {
     // In non-production environments, check test users first
     if (!config.isProduction && isTestUser(user, passwd)) {
+        return;
+    }
+
+    // Try saslauthd authentication
+    if (await testsaslauthd(user, passwd)) {
         return;
     }
 

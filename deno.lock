@@ -4,6 +4,7 @@
     "jsr:@avroit/memcached@^0.0.4": "0.0.4",
     "jsr:@db/sqlite@0.13": "0.13.0",
     "jsr:@denosaurs/plug@1": "1.1.0",
+    "jsr:@hono/hono@*": "4.11.9",
     "jsr:@hono/hono@4": "4.11.9",
     "jsr:@hono/hono@^4.11.9": "4.11.9",
     "jsr:@jcs224/hono-sessions@0.8": "0.8.0",

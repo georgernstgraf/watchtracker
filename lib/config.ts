@@ -28,3 +28,6 @@ export const MEMCACHE_TTL_S = Math.min(COOKIE_MAX_AGE_S + 86400, 2592000);
 export const partialsDir = "./views";
 export const isProduction = DENO_ENV === "production";
 export const isDevelopment = DENO_ENV === "development";
+
+export const saslauthdMux = Deno.env.get("SASLAUTHD_MUX") || "/var/run/saslauthd/mux";
+export const saslauthdLieTrue = Deno.env.get("SASLAUTHD_LIE_TRUE") === "true";
