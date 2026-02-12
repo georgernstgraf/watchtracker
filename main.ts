@@ -81,10 +81,8 @@ function main() {
         };
 
         if (isHTMX) {
-            // Return a partial for HTMX
             return c.html(renderError(errorData), status as ContentfulStatusCode);
         } else {
-            // Return a full page for normal requests
             return c.html(renderErrorFull(errorData), status as ContentfulStatusCode);
         }
     });

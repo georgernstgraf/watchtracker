@@ -2,11 +2,11 @@
 
 <body>
     <!-- Toast Container -->
-    <div class="toast-container position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1100;">
-        <div id="errorToast" class="toast align-items-center text-bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
-            <div class="d-flex">
-                <div class="toast-body" id="errorToastMessage"></div>
-                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 1100; width: 100%; max-width: 500px; padding: 0 10px;">
+        <div id="errorToast" class="toast text-bg-danger border-0 w-100" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-body d-flex align-items-start">
+                <div id="errorToastMessage" class="flex-grow-1" style="overflow-y: auto; max-height: 300px; font-size: 0.875rem;"></div>
+                <button type="button" class="btn-close btn-close-white ms-2 flex-shrink-0" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         </div>
     </div>

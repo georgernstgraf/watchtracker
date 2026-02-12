@@ -1,20 +1,4 @@
-<div class="alert alert-danger">
-    <p>
-        <strong>Error:</strong> {{error.message}}
-    </p>
-    {{#if error.path}}
-        <p>
-            <small><em>Path: </em>{{error.path}}</small>
-        </p>
-    {{/if}}
-    {{#if error.stack}}
-        <pre class="small mt-2" style="max-height: 200px; overflow: auto;">{{error.stack}}</pre>
-    {{/if}}
-</div>
-{{#if errors}}
-    {{#each errors}}
-        <div class="alert alert-warning">
-            {{this}}
-        </div>
-    {{/each}}
+<div class="fw-bold">Error: {{error.message}}</div>
+{{#if error.stack}}
+    <pre class="mt-2 mb-0" style="font-size: 0.75rem; white-space: pre; overflow-x: auto;">{{error.stack}}</pre>
 {{/if}}

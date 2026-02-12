@@ -17,11 +17,15 @@ document
     .querySelector('body')
     .addEventListener('htmx:responseError', (event) => {
         if (event.detail.xhr.status === 401) {
-            // Trigger an htmx request on otherDiv
-            htmx.ajax('GET', '/watchtracker/'); // TODO FIXME
+            htmx.ajax('GET', '/watchtracker/');
         } else {
-            const message = event.detail.xhr.responseText || 'An error occurred';
-            showErrorToast(message);
+            // Swap error HTML into toast and show it
+            const messageEl = document.getElementById('errorToastMessage');
+            const toastEl = document.getElementById('errorToast');
+            if (messageEl && toastEl) {
+                messageEl.innerHTML = event.detail.xhr.responseText;
+                bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 }).show();
+            }
         }
     });
 document.querySelector('body').addEventListener('keyup', (event) => {
@@ -122,13 +126,4 @@ function toggleTheme() {
     if (icon) {
         icon.textContent = newTheme === 'dark' ? '🌙' : '☀️';
     }
-}
-
-function showErrorToast(message) {
-    const toastEl = document.getElementById('errorToast');
-    const messageEl = document.getElementById('errorToastMessage');
-    if (!toastEl || !messageEl) return;
-    messageEl.textContent = message;
-    const toast = bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 });
-    toast.show();
 }
