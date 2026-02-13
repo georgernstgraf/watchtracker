@@ -85,9 +85,10 @@ watchRouter.post("/watch", async (c) => {
 
 watchRouter.delete("/watch/:id", validateWatchOwnership, async (c) => {
     const session = getSession(c);
+    const userId = session.get("userId")!;
     const username = session.get("username")!;
     try {
-        await WatchService.deleteWatch(c.req.param("id"), username);
+        await WatchService.deleteWatch(c.req.param("id"), userId);
     } catch (err) {
         if (err instanceof ForbiddenError) {
             throw new HTTPException(403, { message: err.message });

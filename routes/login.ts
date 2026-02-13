@@ -31,9 +31,9 @@ export default async function loginHandler(c: Context) {
         return c.html(renderLoginBody({ errors }));
     }
 
-    // registers the session and sends the cookie
-    const user = await UserService.ensureUserExists(userName);
-    session.login(user.name); // Store the user data in session
+        // registers the session and sends the cookie
+        const user = await UserService.ensureUserExists(userName);
+        session.login(user.name, user.id); // Store the user data in session
 
     const userWatches = await WatchService.getUserWatchesByUname(user.name);
     const watch = await WatchService.getWatchForDisplay(user.name);

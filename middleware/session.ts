@@ -8,18 +8,20 @@ import * as config from "../lib/config.ts";
 
 export type SessionData = {
     username?: string;
+    userId?: string;
     createdAt: number;
 };
 
 export type SessionDataAuth = {
     username: string;
+    userId: string;
     createdAt: number;
 };
 
 // Extend the Hono session type with our methods
 declare module "@jcs224/hono-sessions" {
     interface Session {
-        login(username: string): void;
+        login(username: string, userId: string): void;
         logout(): void;
     }
 }
@@ -71,8 +73,9 @@ export function createSessionMiddleware(enforceAuth: boolean): MiddlewareHandler
             }
 
             // Add helper methods to session
-            session.login = (username: string) => {
+            session.login = (username: string, userId: string) => {
                 session.set("username", username);
+                session.set("userId", userId);
                 session.set("createdAt", Date.now());
             };
 
