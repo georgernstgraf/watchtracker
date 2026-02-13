@@ -28,49 +28,37 @@ function getKey(sessionId: string): string {
     return `${PREFIX}-${sessionId}`;
 }
 
-async function encrypt(text: string, key: string): Promise<string> {
+async function hmacSign(data: string, secret: string): Promise<string> {
     const encoder = new TextEncoder();
-    const keyData = encoder.encode(key);
-    const cryptoKey = await crypto.subtle.importKey(
+    const key = await crypto.subtle.importKey(
         "raw",
-        keyData.slice(0, 32),
-        { name: "AES-GCM" },
+        encoder.encode(secret),
+        { name: "HMAC", hash: "SHA-256" },
         false,
-        ["encrypt"]
+        ["sign"]
     );
-    const iv = crypto.getRandomValues(new Uint8Array(12));
-    const encrypted = await crypto.subtle.encrypt(
-        { name: "AES-GCM", iv },
-        cryptoKey,
-        encoder.encode(text)
-    );
-    const combined = new Uint8Array(iv.length + encrypted.byteLength);
-    combined.set(iv);
-    combined.set(new Uint8Array(encrypted), iv.length);
-    return btoa(String.fromCharCode(...combined));
+    const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(data));
+    return btoa(String.fromCharCode(...new Uint8Array(signature)));
 }
 
-async function decrypt(encryptedText: string, key: string): Promise<string> {
-    const encoder = new TextEncoder();
-    const keyData = encoder.encode(key);
-    const cryptoKey = await crypto.subtle.importKey(
-        "raw",
-        keyData.slice(0, 32),
-        { name: "AES-GCM" },
-        false,
-        ["decrypt"]
-    );
-    const combined = new Uint8Array(
-        atob(encryptedText).split("").map((c) => c.charCodeAt(0))
-    );
-    const iv = combined.slice(0, 12);
-    const encrypted = combined.slice(12);
-    const decrypted = await crypto.subtle.decrypt(
-        { name: "AES-GCM", iv },
-        cryptoKey,
-        encrypted
-    );
-    return new TextDecoder().decode(decrypted);
+async function hmacVerify(data: string, signature: string, secret: string): Promise<boolean> {
+    const expected = await hmacSign(data, secret);
+    if (signature.length !== expected.length) return false;
+    let result = 0;
+    for (let i = 0; i < signature.length; i++) {
+        result |= signature.charCodeAt(i) ^ expected.charCodeAt(i);
+    }
+    return result === 0;
+}
+
+function signSessionId(sessionId: string, signature: string): string {
+    return `${sessionId}.${signature}`;
+}
+
+function parseSignedCookie(cookie: string): { sessionId: string; signature: string } | null {
+    const parts = cookie.split(".");
+    if (parts.length !== 2) return null;
+    return { sessionId: parts[0], signature: parts[1] };
 }
 
 export class Session {
@@ -187,14 +175,16 @@ export function createGlobalSessionMiddleware(): MiddlewareHandler {
 
         const cookieValue = getCookie(c, config.COOKIE_NAME);
         if (cookieValue && config.COOKIE_SECRET) {
-            try {
-                sessionId = await decrypt(cookieValue, config.COOKIE_SECRET);
-                sessionData = await getSessionFromStore(sessionId);
-                if (!sessionData) {
-                    sessionId = null;
+            const parsed = parseSignedCookie(cookieValue);
+            if (parsed) {
+                const isValid = await hmacVerify(parsed.sessionId, parsed.signature, config.COOKIE_SECRET);
+                if (isValid) {
+                    sessionId = parsed.sessionId;
+                    sessionData = await getSessionFromStore(sessionId);
+                    if (!sessionData) {
+                        sessionId = null;
+                    }
                 }
-            } catch {
-                sessionId = null;
             }
         }
 
@@ -245,8 +235,8 @@ export function createGlobalSessionMiddleware(): MiddlewareHandler {
         } else if (session.isModified()) {
             await persistSession(sessionId, session.getData());
             if (session.isNewSession() && config.COOKIE_SECRET) {
-                const encryptedId = await encrypt(sessionId, config.COOKIE_SECRET);
-                setCookie(c, config.COOKIE_NAME, encryptedId, {
+                const signature = await hmacSign(sessionId, config.COOKIE_SECRET);
+                setCookie(c, config.COOKIE_NAME, signSessionId(sessionId, signature), {
                     path: config.APP_PATH || "/",
                     httpOnly: true,
                     secure: config.isProduction,
