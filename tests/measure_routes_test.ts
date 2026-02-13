@@ -14,8 +14,8 @@ import {
 } from "./helpers.ts";
 
 // Test data from database
-const TEST_WATCH_ID = "clxivz2qb0008hmcfbsbwvi6h"; // Jaques Lemans (has measurements)
-const TEST_MEASUREMENT_ID = "clxivzt3p000ahmcf4gbho1os"; // First measurement
+const TEST_WATCH_ID = "cm9s81bh3000r13la5wqn10fj"; // Manero (owned by grafg)
+// const TEST_MEASUREMENT_ID = "clxivzt3p000ahmcf4gbho1os"; // First measurement
 
 describe("Measurement Routes (Read-Only)", { sanitizeResources: false, sanitizeOps: false }, () => {
     it("POST /measure/:id returns measurements component", async () => {
@@ -54,15 +54,39 @@ describe("Measurement Routes (Write Operations)", { sanitizeResources: false, sa
         const user = TEST_USERS[1]; // grafg
         await loginUser(user.user, user.passwd);
         
+        // Create a measurement first to ensure we have a valid ID and ownership
+        const createResponse = await fetchWithAuth(
+            `/measure/${TEST_WATCH_ID}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                    value: "10",
+                    isStart: "false",
+                    comment: "To be updated",
+                }),
+            },
+            user.user
+        );
+        assertStatus(createResponse, 200);
+        const createBody = await createResponse.text();
+        const measureIdMatch = createBody.match(/data-id="([^"]+)"/);
+        if (!measureIdMatch) {
+            throw new Error("Could not find created measurement ID for PATCH test");
+        }
+        const measureId = measureIdMatch[1];
+
         const response = await fetchWithAuth(
-            `/measure/${TEST_MEASUREMENT_ID}`,
+            `/measure/${measureId}`,
             {
                 method: "PATCH",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },
                 body: new URLSearchParams({
-                    value: "10",
+                    value: "20",
                     isStart: "false",
                     comment: "Updated by test",
                 }),

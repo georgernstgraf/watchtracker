@@ -7,6 +7,7 @@ import { prisma } from "./lib/db.ts";
 import { renderError, renderErrorFull } from "./lib/views.ts";
 import { publicRouter } from "./routers/publicRouter.ts";
 import { protectedRouter } from "./routers/protectedRouter.ts";
+import { globalSessionMiddleware } from "./middleware/session.ts";
 import * as config from "./lib/config.ts";
 import process from "node:process";
 
@@ -51,6 +52,10 @@ function main() {
         `${config.APP_PATH}/static/*`,
         serveStatic({ root: "./static", rewriteRequestPath: (path) => path.replace(`${config.APP_PATH}/static`, "") }),
     );
+
+    // Global Session Middleware
+    // Apply to all routes under APP_PATH (except static which is handled above)
+    app.use(`${config.APP_PATH}/*`, globalSessionMiddleware);
 
     // Mount routers
     app.route(config.APP_PATH, publicRouter);

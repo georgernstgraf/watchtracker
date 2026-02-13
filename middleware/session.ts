@@ -33,14 +33,11 @@ export function getSession(c: Context): HonoSession<SessionData> {
     return c.get("session") as HonoSession<SessionData>;
 }
 
-// Create the session middleware with rolling logic
-export function createSessionMiddleware(enforceAuth: boolean): MiddlewareHandler {
+// Create the global session middleware
+export function createGlobalSessionMiddleware(): MiddlewareHandler {
     return async (c, next) => {
         const requestUrl = `${c.req.method} ${c.req.path}`;
         console.log(`=========== SESSION MW START: ${requestUrl} ===========`);
-
-        // Track if auth check failed
-        let authFailed = false;
 
         // Apply hono-sessions middleware
         // Cast to unknown first to avoid Context type mismatch between jsr:@hono/hono and npm:hono
@@ -98,27 +95,28 @@ export function createSessionMiddleware(enforceAuth: boolean): MiddlewareHandler
                 }
             }
 
-            // Check auth if required
-            if (enforceAuth && !userId) {
-                console.log(`SESSION: ${requestUrl} unauthorized`);
-                authFailed = true;
-                return;
-            }
-
             console.log(`    >>>>>>> SESSION NOW NEXT: ${requestUrl} <<<<<<<`);
             await next();
             console.log(`    >>>>>>> SESSION AFTER NEXT: ${requestUrl} <<<<<<<`);
         });
 
-        // Handle auth failure after middleware completes
-        if (authFailed) {
-            return c.text("Unauthorized", 401);
-        }
-
         console.log(`=========== SESSION MW END: ${requestUrl} ===========`);
     };
 }
 
-// Convenience middlewares
-export const sessionMiddlewarePublic = createSessionMiddleware(false);
-export const sessionMiddlewareProtected = createSessionMiddleware(true);
+// Auth guard middleware
+export const authGuard: MiddlewareHandler = async (c, next) => {
+    const session = getSession(c);
+    const userId = session.get("userId") as string | undefined;
+    
+    if (!userId) {
+        console.log(`SESSION: ${c.req.method} ${c.req.path} unauthorized`);
+        return c.text("Unauthorized", 401);
+    }
+    
+    await next();
+};
+
+// Export the global middleware
+export const globalSessionMiddleware = createGlobalSessionMiddleware();
+
