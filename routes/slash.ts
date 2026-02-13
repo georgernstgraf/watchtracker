@@ -16,7 +16,7 @@ export default async function slashHandler(c: Context) {
         const data = { user, watch, userWatches, timeZones: TimeZone.timeZones };
         return c.html(full === "-body" ? renderIndexBody(data) : renderIndexFull(data));
     } else {
-        const sessionId = session.getCache()._id;
+        const sessionId = session.getId();
         console.log(`slash.ts: No user found -- rendering login page (${sessionId ? sessionId.substring(0, 8) : 'new'}...)`);
         return c.html(full === "-body" ? renderLoginBody({}) : renderLoginFull({}));
     }
