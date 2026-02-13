@@ -178,6 +178,13 @@
                                class="form-control form-control-sm mb-2">
                     </form>
                     <div class="btn-group btn-group-sm">
+                        <button class="btn btn-outline-danger"
+                                title="Delete Watch"
+                                hx-delete="{{appPath}}/watch/{{watch.id}}"
+                                hx-target="#mainContent"
+                                hx-swap="innerHTML"
+                                hx-confirm="Are you sure you want to delete this watch?"
+                                onclick="event.preventDefault()">Delete</button>
                         <button class="btn btn-outline-secondary"
                                 title="Cancel Edit"
                                 @click="toggleEdit(false)">Cancel</button>
