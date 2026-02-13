@@ -1,12 +1,11 @@
 import { Hono } from "hono";
-import type { Session as HonoSession } from "@jcs224/hono-sessions";
-import { type SessionData } from "../middleware/session.ts";
+import { type Session } from "../middleware/session.ts";
 
 import slash from "../routes/slash.ts";
 import login from "../routes/login.ts";
 import logout from "../routes/logout.ts";
 
-export const publicRouter = new Hono<{ Variables: { session: HonoSession<SessionData> } }>();
+export const publicRouter = new Hono<{ Variables: { session: Session } }>();
 
 // Public routes
 publicRouter.get("/", slash);

@@ -18,6 +18,8 @@ deno task watch        # Development server with file watching
 deno task start        # Production server
 deno task check        # TypeScript checking across all modules
 deno task lint         # Lint all TypeScript files
+deno task test         # Run all tests (resets DB, requires server running)
+deno task replacedb    # Reset database to clean test state
 deno task p_g          # Generate Prisma client (output: prisma/client/)
 deno task p_m          # Run Prisma migrations
 deno task purgecss     # Purge unused CSS from static files
@@ -57,10 +59,12 @@ agent-browser fill @e2 "test"
 ### Testing
 
 ```bash
-deno task test          # Run all tests (requires server to be running)
+deno task test          # Run all tests (resets DB, requires server running)
 ```
 
 **Test Suite:** Located in `tests/` directory using Deno's built-in testing framework.
+
+**Note:** `deno task test` automatically resets the database before running tests. To manually reset the database, use `deno task replacedb`.
 
 **Before completing any task:**
 1. Run `deno task check` - TypeScript type checking
@@ -138,11 +142,16 @@ export class WatchRepository {
 ### Session Middleware
 
 ```typescript
-const session = c.get("session");
-const username = session.username;  // string | undefined
-session.login(userName);            // Set username
-session.logout();                   // Clear session
+const session = getSession(c);
+const username = session.get("username");  // string | undefined
+session.login(userId);                      // Set userId and createdAt
+session.logout();                           // Delete session from Memcached and clear cookie
 ```
+
+The session middleware is implemented in `middleware/session.ts` with:
+- Cookie containing only an encrypted session ID
+- Session data stored in Memcached
+- Persistence only when session is modified
 
 ## Error Handling
 
@@ -190,7 +199,7 @@ views/         # Handlebars templates (.hbs)
 
 - **Prisma Client**: Generated to `prisma/client/`, imported via `generated-prisma-client` alias
 - **Prisma DATABASE_URL**: Prisma resolves relative paths from the `prisma/` folder, NOT the project root. The `DATABASE_URL` in `prisma/.env` uses `file:../watchtracker.db` which resolves to `./watchtracker.db` at project root. The runtime `.env` uses an absolute path for clarity.
-- **Sessions**: Cookie-based with memcached backend (see `lib/memcachedSessionStore.ts`)
+- **Sessions**: Custom session middleware in `middleware/session.ts` with Memcached backend. Cookie contains only encrypted session ID.
 - **Templates**: Handlebars with partials auto-loaded from `views/`
 - **Time Zones**: Use `lib/timeZone.ts` with moment-timezone and luxon for TZ handling
 - **Auth**: External API authentication via `lib/auth.ts`, test credentials: user=test, passwd=test

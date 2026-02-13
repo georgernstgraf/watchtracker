@@ -140,6 +140,8 @@ deno task lint        # Run linter
 deno task check       # TypeScript type checking
 deno task start       # Production server
 deno task watch       # Development server with hot reload
+deno task test        # Run tests (resets DB automatically)
+deno task replacedb   # Reset database to clean test state
 deno task purgecss    # Optimize CSS
 ```
 
@@ -178,6 +180,8 @@ Key points:
 
 ## Changelog
 
+- Replace hono-sessions with custom session middleware - issue #95
+- Fix double session middleware execution - issue #94
 - Implement environment-based authentication for test users
 - Fix lint errors and dev script task name
 - upgrades

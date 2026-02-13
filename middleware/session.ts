@@ -73,7 +73,7 @@ async function decrypt(encryptedText: string, key: string): Promise<string> {
     return new TextDecoder().decode(decrypted);
 }
 
-class Session {
+export class Session {
     private data: SessionData;
     private modified = false;
     private id: string;

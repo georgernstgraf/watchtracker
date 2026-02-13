@@ -1,12 +1,11 @@
 import { Hono } from "hono";
-import type { Session as HonoSession } from "@jcs224/hono-sessions";
-import { authGuard, type SessionDataAuth } from "../middleware/session.ts";
+import { authGuard, type Session } from "../middleware/session.ts";
 
 import watch from "../routes/watch.ts";
 import measure from "../routes/measure.ts";
 import user from "../routes/user.ts";
 
-export const protectedRouter = new Hono<{ Variables: { session: HonoSession<SessionDataAuth> } }>();
+export const protectedRouter = new Hono<{ Variables: { session: Session } }>();
 
 // Apply protected session middleware (requires authentication)
 protectedRouter.use(authGuard);
