@@ -115,7 +115,7 @@ describe("Watch Routes (Write Operations)", { sanitizeResources: false, sanitize
         await assertBodyContains(response, "Updated Test Watch");
     });
 
-    it.skip("DELETE /watch/:id deletes a watch", async () => {
+    it("DELETE /watch/:id deletes a watch", async () => {
         const user = TEST_USERS[1]; // grafg
         await loginUser(user.user, user.passwd);
         
