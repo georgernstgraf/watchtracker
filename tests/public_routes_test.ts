@@ -1,0 +1,58 @@
+/**
+ * Tests for public routes
+ */
+
+import { describe, it } from "@std/testing/bdd";
+import {
+    assertStatus,
+    assertBodyContains,
+    assertHasSessionCookie,
+    loginUser,
+    logoutUser,
+    clearSessions,
+    TEST_USERS,
+} from "./helpers.ts";
+
+describe("Public Routes", { sanitizeResources: false, sanitizeOps: false }, () => {
+    it("GET / returns login page when not authenticated", async () => {
+        const response = await fetch("http://localhost:8000/watchtracker/", {
+            headers: { "HX-Request": "true" },
+        });
+        assertStatus(response, 200);
+        await assertBodyContains(response, "Login");
+    });
+
+    it("POST /login with valid credentials succeeds", async () => {
+        const user = TEST_USERS[0];
+        const response = await loginUser(user.user, user.passwd);
+        assertStatus(response, 200);
+        assertHasSessionCookie(response);
+        await assertBodyContains(response, "Watchtracker");
+    });
+
+    it("POST /login with invalid credentials fails", async () => {
+        const response = await fetch("http://localhost:8000/watchtracker/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded",
+                "HX-Request": "true",
+            },
+            body: new URLSearchParams({ user: "invalid", passwd: "wrong" }),
+        });
+        assertStatus(response, 200);
+        await assertBodyContains(response, "login failed");
+    });
+
+    it("POST /logout clears session", async () => {
+        const user = TEST_USERS[0];
+        await loginUser(user.user, user.passwd);
+        const response = await logoutUser(user.user);
+        assertStatus(response, 200);
+        await assertBodyContains(response, "Login");
+    });
+
+    // Cleanup
+    it("cleanup", () => {
+        clearSessions();
+    });
+});

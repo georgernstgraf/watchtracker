@@ -12,7 +12,8 @@
         "watch": "deno run --env-file --allow-env --allow-ffi --allow-read --allow-write --allow-net --watch=main.ts,lib/,routes/,service/,views/,static/,prisma/schema.prisma --watch-exclude=prisma/client/ main.ts",
         "pulldb": "scripts/pulldb.sh",
         "replacedb": "scripts/replacedb.sh",
-        "purgecss": "purgecss --config purgecss.config.js"
+        "purgecss": "purgecss --config purgecss.config.js",
+        "test": "deno test --env-file --allow-env --allow-net tests/"
     },
     "imports": {
         "@avroit/memcached": "jsr:@avroit/memcached@^0.0.4",
@@ -21,7 +22,9 @@
         "@jcs224/hono-sessions": "jsr:@jcs224/hono-sessions@^0.8.0",
         "@prisma/client": "npm:@prisma/client@^6.19.2",
         "@std/assert": "jsr:@std/assert@1",
+        "@std/cli": "jsr:@std/cli@^1.0.27",
         "@std/fs": "jsr:@std/fs@^1.0.22",
+        "@std/testing": "jsr:@std/testing@^1.0.17",
         "generated-prisma-client": "./prisma/client/client.ts",
         "handlebars": "npm:handlebars@^4.7.8",
         "hono": "jsr:@hono/hono@^4",
