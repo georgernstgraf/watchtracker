@@ -33,7 +33,7 @@ export default async function loginHandler(c: Context) {
 
         // registers the session and sends the cookie
         const user = await UserService.ensureUserExists(userName);
-        session.login(user.name, user.id); // Store the user data in session
+        session.login(user.id); // Store only userId in session
 
     const userWatches = await WatchService.getUserWatchesByUname(user.name);
     const watch = await WatchService.getWatchForDisplay(user.name);

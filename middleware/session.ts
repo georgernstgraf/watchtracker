@@ -1,27 +1,29 @@
 /**
  * Session Middleware using hono-sessions
+ * Stores only userId in session, looks up username from DB on each request
  */
 import type { Context, MiddlewareHandler } from "hono";
 import { sessionMiddleware, type Session as HonoSession } from "@jcs224/hono-sessions";
 import store from "../lib/honoMemcachedStore.ts";
 import * as config from "../lib/config.ts";
+import { UserService } from "../service/userService.ts";
 
 export type SessionData = {
-    username?: string;
     userId?: string;
+    username?: string;  // Set dynamically by middleware from DB
     createdAt: number;
 };
 
 export type SessionDataAuth = {
-    username: string;
     userId: string;
+    username: string;
     createdAt: number;
 };
 
 // Extend the Hono session type with our methods
 declare module "@jcs224/hono-sessions" {
     interface Session {
-        login(username: string, userId: string): void;
+        login(userId: string): void;
         logout(): void;
     }
 }
@@ -63,7 +65,7 @@ export function createSessionMiddleware(enforceAuth: boolean): MiddlewareHandler
 
             // Check if session needs refresh (older than 1 week)
             const createdAt = session.get("createdAt") as number | undefined;
-            const username = session.get("username") as string | undefined;
+            const userId = session.get("userId") as string | undefined;
 
             if (createdAt && now - createdAt > config.SESSION_REFRESH_THRESHOLD_MS) {
                 console.log(`SESSION: ${requestUrl} session needs refresh (age: ${Math.floor((now - createdAt) / 1000 / 60 / 60)}h)`);
@@ -73,8 +75,7 @@ export function createSessionMiddleware(enforceAuth: boolean): MiddlewareHandler
             }
 
             // Add helper methods to session
-            session.login = (username: string, userId: string) => {
-                session.set("username", username);
+            session.login = (userId: string) => {
                 session.set("userId", userId);
                 session.set("createdAt", Date.now());
             };
@@ -83,8 +84,22 @@ export function createSessionMiddleware(enforceAuth: boolean): MiddlewareHandler
                 session.deleteSession();
             };
 
+            // If we have a userId, look up the user from DB to get current username
+            // This ensures username changes are immediately reflected
+            if (userId) {
+                try {
+                    const user = await UserService.getUserById(userId);
+                    if (user) {
+                        // Store both in session for routes to access
+                        session.set("username", user.name);
+                    }
+                } catch (err) {
+                    console.error(`SESSION: Error looking up user ${userId}:`, err);
+                }
+            }
+
             // Check auth if required
-            if (enforceAuth && !username) {
+            if (enforceAuth && !userId) {
                 console.log(`SESSION: ${requestUrl} unauthorized`);
                 authFailed = true;
                 return;

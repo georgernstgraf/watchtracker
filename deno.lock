@@ -7,7 +7,7 @@
     "jsr:@hono/hono@*": "4.11.9",
     "jsr:@hono/hono@4": "4.11.9",
     "jsr:@hono/hono@^4.11.9": "4.11.9",
-    "jsr:@jcs224/hono-sessions@0.8": "0.8.0",
+    "jsr:@jcs224/hono-sessions@~0.8.1": "0.8.1",
     "jsr:@std/assert@1": "1.0.18",
     "jsr:@std/assert@^1.0.17": "1.0.18",
     "jsr:@std/async@^1.1.0": "1.1.1",
@@ -60,8 +60,8 @@
     "@hono/hono@4.11.9": {
       "integrity": "c82c6b846abc3c1879d921d8365287d77cdef8073019f509ff80bf53033bdcba"
     },
-    "@jcs224/hono-sessions@0.8.0": {
-      "integrity": "8206fb587ec665a608c381fd7648f837a901e8a56857bac27745c521be69140e",
+    "@jcs224/hono-sessions@0.8.1": {
+      "integrity": "6c998b27332ee90e64dcb39f54afaa281a55b519397af62004d34df4aa188234",
       "dependencies": [
         "npm:hono",
         "npm:iron-webcrypto",
@@ -588,7 +588,7 @@
       "jsr:@hono/hono@*",
       "jsr:@hono/hono@4",
       "jsr:@hono/hono@^4.11.9",
-      "jsr:@jcs224/hono-sessions@0.8",
+      "jsr:@jcs224/hono-sessions@~0.8.1",
       "jsr:@std/assert@1",
       "jsr:@std/cli@^1.0.27",
       "jsr:@std/fs@^1.0.22",

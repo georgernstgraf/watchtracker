@@ -19,6 +19,13 @@ export class UserService {
     }
 
     /**
+     * Get user by ID (alias for findUserById)
+     */
+    static async getUserById(id: string): Promise<User | null> {
+        return await this.findUserById(id);
+    }
+
+    /**
      * Find user by name
      */
     static async getUserByName(name: string): Promise<User> {
