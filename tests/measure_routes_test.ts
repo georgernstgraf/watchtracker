@@ -14,8 +14,8 @@ import {
 } from "./helpers.ts";
 
 // Test data from database
-const TEST_WATCH_ID = "clwbuij9a000442678gpc27x7"; // Noramis (has many measurements)
-const TEST_MEASUREMENT_ID = "clwbuinu3000642679vcafdak"; // First measurement
+const TEST_WATCH_ID = "clxivz2qb0008hmcfbsbwvi6h"; // Jaques Lemans (has measurements)
+const TEST_MEASUREMENT_ID = "clxivzt3p000ahmcf4gbho1os"; // First measurement
 
 describe("Measurement Routes (Read-Only)", { sanitizeResources: false, sanitizeOps: false }, () => {
     it("POST /measure/:id returns measurements component", async () => {

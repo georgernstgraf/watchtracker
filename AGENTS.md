@@ -56,7 +56,18 @@ agent-browser fill @e2 "test"
 
 ### Testing
 
-No formal test framework configured. Use browser or REST client (`route.rest`) for testing.
+```bash
+deno task test          # Run all tests (requires server to be running)
+```
+
+**Test Suite:** Located in `tests/` directory using Deno's built-in testing framework.
+
+**Before completing any task:**
+1. Run `deno task check` - TypeScript type checking
+2. Run `deno task lint` - Linting
+3. Run `deno task test` - **All tests must pass**
+
+> **IMPORTANT**: Tests require the server to be running (`deno task watch` in another terminal).
 
 ## Code Style Guidelines
 
