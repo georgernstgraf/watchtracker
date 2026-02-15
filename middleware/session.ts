@@ -4,15 +4,13 @@ import { Memcached } from "@avroit/memcached";
 import * as config from "../lib/config.ts";
 import { UserService } from "../service/userService.ts";
 
-export type SessionData = {
+export type MemcacheData = {
     userId?: string;
-    username?: string;
     createdAt: number;
 };
 
-export type SessionDataAuth = {
+export type MemcacheDataAuth = {
     userId: string;
-    username: string;
     createdAt: number;
 };
 
@@ -62,30 +60,40 @@ function parseSignedCookie(cookie: string): { sessionId: string; signature: stri
 }
 
 export class Session {
-    private data: SessionData;
+    private data: MemcacheData;
+    private _username: string | undefined;
     private modified = false;
     private id: string;
     private isNew: boolean;
     private shouldDelete = false;
 
-    constructor(id: string, data: SessionData | null, isNew: boolean) {
+    constructor(id: string, data: MemcacheData | null, isNew: boolean, username?: string) {
         this.id = id;
         this.isNew = isNew;
         this.data = data ?? { createdAt: Date.now() };
+        this._username = username;
         if (isNew) {
             this.modified = true;
         }
     }
 
-    get<K extends keyof SessionData>(key: K): SessionData[K] | undefined {
+    get<K extends keyof MemcacheData>(key: K): MemcacheData[K] | undefined {
         return this.data[key];
     }
 
-    set<K extends keyof SessionData>(key: K, value: SessionData[K]): void {
+    set<K extends keyof MemcacheData>(key: K, value: MemcacheData[K]): void {
         if (this.data[key] !== value) {
             this.data[key] = value;
             this.modified = true;
         }
+    }
+
+    get username(): string | undefined {
+        return this._username;
+    }
+
+    set username(value: string | undefined) {
+        this._username = value;
     }
 
     isModified(): boolean {
@@ -100,7 +108,7 @@ export class Session {
         return this.id;
     }
 
-    getData(): SessionData {
+    getData(): MemcacheData {
         return this.data;
     }
 
@@ -118,7 +126,7 @@ export class Session {
     }
 }
 
-async function getSessionFromStore(sessionId: string): Promise<SessionData | null> {
+async function getSessionFromStore(sessionId: string): Promise<MemcacheData | null> {
     try {
         const key = getKey(sessionId);
         const data = await memcached.get(key);
@@ -126,14 +134,14 @@ async function getSessionFromStore(sessionId: string): Promise<SessionData | nul
             console.log(`SessionStore get: ${sessionId.substring(0, 8)}... (${data ? data.length : 0} bytes)`);
         }
         if (!data) return null;
-        return JSON.parse(data) as SessionData;
+        return JSON.parse(data) as MemcacheData;
     } catch (err) {
         console.error("SessionStore get error:", err);
         return null;
     }
 }
 
-async function persistSession(sessionId: string, data: SessionData): Promise<void> {
+async function persistSession(sessionId: string, data: MemcacheData): Promise<void> {
     try {
         const key = getKey(sessionId);
         const json = JSON.stringify(data);
@@ -170,7 +178,7 @@ export function createGlobalSessionMiddleware(): MiddlewareHandler {
         }
 
         let sessionId: string | null = null;
-        let sessionData: SessionData | null = null;
+        let sessionData: MemcacheData | null = null;
         let isNew = false;
 
         const cookieValue = getCookie(c, config.COOKIE_NAME);
@@ -202,10 +210,7 @@ export function createGlobalSessionMiddleware(): MiddlewareHandler {
             try {
                 const user = await UserService.getUserById(userId);
                 if (user) {
-                    const currentUsername = session.get("username");
-                    if (currentUsername !== user.name) {
-                        session.set("username", user.name);
-                    }
+                    session.username = user.name;
                 }
             } catch (err) {
                 console.error(`SESSION: Error looking up user ${userId}:`, err);

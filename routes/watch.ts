@@ -14,7 +14,7 @@ const watchRouter = new Hono();
 // GET /watches - Return watch cards for back navigation
 watchRouter.get("/watches", async (c) => {
     const session = getSession(c);
-    const username = session.get("username")!;
+    const username = session.username!;
     const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
     const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
     return c.html(renderUserWatches({ userWatches, sortBy }));
@@ -34,7 +34,7 @@ watchRouter.get("/watch/:id", validateWatchOwnership, async (c) => {
 
 watchRouter.patch("/watch/:id", validateWatchOwnership, async (c) => {
     const session = getSession(c);
-    const username = session.get("username")!;
+    const username = session.username!;
     const watchId = c.req.param("id");
     const body = await c.req.parseBody();
 
@@ -70,7 +70,7 @@ watchRouter.patch("/watch/:id", validateWatchOwnership, async (c) => {
 
 watchRouter.post("/watch", async (c) => {
     const session = getSession(c);
-    const username = session.get("username")!;
+    const username = session.username!;
     const body = await c.req.parseBody();
     const watch = await WatchService.createWatch({
         name: body.name as string,
@@ -86,7 +86,7 @@ watchRouter.post("/watch", async (c) => {
 watchRouter.delete("/watch/:id", validateWatchOwnership, async (c) => {
     const session = getSession(c);
     const userId = session.get("userId")!;
-    const username = session.get("username")!;
+    const username = session.username!;
     try {
         await WatchService.deleteWatch(c.req.param("id"), userId);
     } catch (err) {
@@ -101,7 +101,7 @@ watchRouter.delete("/watch/:id", validateWatchOwnership, async (c) => {
 
 async function handleGetDetails(id: string, c: Context) {
     const session = getSession(c);
-    const username = session.get("username");
+    const username = session.username;
     if (!username) {
         throw new HTTPException(401, { message: "Unauthorized" });
     }

@@ -5,7 +5,7 @@ import { getSession } from "./session.ts";
 
 export const validateWatchOwnership = async (c: Context, next: Next) => {
     const session = getSession(c);
-    const username = session?.get("username");
+    const username = session?.username;
     const watchId = c.req.param("id") || c.req.query("id");
 
     if (!username) {
@@ -27,7 +27,7 @@ export const validateWatchOwnership = async (c: Context, next: Next) => {
 
 export const validateMeasurementOwnership = async (c: Context, next: Next) => {
     const session = getSession(c);
-    const username = session?.get("username");
+    const username = session?.username;
     const measureId = c.req.param("id");
 
     if (!username) {

@@ -10,7 +10,7 @@ const userRouter = new Hono();
 // PATCH /user - Update user settings
 userRouter.patch("/user", async (c) => {
     const session = getSession(c);
-    const username = session.get("username")!;
+    const username = session.username!;
 
     const body = await c.req.parseBody();
 

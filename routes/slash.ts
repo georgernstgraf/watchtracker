@@ -6,7 +6,7 @@ import { getSession } from "../middleware/session.ts";
 
 export default async function slashHandler(c: Context) {
     const session = getSession(c);
-    const username = session.get("username");
+    const username = session.username;
     const full = c.req.header("hx-request") ? "-body" : "-full";
     if (username) {
         const user = await UserService.getUserByName(username);

@@ -12,7 +12,7 @@ measureRouter.post("/measure/:id", validateWatchOwnership, async (c) => {
     // this is a watchId here!!
     const session = getSession(c);
     const watchId = c.req.param("id");
-    const username = session.get("username")!;
+    const username = session.username!;
 
     // Create the measurement using the service
     const body = await c.req.parseBody();
@@ -40,7 +40,7 @@ measureRouter.post("/measure/:id", validateWatchOwnership, async (c) => {
 
 measureRouter.delete("/measure/:id", validateMeasurementOwnership, async (c) => {
     const session = getSession(c);
-    const username = session.get("username")!;
+    const username = session.username!;
     const measureId = c.req.param("id");
     const watchId = await MeasurementService.getWatchIdForUserMeasurement(username, measureId);
 
@@ -59,7 +59,7 @@ measureRouter.delete("/measure/:id", validateMeasurementOwnership, async (c) => 
 
 measureRouter.patch("/measure/:id", validateMeasurementOwnership, async (c) => {
     const session = getSession(c);
-    const username = session.get("username")!;
+    const username = session.username!;
 
     const measureId = c.req.param("id");
     const measure = await MeasurementService.getUserMeasurement(username, measureId);
