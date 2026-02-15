@@ -32,7 +32,7 @@ export const MEMCACHE_HOST = Deno.env.get("MEMCACHE_HOST") || "127.0.0.1";
 export const MEMCACHE_PORT = Number(Deno.env.get("MEMCACHE_PORT")) || 11211;
 // Memcached TTL must be <= 30 days (2592000s), otherwise it's treated as Unix timestamp
 // We add 1 day buffer to cookie max age, but cap at 30 days max
-export const MEMCACHE_TTL_S = 0;
+export const MEMCACHE_TTL_S = Math.min(COOKIE_MAX_AGE_S + 86400, 2592000);
 
 // derived
 export const partialsDir = "./views";
