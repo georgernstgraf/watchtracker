@@ -7,10 +7,14 @@ import user from "../routes/user.ts";
 
 export const protectedRouter = new Hono<{ Variables: { session: Session } }>();
 
-// Apply protected session middleware (requires authentication)
-protectedRouter.use(authGuard);
+// Protected routes - each route wrapped with authGuard
+// We use .use() with specific paths to avoid authGuard running for unmatched routes
+protectedRouter.use("/watch/*", authGuard);
+protectedRouter.use("/watches", authGuard);
+protectedRouter.use("/measure/*", authGuard);
+protectedRouter.use("/user", authGuard);
 
-// Protected routes - mounted at root to preserve URL structure
+// Routes - mounted at root to preserve URL structure
 protectedRouter.route("/", watch);
 protectedRouter.route("/", measure);
 protectedRouter.route("/", user);

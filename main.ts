@@ -2,7 +2,6 @@
 
 import { Hono } from "hono";
 import { ContentfulStatusCode } from "hono/utils/http-status";
-import { serveStatic } from "hono/deno";
 import { prisma } from "./lib/db.ts";
 import { renderError, renderErrorFull } from "./lib/views.ts";
 import { publicRouter } from "./routers/publicRouter.ts";
@@ -10,6 +9,27 @@ import { protectedRouter } from "./routers/protectedRouter.ts";
 import { globalSessionMiddleware } from "./middleware/session.ts";
 import * as config from "./lib/config.ts";
 import process from "node:process";
+
+function getContentType(path: string): string {
+    const ext = path.split(".").pop()?.toLowerCase() || "";
+    const types: Record<string, string> = {
+        "css": "text/css",
+        "js": "application/javascript",
+        "json": "application/json",
+        "png": "image/png",
+        "jpg": "image/jpeg",
+        "jpeg": "image/jpeg",
+        "gif": "image/gif",
+        "svg": "image/svg+xml",
+        "ico": "image/x-icon",
+        "woff": "font/woff",
+        "woff2": "font/woff2",
+        "ttf": "font/ttf",
+        "eot": "application/vnd.ms-fontobject",
+        "map": "application/json",
+    };
+    return types[ext] || "application/octet-stream";
+}
 
 function main() {
     const listen_host = config.APP_HOST;
@@ -48,13 +68,21 @@ function main() {
     });
 
     // Static files - serve from /watchtracker/static/*
-    app.use(
-        `${config.APP_PATH}/static/*`,
-        serveStatic({ root: "./static", rewriteRequestPath: (path) => path.replace(`${config.APP_PATH}/static`, "") }),
-    );
+    // Handle completely separately - no session, return 404 if not found
+    app.all(`${config.APP_PATH}/static/*`, async (c) => {
+        const filePath = c.req.path.replace(`${config.APP_PATH}/static`, "");
+        try {
+            const file = await Deno.readFile(`./static${filePath}`);
+            const contentType = getContentType(filePath);
+            return new Response(file, {
+                headers: { "Content-Type": contentType },
+            });
+        } catch {
+            return c.text(`Static file not found: ${c.req.path}`, 404);
+        }
+    });
 
-    // Global Session Middleware
-    // Apply to all routes under APP_PATH (except static which is handled above)
+    // Global Session Middleware - for all non-static routes
     app.use(`${config.APP_PATH}/*`, globalSessionMiddleware);
 
     // Mount routers
