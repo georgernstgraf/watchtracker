@@ -237,7 +237,7 @@ export function createGlobalSessionMiddleware(): MiddlewareHandler {
         if (session.needsDelete()) {
             await deleteSessionFromStore(sessionId);
             deleteCookie(c, config.COOKIE_NAME, { path: config.APP_PATH || "/" });
-        } else if (session.isModified()) {
+        } else if (session.isModified() && c.res.status < 400) {
             await persistSession(sessionId, session.getData());
             if (session.isNewSession() && config.COOKIE_SECRET) {
                 const signature = await hmacSign(sessionId, config.COOKIE_SECRET);
