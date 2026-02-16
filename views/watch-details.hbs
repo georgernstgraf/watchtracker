@@ -4,7 +4,8 @@
          isNew: {{#if watch.id}}false{{else}}true{{/if}},
          editing: {{#if watch.id}}false{{else}}true{{/if}},
          selectedImageFile: null,
-         imagePreview: null,
+         imagePreview: {{#if watch.image}}'data:image/jpeg;base64,{{toBase64 watch.image}}'{{else}}null{{/if}},
+         imageCleared: false,
          imageError: '',
          init() {
              $watch('selectedImageFile', (file) => {
@@ -18,11 +19,13 @@
                              if (Math.abs(ratio - 1) > tolerance) {
                                  this.imageError = 'Image must be square. Got ' + img.width + 'x' + img.height;
                                  this.selectedImageFile = null;
-                                 this.imagePreview = null;
+                                 this.imagePreview = {{#if watch.image}}'data:image/jpeg;base64,{{toBase64 watch.image}}'{{else}}null{{/if}};
+                                 this.imageCleared = false;
                                  this.$refs.imageInput.value = '';
                              } else {
                                  this.imageError = '';
                                  this.imagePreview = e.target.result;
+                                 this.imageCleared = false;
                              }
                          };
                          img.src = e.target.result;
@@ -34,6 +37,7 @@
          clearImagePreview() {
              this.selectedImageFile = null;
              this.imagePreview = null;
+             this.imageCleared = true;
              this.imageError = '';
              this.$refs.imageInput.value = '';
          },
@@ -51,13 +55,15 @@
                  this.toggleEdit(false);
              }
          },
-         async saveDetails() {
-             const form = this.$refs.watchForm;
-             const formData = new FormData(form);
-             if (this.selectedImageFile) {
-                 formData.set('image', this.selectedImageFile);
-             }
-             const isCreating = this.isNew;
+          async saveDetails() {
+              const form = this.$refs.watchForm;
+              const formData = new FormData(form);
+              if (this.selectedImageFile) {
+                  formData.set('image', this.selectedImageFile);
+              } else if (this.imageCleared) {
+                  formData.set('clearImage', 'true');
+              }
+              const isCreating = this.isNew;
              const url = isCreating ? '{{appPath}}/watch' : '{{appPath}}/watch/{{watch.id}}';
              const method = isCreating ? 'POST' : 'PATCH';
              try {

@@ -74,8 +74,11 @@ watchRouter.patch("/watch/:id", validateWatchOwnership, async (c) => {
         comment: body.comment as string,
     };
 
-    // Handle image upload
-    if (body.image && body.image instanceof File) {
+    // Handle image operations
+    if (body.clearImage === 'true') {
+        // User cleared the image
+        updateData.image = null;
+    } else if (body.image && body.image instanceof File) {
         const imageBuffer = await body.image.arrayBuffer();
         const uint8Array = new Uint8Array(imageBuffer);
 
@@ -103,11 +106,29 @@ watchRouter.post("/watch", async (c) => {
     const session = getSession(c);
     const username = session.username!;
     const body = await c.req.parseBody();
-    const watch = await WatchService.createWatch({
+
+    const createData: Prisma.WatchCreateInput = {
         name: body.name as string,
         comment: body.comment as string,
         user: { connect: { name: username } },
-    });
+    };
+
+    // Handle image upload
+    if (body.image && body.image instanceof File) {
+        const imageBuffer = await body.image.arrayBuffer();
+        const uint8Array = new Uint8Array(imageBuffer);
+
+        // Validate square image
+        const validation = await validateSquareImage(uint8Array);
+        if (!validation.valid) {
+            throw new HTTPException(422, { message: validation.error });
+        }
+
+        // Resize and store
+        createData.image = Buffer.from(await resizeImage(uint8Array));
+    }
+
+    const watch = await WatchService.createWatch(createData);
     await UserService.setLastWatch(username, watch.id);
     const userWatches = await WatchService.getUserWatchesByUname(username);
     const newWatch = await WatchService.getWatchForDisplay(username, watch.id);
