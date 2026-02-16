@@ -3,7 +3,7 @@ import { Hono, type Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { UserService, WatchService, type SortOption } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
-import { renderAllButHeadAndFoot, renderWatchDetails, renderWatchGrid } from "../lib/views.ts";
+import { renderAllButHeadAndFoot, renderWatchDetails } from "../lib/views.ts";
 import { resizeImage, validateSquareImage } from "../lib/imageUtils.ts";
 import { ForbiddenError } from "../lib/errors.ts";
 import type { Prisma } from "generated-prisma-client";
@@ -17,7 +17,7 @@ watchRouter.get("/watches", async (c) => {
     const username = session.username!;
     const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
     const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
-    return c.html(renderWatchGrid({ userWatches }));
+    return c.html(renderAllButHeadAndFoot({ userWatches, watch: null }));
 });
 
 // GET /watch - Legacy route with query param
