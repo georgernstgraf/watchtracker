@@ -31,3 +31,41 @@
     </div>
     <!-- Watch Cards Grid -->
     <div id="watchGrid"></div>
+
+    <!-- Add Watch Button -->
+    <div class="my-2 d-flex justify-content-around" id="watchCreateBtn">
+        <button title="Add a new Watch to track"
+                onclick="watchCreateDisplay()"
+                class="btn btn-outline-secondary">Add new Watch to track</button>
+    </div>
+
+    <!-- Create Watch Form -->
+    <div id="watchCreateForm"
+         class="my-4 justify-content-center gap-3 align-items-baseline"
+         style="display:none">
+        <form id="newWatchSave"
+              hx-post="{{appPath}}/watch"
+              hx-target="#allButHeadAndFoot"
+              hx-swap="outerHTML"
+              hx-trigger="trigger">
+            <input type="text"
+                   name="name"
+                   value=""
+                   placeholder="enter Name" />
+            <input type="text"
+                   name="comment"
+                   value=""
+                   placeholder="enter Comment" />
+        </form>
+        <div class="btn-group">
+            <button class="btn btn-outline-secondary"
+                    title="Cancel Edit"
+                    onclick="watchCreateDisplay(false)">❌</button>
+            <button title="Save"
+                    class="btn btn-outline-secondary"
+                    type="button"
+                    onclick="htmx.trigger('#newWatchSave', 'trigger')">💾</button>
+        </div>
+    </div>
+</div>
+<!-- /userwatches.hbs -->
