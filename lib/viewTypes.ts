@@ -76,10 +76,14 @@ export interface NavProfileData extends BaseRenderData {
     timeZones: string[];
 }
 
-// UserWatchesData - for userwatches.hbs
+// UserWatchesData - for userwatches.hbs (shell only)
 export interface UserWatchesData extends BaseRenderData {
+    // No data needed - grid is loaded via HTMX
+}
+
+// WatchGridData - for watchgrid.hbs
+export interface WatchGridData extends BaseRenderData {
     userWatches: WatchCard[];
-    sortBy?: string;
 }
 
 // WatchDetailsViewData - for watch-details.hbs

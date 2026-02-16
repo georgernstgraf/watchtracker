@@ -63,8 +63,12 @@ export function renderNavProfile(data: ViewInput<types.NavProfileData>): string 
     return render<types.NavProfileData>("navProfile", merge(data));
 }
 
-export function renderUserWatches(data: ViewInput<types.UserWatchesData>): string {
-    return render<types.UserWatchesData>("userwatches", merge(data));
+export function renderUserWatches(data?: ViewInput<types.UserWatchesData>): string {
+    return render<types.UserWatchesData>("userwatches", merge(data || {}));
+}
+
+export function renderWatchGrid(data: ViewInput<types.WatchGridData>): string {
+    return render<types.WatchGridData>("watchgrid", merge(data));
 }
 
 export function renderWatchDetails(data: ViewInput<types.WatchDetailsViewData>): string {

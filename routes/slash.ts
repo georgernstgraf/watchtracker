@@ -10,10 +10,9 @@ export default async function slashHandler(c: Context) {
     const full = c.req.header("hx-request") ? "-body" : "-full";
     if (username) {
         const user = await UserService.getUserByName(username);
-        const userWatches = await WatchService.getUserWatchesSorted(username, "recent_desc");
         const watch = await WatchService.getWatchForDisplay(username);
 
-        const data = { user, watch, userWatches, timeZones: TimeZone.timeZones };
+        const data = { user, watch, userWatches: [], timeZones: TimeZone.timeZones };
         return c.html(full === "-body" ? renderIndexBody(data) : renderIndexFull(data));
     } else {
         const sessionId = session.getId();
