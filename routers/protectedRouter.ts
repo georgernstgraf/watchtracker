@@ -11,6 +11,7 @@ export const protectedRouter = new Hono<{ Variables: { session: Session } }>();
 // We use .use() with specific paths to avoid authGuard running for unmatched routes
 protectedRouter.use("/watch/*", authGuard);
 protectedRouter.use("/watches", authGuard);
+protectedRouter.use("/home", authGuard);
 protectedRouter.use("/measure/*", authGuard);
 protectedRouter.use("/user", authGuard);
 

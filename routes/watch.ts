@@ -3,7 +3,7 @@ import { Hono, type Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { UserService, WatchService, type SortOption } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
-import { renderAllButHeadAndFoot, renderWatchDetails } from "../lib/views.ts";
+import { renderAllButHeadAndFoot, renderWatchDetails, renderWatchGrid } from "../lib/views.ts";
 import { resizeImage, validateSquareImage } from "../lib/imageUtils.ts";
 import { ForbiddenError } from "../lib/errors.ts";
 import type { Prisma } from "generated-prisma-client";
@@ -11,13 +11,22 @@ import { getSession } from "../middleware/session.ts";
 
 const watchRouter = new Hono();
 
-// GET /watches - Return watch cards for back navigation
-watchRouter.get("/watches", async (c) => {
+// GET /home - Return watch cards for back navigation
+watchRouter.get("/home", async (c) => {
     const session = getSession(c);
     const username = session.username!;
     const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
     const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
     return c.html(renderAllButHeadAndFoot({ userWatches, watch: null }));
+});
+
+// GET /watches - Return watch grid for HTMX sort buttons
+watchRouter.get("/watches", async (c) => {
+    const session = getSession(c);
+    const username = session.username!;
+    const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
+    const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
+    return c.html(renderWatchGrid({ userWatches }));
 });
 
 // GET /watch - Legacy route with query param
@@ -80,7 +89,10 @@ watchRouter.post("/watch", async (c) => {
     await UserService.setLastWatch(username, watch.id);
     const userWatches = await WatchService.getUserWatchesByUname(username);
     const newWatch = await WatchService.getWatchForDisplay(username, watch.id);
-    return c.html(renderAllButHeadAndFoot({ watch: newWatch, userWatches }));
+    if (!newWatch) {
+        throw new HTTPException(500, { message: "Failed to retrieve created watch" });
+    }
+    return c.html(renderWatchDetails({ watch: newWatch, userWatches }));
 });
 
 watchRouter.delete("/watch/:id", validateWatchOwnership, async (c) => {

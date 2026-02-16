@@ -7,7 +7,7 @@ import logout from "../routes/logout.ts";
 
 export const publicRouter = new Hono<{ Variables: { session: Session } }>();
 
-// Public routes
 publicRouter.get("/", slash);
+publicRouter.get("/login", login);
 publicRouter.post("/login", login);
 publicRouter.post("/logout", logout);

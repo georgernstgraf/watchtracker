@@ -52,8 +52,8 @@
         <div class="card-body text-center py-2">
             <form id="newWatchSave"
                   hx-post="{{appPath}}/watch"
-                  hx-target="#allButHeadAndFoot"
-                  hx-swap="outerHTML"
+                  hx-target="#mainContent"
+                  hx-swap="innerHTML"
                   hx-trigger="trigger">
                 <input type="text"
                        name="name"

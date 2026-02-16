@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { renderLoginBody, renderLoginFull } from "../lib/views.ts";
+import { renderBodyUnauth, renderUnauthFull } from "../lib/views.ts";
 import { getSession } from "../middleware/session.ts";
 
 export default async function logoutHandler(c: Context) {
@@ -7,7 +7,7 @@ export default async function logoutHandler(c: Context) {
     await session.logout();
 
     if (c.req.header("hx-request")) {
-        return c.html(renderLoginBody({}));
+        return c.html(renderBodyUnauth({}));
     }
-    return c.html(renderLoginFull({}));
+    return c.html(renderUnauthFull({}));
 }

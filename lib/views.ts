@@ -18,12 +18,16 @@ export function renderErrorFull(data: ViewInput<types.ErrorData>): string {
     return render<types.ErrorData>("error-full", merge(data));
 }
 
-export function renderLoginBody(data: ViewInput<types.LoginData>): string {
-    return render<types.LoginData>("login-body", merge(data));
+export function renderLoginContent(data: ViewInput<types.LoginData>): string {
+    return render<types.LoginData>("login-content", merge(data));
 }
 
-export function renderLoginFull(data: ViewInput<types.LoginData>): string {
-    return render<types.LoginData>("login-full", merge(data));
+export function renderBodyUnauth(data: ViewInput<types.LoginData>): string {
+    return render<types.LoginData>("body-unauth", merge(data));
+}
+
+export function renderUnauthFull(data: ViewInput<types.LoginData>): string {
+    return render<types.LoginData>("unauth-full", merge(data));
 }
 
 export function renderIndexFull(data: ViewInput<types.UserWatchData>): string {

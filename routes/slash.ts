@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { TimeZone } from "../lib/timeZone.ts";
 import { UserService, WatchService } from "../service/index.ts";
-import { renderIndexFull, renderIndexBody, renderLoginFull, renderLoginBody } from "../lib/views.ts";
+import { renderIndexFull, renderIndexBody, renderUnauthFull, renderLoginContent } from "../lib/views.ts";
 import { getSession } from "../middleware/session.ts";
 
 export default async function slashHandler(c: Context) {
@@ -17,6 +17,6 @@ export default async function slashHandler(c: Context) {
     } else {
         const sessionId = session.getId();
         console.log(`slash.ts: No user found -- rendering login page (${sessionId ? sessionId.substring(0, 8) : 'new'}...)`);
-        return c.html(full === "-body" ? renderLoginBody({}) : renderLoginFull({}));
+        return c.html(full === "-body" ? renderLoginContent({}) : renderUnauthFull({}));
     }
 }
