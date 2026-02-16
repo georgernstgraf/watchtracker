@@ -70,17 +70,6 @@ function editMode(eltId, on = false) {
     }
 }
 
-function watchCreateDisplay(yes = true) {
-    const btn$ = document.getElementById('watchCreateBtn');
-    const form$ = document.getElementById('watchCreateForm');
-    if (yes) {
-        btn$.style.display = 'none';
-        form$.style.display = '';
-    } else {
-        form$.style.display = 'none';
-        btn$.style.display = '';
-    }
-}
 function editTimezone(really = true) {
     const edit$ = document.getElementById('timeZoneEdit');
     const btn$ = document.getElementById('timeZoneButton');

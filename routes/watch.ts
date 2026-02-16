@@ -7,6 +7,7 @@ import { renderAllButHeadAndFoot, renderWatchDetails, renderWatchGrid } from "..
 import { resizeImage, validateSquareImage } from "../lib/imageUtils.ts";
 import { ForbiddenError } from "../lib/errors.ts";
 import type { Prisma } from "generated-prisma-client";
+import type * as types from "../lib/viewTypes.ts";
 import { getSession } from "../middleware/session.ts";
 
 const watchRouter = new Hono();
@@ -27,6 +28,27 @@ watchRouter.get("/watches", async (c) => {
     const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
     const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
     return c.html(renderWatchGrid({ userWatches }));
+});
+
+// GET /watch/new - Return empty watch form for creating a new watch
+// MUST be defined BEFORE /watch/:id to avoid being matched as an ID
+watchRouter.get("/watch/new", async (c) => {
+    const session = getSession(c);
+    const username = session.username;
+    if (!username) {
+        throw new HTTPException(401, { message: "Unauthorized" });
+    }
+    const userWatches = await WatchService.getUserWatchesByUname(username);
+    // Create a minimal watch object for the "new" state
+    const emptyWatch = {
+        id: "",
+        name: "",
+        comment: null,
+        image: null,
+        userId: "",
+        measurements: [],
+    } as unknown as types.EnrichedWatch;
+    return c.html(renderWatchDetails({ watch: emptyWatch, userWatches }));
 });
 
 // GET /watch - Legacy route with query param

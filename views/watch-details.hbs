@@ -1,7 +1,8 @@
 <!-- #watch-details.hbs -->
 <div id="watchDetails"
      x-data="{
-         editing: false,
+         isNew: {{#if watch.id}}false{{else}}true{{/if}},
+         editing: {{#if watch.id}}false{{else}}true{{/if}},
          selectedImageFile: null,
          imagePreview: null,
          imageError: '',
@@ -42,15 +43,26 @@
                  this.clearImagePreview();
              }
          },
+         cancelEdit() {
+             if (this.isNew) {
+                 // For new watches, cancel goes back to the watch list
+                 htmx.ajax('GET', '{{appPath}}/home', { target: '#mainContent', swap: 'innerHTML' });
+             } else {
+                 this.toggleEdit(false);
+             }
+         },
          async saveDetails() {
              const form = this.$refs.watchForm;
              const formData = new FormData(form);
              if (this.selectedImageFile) {
                  formData.set('image', this.selectedImageFile);
              }
+             const isCreating = this.isNew;
+             const url = isCreating ? '{{appPath}}/watch' : '{{appPath}}/watch/{{watch.id}}';
+             const method = isCreating ? 'POST' : 'PATCH';
              try {
-                 const response = await fetch(form.getAttribute('hx-patch'), {
-                     method: 'PATCH',
+                 const response = await fetch(url, {
+                     method: method,
                      body: formData
                  });
                  if (response.ok) {
@@ -69,8 +81,8 @@
              }
          }
      }">
-    <!-- Back Button -->
-    <div class="mb-3">
+    <!-- Back Button (only for existing watches) -->
+    <div class="mb-3" x-show="!isNew">
         <button class="btn btn-outline-secondary btn-sm"
                 hx-get='{{appPath}}/home'
                 hx-target='#mainContent'
@@ -159,11 +171,7 @@
             <div class="card border-secondary mb-3" x-show="editing" x-cloak>
                 <div class="card-body">
                     <form x-ref="watchForm"
-                          hx-patch="{{appPath}}/watch/{{watch.id}}"
-                          hx-encoding="multipart/form-data"
-                          hx-trigger="trigger"
-                          hx-target="#mainContent"
-                          hx-swap="innerHTML">
+                          hx-encoding="multipart/form-data">
                         <input type="text"
                                name="name"
                                value="{{watch.name}}"
@@ -180,14 +188,15 @@
                     <div class="btn-group btn-group-sm">
                         <button class="btn btn-outline-danger"
                                 title="Delete Watch"
+                                x-show="!isNew"
                                 hx-delete="{{appPath}}/watch/{{watch.id}}"
                                 hx-target="#mainContent"
                                 hx-swap="innerHTML"
                                 hx-confirm="Are you sure you want to delete this watch?"
                                 onclick="event.preventDefault()">Delete</button>
                         <button class="btn btn-outline-secondary"
-                                title="Cancel Edit"
-                                @click="toggleEdit(false)">Cancel</button>
+                                title="Cancel"
+                                @click="cancelEdit()">Cancel</button>
                         <button class="btn btn-outline-secondary"
                                 title="Save"
                                 @click="saveDetails()">Save</button>
