@@ -97,7 +97,9 @@ html {
 }
 
 /* Hide elements with x-cloak until Alpine loads */
-[x-cloak] { display: none !important; }
+[x-cloak] {
+    display: none !important;
+}
 
 /* Card styling using custom properties */
 .card {
@@ -126,6 +128,14 @@ html {
 .form-control:focus {
     background-color: var(--bs-form-bg);
     color: var(--bs-form-color);
+}
+
+.btn-outline-secondary {
+    --bs-btn-active-bg: #6c757d44;
+}
+
+.btn-secondary {
+    --bs-btn-bg: #6c757d44;
 }
 
 /* HTMX Loading Spinner */
