@@ -245,7 +245,7 @@ export function createGlobalSessionMiddleware(): MiddlewareHandler {
                     path: config.APP_PATH || "/",
                     httpOnly: true,
                     secure: config.isProduction,
-                    sameSite: "Strict",
+                    sameSite: "Lax",
                     maxAge: config.COOKIE_MAX_AGE_S,
                 });
             }
