@@ -1,0 +1,37 @@
+<!-- #timezone-selector.hbs -->
+<div id="timeZoneEdit"
+     x-data="{ editing: false }">
+    <div class="d-flex align-items-center gap-2"
+         x-show="editing"
+         x-cloak>
+        <form onsubmit="return false;"
+              hx-patch="{{appPath}}/user"
+              hx-target="#timeZoneEdit"
+              id="timeZoneSelectForm"
+              hx-trigger="trigger"
+              hx-swap="outerHTML">
+            <input id="timeZoneSelector"
+                   list="timeZoneList"
+                   name="timeZone"
+                   placeholder="{{user.timeZone}}"
+                   class="btn btn-outline-secondary btn-sm"
+                   style="width: 140px;" />
+            <datalist id="timeZoneList"
+                      style="display: none;">
+                {{#each timeZones}}
+                    <option value="{{this}}">{{this}}</option>
+                {{/each}}
+            </datalist>
+        </form>
+        <div class="btn-group btn-group-sm"
+             role="group">
+            <button title="Cancel"
+                    class="btn btn-outline-secondary"
+                    @click="editing = false">❌</button>
+            <button title="Done"
+                    class="btn btn-outline-secondary"
+                    @click="htmx.trigger('#timeZoneSelectForm', 'trigger'); editing = false">💾</button>
+        </div>
+    </div>
+</div>
+<!-- /timezone-selector.hbs -->

@@ -76,6 +76,12 @@ export interface NavProfileData extends BaseRenderData {
     timeZones: string[];
 }
 
+// TimezoneSelectorData - for timezone-selector.hbs
+export interface TimezoneSelectorData extends BaseRenderData {
+    user: User;
+    timeZones: string[];
+}
+
 // UserWatchesData - for userwatches.hbs (shell only)
 export interface UserWatchesData extends BaseRenderData {
     // No data needed - grid is loaded via HTMX

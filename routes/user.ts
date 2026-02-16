@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { TimeZone } from "../lib/timeZone.ts";
-import { UserService, WatchService } from "../service/index.ts";
-import { renderBodyAuth } from "../lib/views.ts";
+import { UserService } from "../service/index.ts";
+import { renderTimezoneSelector } from "../lib/views.ts";
 import { getSession } from "../middleware/session.ts";
 
 const userRouter = new Hono();
@@ -24,17 +24,9 @@ userRouter.patch("/user", async (c) => {
         name: body.name as string,
     });
 
-    const userWatches = await WatchService.getUserWatchesByUname(username);
-    let watch = null;
-    if (body.selectedWatchId) {
-        watch = await WatchService.getWatchForDisplay(username, body.selectedWatchId as string);
-    }
-
-    return c.html(renderBodyAuth({
+    return c.html(renderTimezoneSelector({
         user: updatedUser,
         timeZones: TimeZone.timeZones,
-        userWatches,
-        watch,
     }));
 });
 

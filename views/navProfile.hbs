@@ -3,42 +3,7 @@
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center">
         <h1 class="mb-2 mb-sm-0">Watchtracker</h1>
         <div class="d-flex align-items-center gap-3">
-            <button id="timeZoneButton"
-                    title="Switch Timezone"
-                    class="btn btn-outline-secondary btn-sm"
-                    onclick="editTimezone()">
-                {{user.timeZone}}
-            </button>
-            <div id="timeZoneEdit"
-                 class="align-items-center gap-2"
-                 style="display: none">
-                <form onsubmit="return false;"
-                      hx-patch="{{appPath}}/user"
-                      hx-target="body"
-                      id="timeZoneSelectForm"
-                      hx-trigger="trigger"
-                      hx-swap="outerHTML">
-                    <input id="timeZoneSelector"
-                           list="timeZoneList"
-                           name="timeZone"
-                           placeholder="{{user.timeZone}}"
-                           class="btn btn-outline-secondary btn-sm"
-                           style="width: 140px;" />
-                    <datalist id="timeZoneList" style="display: none;">
-                        {{#each timeZones}}
-                            <option value="{{this}}">{{this}}</option>
-                        {{/each}}
-                    </datalist>
-                </form>
-                <div class="btn-group btn-group-sm" role="group">
-                    <button title="Cancel"
-                            class="btn btn-outline-secondary"
-                            onclick="editTimezone(false)">❌</button>
-                    <button title="Done"
-                            class="btn btn-outline-secondary"
-                            onclick="htmx.trigger('#timeZoneSelectForm', 'trigger');editTimezone(false)">💾</button>
-                </div>
-            </div>
+            {{> timezone-selector}}
             <button id="themeToggle"
                     class="btn btn-outline-secondary btn-sm"
                     title="Toggle theme"

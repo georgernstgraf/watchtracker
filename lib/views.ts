@@ -67,6 +67,10 @@ export function renderNavProfile(data: ViewInput<types.NavProfileData>): string 
     return render<types.NavProfileData>("navProfile", merge(data));
 }
 
+export function renderTimezoneSelector(data: ViewInput<types.TimezoneSelectorData>): string {
+    return render<types.TimezoneSelectorData>("timezone-selector", merge(data));
+}
+
 export function renderUserWatches(data?: ViewInput<types.UserWatchesData>): string {
     return render<types.UserWatchesData>("userwatches", merge(data || {}));
 }

@@ -31,12 +31,7 @@ document
 document.querySelector('body').addEventListener('keyup', (event) => {
     if (event.key == 'Escape') htmx.ajax('GET', '/watchtracker/'); // TODO FIXME
 });
-// Close timezone edit on HTMX content swaps
-document.querySelector('body').addEventListener('htmx:afterSwap', (event) => {
-    if (event.detail.target.id === 'mainContent') {
-        editTimezone(false);
-    }
-});
+
 function getCurrentDateTime() {
     const now = new Date();
     const month = (now.getMonth() + 1).toString().padStart(2, '0');
@@ -67,32 +62,6 @@ function editMode(eltId, on = false) {
     } else {
         edit$.style.display = "none";
         show$.style.display = "";
-    }
-}
-
-function editTimezone(really = true) {
-    const edit$ = document.getElementById('timeZoneEdit');
-    const btn$ = document.getElementById('timeZoneButton');
-    switch (really) {
-        case true: {
-            // show edit
-            edit$.style.display = "";
-            edit$.classList.add("d-flex");
-            // hide button
-            btn$.style.display = "none";
-            break;
-        }
-        case false: {
-            // show button
-            btn$.style.display = "";
-            // hide edit
-            edit$.classList.remove("d-flex");
-            edit$.style.display = "none";
-            break;
-        }
-        default: {
-            throw new Error("not implemented");
-        }
     }
 }
 
