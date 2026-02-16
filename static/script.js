@@ -74,19 +74,11 @@ function watchCreateDisplay(yes = true) {
     const btn$ = document.getElementById('watchCreateBtn');
     const form$ = document.getElementById('watchCreateForm');
     if (yes) {
-        // hide the newwatch button
-        btn$.classList.remove("d-flex");
-        btn$.style.display = "none";
-        // un-hide the form
-        form$.style.display = "";
-        form$.classList.add("d-flex");
+        btn$.style.display = 'none';
+        form$.style.display = '';
     } else {
-        // hide the form
-        form$.style.display = "none";
-        form$.classList.remove("d-flex");
-        // show the button again
-        btn$.style.display = "";
-        btn$.classList.add("d-flex");
+        form$.style.display = 'none';
+        btn$.style.display = '';
     }
 }
 function editTimezone(really = true) {
