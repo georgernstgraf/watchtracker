@@ -1,37 +1,49 @@
 <!-- #timezone-selector.hbs -->
 <div id="timeZoneEdit"
-     x-data="{ editing: false }">
-    <div class="d-flex align-items-center gap-2"
-         x-show="editing"
-         x-cloak>
-        <form onsubmit="return false;"
-              hx-patch="{{appPath}}/user"
+     x-data="{ editing: false, timeZone: '{{user.timeZone}}' }"
+     class="d-inline-block">
+    <!-- Default view: Button-like display -->
+    <button x-show="!editing"
+            @click="editing = true; $nextTick(() => document.getElementById('timeZoneSelector').focus())"
+            class="btn btn-outline-secondary btn-sm px-2"
+            title="Click to change timezone: {{user.timeZone}}"
+            type="button">&nbsp;🌐&nbsp;&nbsp;&nbsp;{{user.timeZone}}
+    </button>
+    <!-- Edit mode: Input with datalist and controls -->
+    <div x-show="editing"
+         x-cloak
+         @keydown.escape.window="editing = false"
+         class="align-items-center gap-2">
+        <form hx-patch="{{appPath}}/user"
               hx-target="#timeZoneEdit"
-              id="timeZoneSelectForm"
-              hx-trigger="trigger"
-              hx-swap="outerHTML">
+              hx-swap="outerHTML"
+              hx-trigger="submit"
+              @htmx:after-request="editing = false"
+              class="d-flex align-items-center gap-2">
             <input id="timeZoneSelector"
                    list="timeZoneList"
                    name="timeZone"
-                   placeholder="{{user.timeZone}}"
-                   class="btn btn-outline-secondary btn-sm"
-                   style="width: 140px;" />
-            <datalist id="timeZoneList"
-                      style="display: none;">
+                   :value="timeZone"
+                   placeholder="Select timezone"
+                   class="form-control form-control-sm"
+                   style="width: 180px;"
+                   autocomplete="off" />
+            <datalist id="timeZoneList">
                 {{#each timeZones}}
                     <option value="{{this}}">{{this}}</option>
                 {{/each}}
             </datalist>
+            <div class="btn-group btn-group-sm"
+                 role="group">
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        @click="editing = false"
+                        title="Cancel"> ❌ </button>
+                <button type="submit"
+                        class="btn btn-outline-secondary"
+                        title="Save timezone"> 💾 </button>
+            </div>
         </form>
-        <div class="btn-group btn-group-sm"
-             role="group">
-            <button title="Cancel"
-                    class="btn btn-outline-secondary"
-                    @click="editing = false">❌</button>
-            <button title="Done"
-                    class="btn btn-outline-secondary"
-                    @click="htmx.trigger('#timeZoneSelectForm', 'trigger'); editing = false">💾</button>
-        </div>
     </div>
 </div>
 <!-- /timezone-selector.hbs -->
