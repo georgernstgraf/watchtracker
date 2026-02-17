@@ -1,9 +1,10 @@
 import { Context } from "hono";
-import { UserService, WatchService } from "../service/index.ts";
+import { UserService } from "../service/index.ts";
 import { TimeZone } from "../lib/timezone.ts";
 import { renderLoginContent, renderBodyAuth, renderUnauthFull } from "../lib/views.ts";
 import authenticate from "../lib/auth.ts";
 import { getSession } from "../middleware/session.ts";
+import { toUserDataForViews } from "../lib/viewtypes.ts";
 
 export default function loginHandler(c: Context) {
     if (c.req.method === "GET") {
@@ -19,12 +20,8 @@ async function handleGetLogin(c: Context) {
 
     if (username) {
         const user = await UserService.getUserByName(username);
-        const userWatches = await WatchService.getUserWatchesByUname(username);
-        const watch = await WatchService.getWatchForDisplay(username);
         return c.html(renderBodyAuth({
-            user,
-            userWatches,
-            watch,
+            user: toUserDataForViews(user),
             timeZones: TimeZone.timeZones,
         }));
     }
@@ -61,13 +58,8 @@ async function handlePostLogin(c: Context) {
     const user = await UserService.ensureUserExists(userName);
     session.login(user.id);
 
-    const userWatches = await WatchService.getUserWatchesByUname(user.name);
-    const watch = await WatchService.getWatchForDisplay(user.name);
-
     return c.html(renderBodyAuth({
-        user,
-        userWatches,
-        watch,
+        user: toUserDataForViews(user),
         timeZones: TimeZone.timeZones,
     }));
 }

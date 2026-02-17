@@ -4,6 +4,7 @@ import { TimeZone } from "../lib/timezone.ts";
 import { UserService } from "../service/index.ts";
 import { renderTimezoneSelector } from "../lib/views.ts";
 import { getSession } from "../middleware/session.ts";
+import { toUserDataForViews } from "../lib/viewtypes.ts";
 
 const userRouter = new Hono();
 
@@ -25,7 +26,7 @@ userRouter.patch("/user", async (c) => {
     });
 
     return c.html(renderTimezoneSelector({
-        user: updatedUser,
+        user: toUserDataForViews(updatedUser),
         timeZones: TimeZone.timeZones,
     }));
 });

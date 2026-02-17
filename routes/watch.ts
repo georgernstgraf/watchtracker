@@ -13,12 +13,8 @@ import { getSession } from "../middleware/session.ts";
 const watchRouter = new Hono();
 
 // GET /home - Return watch cards for back navigation
-watchRouter.get("/home", async (c) => {
-    const session = getSession(c);
-    const username = session.username!;
-    const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
-    const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
-    return c.html(renderAllButHeadAndFoot({ userWatches, watch: null }));
+watchRouter.get("/home", (c) => {
+    return c.html(renderAllButHeadAndFoot({}));
 });
 
 // GET /watches - Return watch grid for HTMX sort buttons
@@ -32,14 +28,12 @@ watchRouter.get("/watches", async (c) => {
 
 // GET /watch/new - Return empty watch form for creating a new watch
 // MUST be defined BEFORE /watch/:id to avoid being matched as an ID
-watchRouter.get("/watch/new", async (c) => {
+watchRouter.get("/watch/new", (c) => {
     const session = getSession(c);
     const username = session.username;
     if (!username) {
         throw new HTTPException(401, { message: "Unauthorized" });
     }
-    const userWatches = await WatchService.getUserWatchesByUname(username);
-    // Create a minimal watch object for the "new" state
     const emptyWatch = {
         id: "",
         name: "",
@@ -48,7 +42,7 @@ watchRouter.get("/watch/new", async (c) => {
         userId: "",
         measurements: [],
     } as unknown as types.EnrichedWatch;
-    return c.html(renderWatchDetails({ watch: emptyWatch, userWatches }));
+    return c.html(renderWatchDetails({ watch: emptyWatch }));
 });
 
 // GET /watch - Legacy route with query param
@@ -115,8 +109,7 @@ watchRouter.patch("/watch/:id", validateWatchOwnership, async (c) => {
     if (!updatedWatch) {
         throw new HTTPException(404, { message: "Watch not found" });
     }
-    const userWatches = await WatchService.getUserWatchesByUname(username);
-    return c.html(renderWatchDetails({ watch: updatedWatch, userWatches }));
+    return c.html(renderWatchDetails({ watch: updatedWatch }));
 });
 
 watchRouter.post("/watch", async (c) => {
@@ -147,18 +140,16 @@ watchRouter.post("/watch", async (c) => {
 
     const watch = await WatchService.createWatch(createData);
     await UserService.setLastWatch(username, watch.id);
-    const userWatches = await WatchService.getUserWatchesByUname(username);
     const newWatch = await WatchService.getWatchForDisplay(username, watch.id);
     if (!newWatch) {
         throw new HTTPException(500, { message: "Failed to retrieve created watch" });
     }
-    return c.html(renderWatchDetails({ watch: newWatch, userWatches }));
+    return c.html(renderWatchDetails({ watch: newWatch }));
 });
 
 watchRouter.delete("/watch/:id", validateWatchOwnership, async (c) => {
     const session = getSession(c);
     const userId = session.get("userId")!;
-    const username = session.username!;
     try {
         await WatchService.deleteWatch(c.req.param("id"), userId);
     } catch (err) {
@@ -167,8 +158,7 @@ watchRouter.delete("/watch/:id", validateWatchOwnership, async (c) => {
         }
         throw err;
     }
-    const userWatches = await WatchService.getUserWatchesByUname(username);
-    return c.html(renderAllButHeadAndFoot({ userWatches, watch: null }));
+    return c.html(renderAllButHeadAndFoot({}));
 });
 
 async function handleGetDetails(id: string, c: Context) {
@@ -182,8 +172,7 @@ async function handleGetDetails(id: string, c: Context) {
         throw new HTTPException(403, { message: "Wrong Watch ID" });
     }
     await UserService.setLastWatch(username, watch.id);
-    const userWatches = await WatchService.getUserWatchesByUname(username);
-    return c.html(renderWatchDetails({ watch, userWatches }));
+    return c.html(renderWatchDetails({ watch }));
 }
 
 export default watchRouter;

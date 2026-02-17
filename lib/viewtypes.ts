@@ -1,9 +1,17 @@
 import type { User, Watch, Measurement } from "generated-prisma-client";
 
+export interface UserDataForViews {
+    name: string;
+    timeZone: string;
+}
+
+export function toUserDataForViews(user: User): UserDataForViews {
+    return { name: user.name, timeZone: user.timeZone };
+}
+
 export interface EnrichedMeasurement extends Measurement {
     createdAt16: string;
     driftDisplay: string;
-    driftMath?: { durationDays: number; driftSeconds: number };
 }
 
 export interface EnrichedWatch extends Watch {
@@ -40,10 +48,8 @@ export interface LoginData extends BaseRenderData {
 }
 
 export interface UserWatchData extends BaseRenderData {
-    user: User;
+    user: UserDataForViews;
     timeZones: string[];
-    userWatches: Watch[];
-    watch: EnrichedWatch | null;
 }
 
 export interface MeasurementsViewData extends BaseRenderData {
@@ -51,8 +57,6 @@ export interface MeasurementsViewData extends BaseRenderData {
 }
 
 export interface AllButHeadAndFootData extends BaseRenderData {
-    userWatches: Watch[];
-    watch: EnrichedWatch | null;
 }
 
 // HeadData - for head.hbs (HTML head section)
@@ -72,13 +76,13 @@ export interface MainHeadingData extends BaseRenderData {
 
 // NavProfileData - for navProfile.hbs
 export interface NavProfileData extends BaseRenderData {
-    user: User;
+    user: UserDataForViews;
     timeZones: string[];
 }
 
 // TimezoneSelectorData - for timezone-selector.hbs
 export interface TimezoneSelectorData extends BaseRenderData {
-    user: User;
+    user: UserDataForViews;
     timeZones: string[];
 }
 
@@ -95,5 +99,4 @@ export interface WatchGridData extends BaseRenderData {
 // WatchDetailsViewData - for watch-details.hbs
 export interface WatchDetailsViewData extends BaseRenderData {
     watch: EnrichedWatch;
-    userWatches: Watch[];
 }
