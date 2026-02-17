@@ -10,7 +10,7 @@
             <!-- Square Image Area -->
             <div class="position-relative ratio ratio-1x1">
                 {{#if image}}
-                <img src="data:image/jpeg;base64,{{toBase64 image}}" 
+                <img src="{{../appPath}}/watch/image/{{id}}" 
                      class="card-img-top" 
                      alt="{{name}}"
                      style="object-fit: cover;">

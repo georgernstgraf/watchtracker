@@ -102,16 +102,6 @@ hbs.registerHelper("getInitials", function (name: string) {
     return words.slice(0, 2).map((w) => w.charAt(0).toUpperCase()).join("");
 });
 
-hbs.registerHelper("toBase64", function (bytes: Uint8Array | null | undefined) {
-    if (!bytes) return "";
-    let binary = "";
-    const len = bytes.byteLength;
-    for (let i = 0; i < len; i++) {
-        binary += String.fromCharCode(bytes[i]);
-    }
-    return btoa(binary);
-});
-
 hbs.registerHelper("deviationColor", function (value: number) {
     if (value > 0) return "text-success";
     if (value < 0) return "text-danger";

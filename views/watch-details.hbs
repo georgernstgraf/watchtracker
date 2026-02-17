@@ -4,7 +4,7 @@
          isNew: {{#if watch.id}}false{{else}}true{{/if}},
          editing: {{#if watch.id}}false{{else}}true{{/if}},
          selectedImageFile: null,
-         imagePreview: {{#if watch.image}}'data:image/jpeg;base64,{{toBase64 watch.image}}'{{else}}null{{/if}},
+          imagePreview: {{#if watch.image}}'{{appPath}}/watch/image/{{watch.id}}'{{else}}null{{/if}},
          imageCleared: false,
          imageError: '',
          init() {
@@ -19,7 +19,7 @@
                              if (Math.abs(ratio - 1) > tolerance) {
                                  this.imageError = 'Image must be square. Got ' + img.width + 'x' + img.height;
                                  this.selectedImageFile = null;
-                                 this.imagePreview = {{#if watch.image}}'data:image/jpeg;base64,{{toBase64 watch.image}}'{{else}}null{{/if}};
+                                 this.imagePreview = {{#if watch.image}}'{{appPath}}/watch/image/{{watch.id}}'{{else}}null{{/if}};
                                  this.imageCleared = false;
                                  this.$refs.imageInput.value = '';
                              } else {
@@ -104,7 +104,7 @@
                 <!-- Normal View -->
                 <div x-show="!editing">
                     {{#if watch.image}}
-                    <img src="data:image/jpeg;base64,{{toBase64 watch.image}}"
+                    <img src="{{appPath}}/watch/image/{{watch.id}}"
                          class="img-fluid w-100"
                          alt="{{watch.name}}"
                          style="max-height: 90vh; object-fit: cover; -webkit-mask-image: radial-gradient(circle, black 50%, transparent 71%); mask-image: radial-gradient(circle, black 50%, transparent 71%);">

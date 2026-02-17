@@ -63,6 +63,23 @@ watchRouter.get("/watch/:id", validateWatchOwnership, async (c) => {
     return await handleGetDetails(id, c);
 });
 
+// GET /watch/image/:id - Return watch image as JPEG
+watchRouter.get("/watch/image/:id", validateWatchOwnership, async (c) => {
+    const watchId = c.req.param("id");
+    const watch = await WatchService.findWatchById(watchId);
+
+    if (!watch || !watch.image) {
+        return c.text("Image not found", 404);
+    }
+
+    return new Response(watch.image, {
+        headers: {
+            "Content-Type": "image/jpeg",
+            "Cache-Control": "private, max-age=86400",
+        },
+    });
+});
+
 watchRouter.patch("/watch/:id", validateWatchOwnership, async (c) => {
     const session = getSession(c);
     const username = session.username!;
