@@ -104,6 +104,11 @@ import { UserService, WatchService } from "../service/index.ts";
 - **Functions/Variables**: camelCase (`findUserById`, `userName`)
 - **Types**: PascalCase (`SessionData`, `renderData`)
 
+### Frontend Guidelines
+
+- **HTML Styling**: Try hard to avoid HTML inline styles; rather stick to Bootstrap classes
+- **JavaScript**: Avoid custom JavaScript as much as possible; try to solve as much as possible with HTMX and Alpine.js
+
 ## Architecture Patterns
 
 ### Route Handler Structure
