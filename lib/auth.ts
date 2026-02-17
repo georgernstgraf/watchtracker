@@ -4,15 +4,15 @@ import { testsaslauthd } from "./testsaslauthd.ts";
 
 // Test users for non-production environments
 const TEST_USERS = [
-    { user: "test", passwd: "test" },
-    { user: "grafg", passwd: "grafg" },
+    { user: "test", password: "test" },
+    { user: "grafg", password: "grafg" },
 ];
 
 /**
  * Check if credentials match a test user
  */
-function isTestUser(user: string, passwd: string): boolean {
-    return TEST_USERS.some((tu) => tu.user === user && tu.passwd === passwd);
+function isTestUser(user: string, password: string): boolean {
+    return TEST_USERS.some((testUser) => testUser.user === user && testUser.password === password);
 }
 
 /**
@@ -20,29 +20,29 @@ function isTestUser(user: string, passwd: string): boolean {
  * In non-production: try test users first, then fall back to API
  * In production: rely solely on API
  */
-async function authenticate(user: string, passwd: string) {
+async function authenticate(user: string, password: string) {
     // In non-production environments, check test users first
-    if (!config.isProduction && isTestUser(user, passwd)) {
+    if (!config.isProduction && isTestUser(user, password)) {
         return;
     }
 
     // Try saslauthd authentication
-    if (await testsaslauthd(user, passwd)) {
+    if (await testsaslauthd(user, password)) {
         return;
     }
 
     // Fall back to API authentication
-    const authResp = await fetch(config.AUTH_API_URL, {
+    const authResponse = await fetch(config.AUTH_API_URL, {
         method: "POST",
         body: JSON.stringify({
             user,
-            passwd,
+            password,
         }),
         headers: { "Content-Type": "application/json" },
     });
 
     // auth (bool) und user (string)
-    if (!(await authResp.json()).auth) {
+    if (!(await authResponse.json()).auth) {
         throw new UnauthorizedError("invalid credentials");
     }
 }

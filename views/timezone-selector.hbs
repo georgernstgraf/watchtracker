@@ -1,5 +1,5 @@
 <!-- #timezone-selector.hbs -->
-<div id="timeZoneEdit"
+<div id="timezoneSelectorContainer"
      x-data="{ editing: false, timeZone: '{{user.timeZone}}' }"
      class="d-inline-block">
     <!-- Default view: Button-like display -->
@@ -15,7 +15,7 @@
          @keydown.escape="editing = false"
          class="align-items-center gap-2">
         <form hx-patch="{{appPath}}/user"
-              hx-target="#timeZoneEdit"
+              hx-target="#timezoneSelectorContainer"
               hx-swap="outerHTML"
               hx-trigger="submit"
               @htmx:after-request="editing = false"

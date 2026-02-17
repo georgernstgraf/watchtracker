@@ -5,13 +5,12 @@ import { validateWatchOwnership, validateMeasurementOwnership } from "../middlew
 import { renderMeasurements } from "../lib/views.ts";
 import { getSession } from "../middleware/session.ts";
 
-const measureRouter = new Hono();
+const measurementRouter = new Hono();
 
-// POST /measure/:id - Create a new measurement for a watch
-measureRouter.post("/measure/:id", validateWatchOwnership, async (c) => {
-    // this is a watchId here!!
+// POST /measure/:watchId - Create a new measurement for a watch
+measurementRouter.post("/measure/:watchId", validateWatchOwnership, async (c) => {
     const session = getSession(c);
-    const watchId = c.req.param("id");
+    const watchId = c.req.param("watchId");
     const username = session.username!;
 
     // Create the measurement using the service
@@ -38,18 +37,18 @@ measureRouter.post("/measure/:id", validateWatchOwnership, async (c) => {
     return c.html(renderMeasurements({ watch }));
 });
 
-measureRouter.delete("/measure/:id", validateMeasurementOwnership, async (c) => {
+measurementRouter.delete("/measure/:measurementId", validateMeasurementOwnership, async (c) => {
     const session = getSession(c);
     const username = session.username!;
-    const measureId = c.req.param("id");
-    const watchId = await MeasurementService.getWatchIdForUserMeasurement(username, measureId);
+    const measurementId = c.req.param("measurementId");
+    const watchId = await MeasurementService.getWatchIdForUserMeasurement(username, measurementId);
 
     if (!watchId) {
         throw new HTTPException(403, { message: "Wrong Measurement ID" });
     }
 
     // Delete the measurement
-    await MeasurementService.deleteUserMeasurement(username, measureId);
+    await MeasurementService.deleteUserMeasurement(username, measurementId);
     const watch = await WatchService.getWatchForDisplay(username, watchId);
     if (!watch) {
         throw new HTTPException(403, { message: "Wrong Watch ID" });
@@ -57,14 +56,14 @@ measureRouter.delete("/measure/:id", validateMeasurementOwnership, async (c) => 
     return c.html(renderMeasurements({ watch }));
 });
 
-measureRouter.patch("/measure/:id", validateMeasurementOwnership, async (c) => {
+measurementRouter.patch("/measure/:measurementId", validateMeasurementOwnership, async (c) => {
     const session = getSession(c);
     const username = session.username!;
 
-    const measureId = c.req.param("id");
-    const measure = await MeasurementService.getUserMeasurement(username, measureId);
+    const measurementId = c.req.param("measurementId");
+    const measurement = await MeasurementService.getUserMeasurement(username, measurementId);
     // Ownership verified by middleware, so we know it exists and belongs to user
-    const watchId = measure!.watchId;
+    const watchId = measurement!.watchId;
 
     const body = await c.req.parseBody();
 
@@ -95,7 +94,7 @@ measureRouter.patch("/measure/:id", validateMeasurementOwnership, async (c) => {
         }
     });
 
-    await MeasurementService.updateMeasurement(measureId, updateData);
+    await MeasurementService.updateMeasurement(measurementId, updateData);
 
     const watch = await WatchService.getWatchForDisplay(username, watchId);
     if (!watch) {
@@ -104,4 +103,4 @@ measureRouter.patch("/measure/:id", validateMeasurementOwnership, async (c) => {
     return c.html(renderMeasurements({ watch }));
 });
 
-export default measureRouter;
+export default measurementRouter;

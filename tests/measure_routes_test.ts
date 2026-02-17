@@ -20,7 +20,7 @@ const TEST_WATCH_ID = "cm9s81bh3000r13la5wqn10fj"; // Manero (owned by grafg)
 describe("Measurement Routes (Read-Only)", { sanitizeResources: false, sanitizeOps: false }, () => {
     it("POST /measure/:id returns measurements component", async () => {
         const user = TEST_USERS[1]; // grafg
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         const response = await fetchWithAuth(
             `/measure/${TEST_WATCH_ID}`,
             {
@@ -52,7 +52,7 @@ describe("Measurement Routes (Write Operations)", { sanitizeResources: false, sa
 
     it("PATCH /measure/:id updates a measurement", async () => {
         const user = TEST_USERS[1]; // grafg
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         
         // Create a measurement first to ensure we have a valid ID and ownership
         const createResponse = await fetchWithAuth(
@@ -99,7 +99,7 @@ describe("Measurement Routes (Write Operations)", { sanitizeResources: false, sa
 
     it("DELETE /measure/:id deletes a measurement", async () => {
         const user = TEST_USERS[1]; // grafg
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         
         // First create a measurement to delete
         const createResponse = await fetchWithAuth(

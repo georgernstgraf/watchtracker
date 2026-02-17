@@ -32,8 +32,8 @@ function getContentType(path: string): string {
 }
 
 function main() {
-    const listen_host = config.APP_HOST;
-    const listen_port = config.APP_PORT;
+    const listenHost = config.APP_HOST;
+    const listenPort = config.APP_PORT;
 
     let serverStarted = false;
     let serverClosing = false;
@@ -121,11 +121,11 @@ function main() {
     });
 
     // Start server
-    console.log(`Starting server on ${listen_host}:${listen_port}${config.APP_PATH}...`);
+    console.log(`Starting server on ${listenHost}:${listenPort}${config.APP_PATH}...`);
 
     Deno.serve({
-        port: listen_port,
-        hostname: listen_host,
+        port: listenPort,
+        hostname: listenHost,
         onListen: ({ hostname, port }) => {
             serverStarted = true;
             console.info(

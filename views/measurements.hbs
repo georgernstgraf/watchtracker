@@ -10,17 +10,17 @@
 
     <!-- Create Form -->
     <div style="display:none"
-         id="measureCreate"
+         id="measurementCreateForm"
          class="mb-3">
         <div class="card border-secondary">
             <div class="card-body py-2">
-                <form id="unsavedMeasurement-form"
+                <form id="newMeasurementForm"
                       class="text-center"
                       hx-post="{{appPath}}/measure/{{watch.id}}"
                       hx-target="closest .measurements-container"
                       hx-swap="outerHTML"
                       hx-trigger="trigger">
-                    <input id="measureCreateDateTime"
+                    <input id="measurementCreateDateTime"
                            type="datetime-local"
                            name="createdAt"
                            class="form-control form-control-sm d-inline-block mb-1"
@@ -46,7 +46,7 @@
                                 onclick="event.preventDefault(); hideMeasurementCreate()">Cancel</button>
                         <button title="Save Record"
                                 class="btn btn-outline-secondary"
-                                onclick="event.preventDefault(); htmx.trigger('#unsavedMeasurement-form', 'trigger')">Save</button>
+                                onclick="event.preventDefault(); htmx.trigger('#newMeasurementForm', 'trigger')">Save</button>
                     </div>
                 </form>
             </div>
@@ -69,7 +69,7 @@
                       hx-trigger="trigger">
                     <input type="datetime-local"
                            name="createdAt"
-                           value="{{createdAt16}}"
+                           value="{{createdAtFormatted}}"
                            class="form-control form-control-sm d-inline-block mb-1"
                            style="width: auto;">
                     <input type="number"
@@ -103,7 +103,7 @@
                                 onclick="event.preventDefault()">Delete</button>
                         <button title="Cancel Edit"
                                 class="btn btn-outline-secondary"
-                                onclick="event.preventDefault(); editMode('{{id}}', false)">Cancel</button>
+                                onclick="event.preventDefault(); toggleEditMode('{{id}}', false)">Cancel</button>
                         <button title="Save Record"
                                 class="btn btn-outline-secondary"
                                 onclick="event.preventDefault(); htmx.trigger('#{{id}}-form', 'trigger')">Save</button>
@@ -115,7 +115,7 @@
         <!-- Show View -->
         <div id="{{id}}-show" data-id="{{id}}">
             <div class="card-header py-1 px-3 fw-bold">
-                {{formatDate createdAt16}}
+                {{formatDate createdAtFormatted}}
             </div>
             <div class="card-body py-2 px-3">
                 <div class="row align-items-center gx-2">
@@ -142,7 +142,7 @@
                     <div class="col-auto ms-auto">
                         <button title="Edit Measurement"
                                 class="btn btn-outline-secondary btn-sm"
-                                onclick="editMode('{{id}}', true)">Edit</button>
+                                onclick="toggleEditMode('{{id}}', true)">Edit</button>
                     </div>
                 </div>
                 {{#if comment}}

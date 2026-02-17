@@ -21,7 +21,7 @@ describe("Authentication", { sanitizeResources: false, sanitizeOps: false }, () 
 
     it("GET /watches returns 200 when authenticated", async () => {
         const user = TEST_USERS[0];
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         const response = await fetchWithAuth("/watches", {}, user.user);
         assertStatus(response, 200);
         await response.body?.cancel();
@@ -30,7 +30,7 @@ describe("Authentication", { sanitizeResources: false, sanitizeOps: false }, () 
     it("watch ownership returns 403 for wrong user", async () => {
         // Login as test user
         const user = TEST_USERS[0];
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
 
         // Try to access a watch that belongs to another user
         // This would require knowing a watch ID from another user

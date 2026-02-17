@@ -19,7 +19,7 @@ const TEST_WATCH_ID = "cm9s81bh3000r13la5wqn10fj"; // Manero
 describe("Watch Routes (Read-Only)", { sanitizeResources: false, sanitizeOps: false }, () => {
     it("GET /watches returns list of watches when authenticated", async () => {
         const user = TEST_USERS[1]; // grafg
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         const response = await fetchWithAuth("/watches", {}, user.user);
         assertStatus(response, 200);
         await assertBodyContains(response, "Manero"); // Should contain test watch
@@ -27,7 +27,7 @@ describe("Watch Routes (Read-Only)", { sanitizeResources: false, sanitizeOps: fa
 
     it("GET /watches with sort parameter works", async () => {
         const user = TEST_USERS[1]; // grafg
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         const response = await fetchWithAuth("/watches?sort=recent_desc", {}, user.user);
         assertStatus(response, 200);
         await response.body?.cancel();
@@ -35,7 +35,7 @@ describe("Watch Routes (Read-Only)", { sanitizeResources: false, sanitizeOps: fa
 
     it("GET /watch/:id returns watch details", async () => {
         const user = TEST_USERS[1]; // grafg
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         const response = await fetchWithAuth(`/watch/${TEST_WATCH_ID}`, {}, user.user);
         assertStatus(response, 200);
         await assertBodyContains(response, "Manero");
@@ -43,7 +43,7 @@ describe("Watch Routes (Read-Only)", { sanitizeResources: false, sanitizeOps: fa
 
     it("GET /watch/:id with invalid ID returns 403", async () => {
         const user = TEST_USERS[1]; // grafg
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         const response = await fetchWithAuth("/watch/invalid-id", {}, user.user);
         assertStatus(response, 403);
         await response.body?.cancel();
@@ -61,7 +61,7 @@ describe("Watch Routes (Write Operations)", { sanitizeResources: false, sanitize
 
     it("POST /watch creates a new watch", async () => {
         const user = TEST_USERS[1]; // grafg
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         
         const uniqueName = `Test Watch ${Date.now()}`;
         const response = await fetchWithAuth(
@@ -84,7 +84,7 @@ describe("Watch Routes (Write Operations)", { sanitizeResources: false, sanitize
 
     it("PATCH /watch/:id updates a watch", async () => {
         const user = TEST_USERS[1]; // grafg
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         
         // First get a watch ID from the watches list
         const watchesResponse = await fetchWithAuth("/watches", {}, user.user);
@@ -117,7 +117,7 @@ describe("Watch Routes (Write Operations)", { sanitizeResources: false, sanitize
 
     it("DELETE /watch/:id deletes a watch", async () => {
         const user = TEST_USERS[1]; // grafg
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         
         // First create a watch to delete with unique name
         const uniqueName = `DeleteMe${Date.now()}`;

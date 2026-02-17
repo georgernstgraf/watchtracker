@@ -1,31 +1,31 @@
 <!-- #userwatches.hbs -->
 <div id='userWatches'
-     x-data="{ sortBy: localStorage.getItem('wt-sortBy') || 'recent_desc' }"
+     x-data="{ sortBy: localStorage.getItem('watchtracker-sortBy') || 'recent_desc' }"
      x-init="htmx.ajax('GET', '{{appPath}}/watches?sort=' + sortBy, { target: '#watchGrid', swap: 'innerHTML' })">
     <!-- Sort Controls -->
     <div class="d-flex justify-content-between mb-2">
         <button type="button"
                 class="btn btn-outline-secondary btn-sm"
                 :class="{ 'active': sortBy === 'recent_desc' }"
-                @click="sortBy = 'recent_desc'; localStorage.setItem('wt-sortBy', 'recent_desc'); htmx.ajax('GET', '{{appPath}}/watches?sort=recent_desc', { target: '#watchGrid', swap: 'innerHTML' })">
+                @click="sortBy = 'recent_desc'; localStorage.setItem('watchtracker-sortBy', 'recent_desc'); htmx.ajax('GET', '{{appPath}}/watches?sort=recent_desc', { target: '#watchGrid', swap: 'innerHTML' })">
             Recent ↓
         </button>
         <button type="button"
                 class="btn btn-outline-secondary btn-sm"
                 :class="{ 'active': sortBy === 'recent_asc' }"
-                @click="sortBy = 'recent_asc'; localStorage.setItem('wt-sortBy', 'recent_asc'); htmx.ajax('GET', '{{appPath}}/watches?sort=recent_asc', { target: '#watchGrid', swap: 'innerHTML' })">
+                @click="sortBy = 'recent_asc'; localStorage.setItem('watchtracker-sortBy', 'recent_asc'); htmx.ajax('GET', '{{appPath}}/watches?sort=recent_asc', { target: '#watchGrid', swap: 'innerHTML' })">
             Recent ↑
         </button>
         <button type="button"
                 class="btn btn-outline-secondary btn-sm"
                 :class="{ 'active': sortBy === 'precise_asc' }"
-                @click="sortBy = 'precise_asc'; localStorage.setItem('wt-sortBy', 'precise_asc'); htmx.ajax('GET', '{{appPath}}/watches?sort=precise_asc', { target: '#watchGrid', swap: 'innerHTML' })">
+                @click="sortBy = 'precise_asc'; localStorage.setItem('watchtracker-sortBy', 'precise_asc'); htmx.ajax('GET', '{{appPath}}/watches?sort=precise_asc', { target: '#watchGrid', swap: 'innerHTML' })">
             Precise ↑
         </button>
         <button type="button"
                 class="btn btn-outline-secondary btn-sm"
                 :class="{ 'active': sortBy === 'precise_desc' }"
-                @click="sortBy = 'precise_desc'; localStorage.setItem('wt-sortBy', 'precise_desc'); htmx.ajax('GET', '{{appPath}}/watches?sort=precise_desc', { target: '#watchGrid', swap: 'innerHTML' })">
+                @click="sortBy = 'precise_desc'; localStorage.setItem('watchtracker-sortBy', 'precise_desc'); htmx.ajax('GET', '{{appPath}}/watches?sort=precise_desc', { target: '#watchGrid', swap: 'innerHTML' })">
             Precise ↓
         </button>
     </div>

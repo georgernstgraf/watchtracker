@@ -1,6 +1,6 @@
 // Initialize theme on page load
 (function() {
-    const theme = localStorage.getItem('wt-theme') || 'dark';
+    const theme = localStorage.getItem('watchtracker-theme') || 'dark';
     document.documentElement.setAttribute('data-bs-theme', theme);
     // Set initial icon
     document.addEventListener('DOMContentLoaded', function() {
@@ -51,18 +51,18 @@ function getCurrentDateTime() {
     return formattedDateTime = now.getFullYear() + '-' + month + '-' + day + 'T' + hour + ':' + minute;
 }
 function showMeasurementCreate() {
-    const create$ = document.getElementById('measureCreate');
-    const dtInput$ = document.getElementById('measureCreateDateTime');
+    const create$ = document.getElementById('measurementCreateForm');
+    const dtInput$ = document.getElementById('measurementCreateDateTime');
     dtInput$.value = getCurrentDateTime();
     create$.style.display = '';
     create$.querySelector('input[type="number"]').focus();
 
 }
 function hideMeasurementCreate() {
-    const create$ = document.getElementById('measureCreate');
+    const create$ = document.getElementById('measurementCreateForm');
     create$.style.display = 'none';
 }
-function editMode(eltId, on = false) {
+function toggleEditMode(eltId, on = false) {
     const edit$ = document.getElementById(`${eltId}-edit`);
     const show$ = document.getElementById(`${eltId}-show`);
     if (on) {
@@ -80,7 +80,7 @@ function toggleTheme() {
     const currentTheme = html.getAttribute('data-bs-theme');
     const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
     html.setAttribute('data-bs-theme', newTheme);
-    localStorage.setItem('wt-theme', newTheme);
+    localStorage.setItem('watchtracker-theme', newTheme);
     // Update icon
     const icon = document.getElementById('themeIcon');
     if (icon) {

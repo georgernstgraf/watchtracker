@@ -34,10 +34,10 @@ async function handlePostLogin(c: Context) {
     const body = await c.req.parseBody();
     const errors = [];
 
-    if (!body.user || (body.user as string).trim() === "") {
+    if (!body.username || (body.username as string).trim() === "") {
         errors.push("Username is required");
     }
-    if (!body.passwd || (body.passwd as string).trim() === "") {
+    if (!body.password || (body.password as string).trim() === "") {
         errors.push("Password is required");
     }
 
@@ -45,17 +45,17 @@ async function handlePostLogin(c: Context) {
         return c.html(renderLoginContent({ errors }));
     }
 
-    const userName = body.user as string;
-    const passwd = body.passwd as string;
+    const username = body.username as string;
+    const password = body.password as string;
 
     try {
-        await authenticate(userName, passwd);
+        await authenticate(username, password);
     } catch (err: unknown) {
         errors.push(`login failed: ${err instanceof Error ? err.message : "unknown error"}`);
         return c.html(renderLoginContent({ errors }));
     }
 
-    const user = await UserService.ensureUserExists(userName);
+    const user = await UserService.ensureUserExists(username);
     session.login(user.id);
 
     return c.html(renderBodyAuth({

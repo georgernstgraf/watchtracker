@@ -218,7 +218,7 @@ export class MeasurementService {
         if (!measurements || measurements.length === 0) return undefined;
 
         // Sort measurements by creation date (newest first)
-        const sortedMeasurements = [...measurements].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+        const sortedMeasurements = [...measurements].sort((measurementA, measurementB) => new Date(measurementB.createdAt).getTime() - new Date(measurementA.createdAt).getTime());
 
         // The last (oldest) measurement is always START
         const lastMeasurement = sortedMeasurements[sortedMeasurements.length - 1];
@@ -252,16 +252,16 @@ export class MeasurementService {
         }
 
         // Calculate overall measure from all driftMath entries
-        const onlyMaths = sortedMeasurements
-            .map((m) => m.driftMath)
-            .filter((m): m is { durationDays: number; driftSeconds: number } => !!m);
+        const driftCalculations = sortedMeasurements
+            .map((measurement) => measurement.driftMath)
+            .filter((calc): calc is { durationDays: number; driftSeconds: number } => !!calc);
 
-        if (onlyMaths.length === 0) return undefined;
+        if (driftCalculations.length === 0) return undefined;
 
-        const overallMeasure = onlyMaths.reduce(
-            (accumulator, m) => ({
-                durationDays: accumulator.durationDays + m.durationDays,
-                driftSeconds: accumulator.driftSeconds + m.driftSeconds,
+        const overallMeasure = driftCalculations.reduce(
+            (accumulator, calc) => ({
+                durationDays: accumulator.durationDays + calc.durationDays,
+                driftSeconds: accumulator.driftSeconds + calc.driftSeconds,
             }),
             { durationDays: 0, driftSeconds: 0 },
         );

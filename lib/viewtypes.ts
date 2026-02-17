@@ -10,7 +10,7 @@ export function toUserDataForViews(user: User): UserDataForViews {
 }
 
 export interface EnrichedMeasurement extends Measurement {
-    createdAt16: string;
+    createdAtFormatted: string;
     driftDisplay: string;
 }
 

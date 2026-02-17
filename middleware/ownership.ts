@@ -6,7 +6,7 @@ import { getSession } from "./session.ts";
 export const validateWatchOwnership = async (c: Context, next: Next) => {
     const session = getSession(c);
     const username = session?.username;
-    const watchId = c.req.param("id") || c.req.query("id");
+    const watchId = c.req.param("watchId") || c.req.param("id") || c.req.query("id");
 
     if (!username) {
         throw new HTTPException(401, { message: "Unauthorized" });
@@ -28,24 +28,24 @@ export const validateWatchOwnership = async (c: Context, next: Next) => {
 export const validateMeasurementOwnership = async (c: Context, next: Next) => {
     const session = getSession(c);
     const username = session?.username;
-    const measureId = c.req.param("id");
+    const measurementId = c.req.param("measurementId") || c.req.param("id");
 
     if (!username) {
         throw new HTTPException(401, { message: "Unauthorized" });
     }
 
-    if (!measureId) {
+    if (!measurementId) {
         await next();
         return;
     }
 
-    const measure = await MeasurementService.getUserMeasurement(username, measureId);
-    if (!measure) {
+    const measurement = await MeasurementService.getUserMeasurement(username, measurementId);
+    if (!measurement) {
         throw new HTTPException(403, { message: "Access denied: You do not own this measurement" });
     }
 
-    // Attach the measure to context to avoid re-fetching in the route if needed
-    // c.set("measurement", measure);
+    // Attach the measurement to context to avoid re-fetching in the route if needed
+    // c.set("measurement", measurement);
 
     await next();
 };

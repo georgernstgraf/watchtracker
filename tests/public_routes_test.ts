@@ -24,7 +24,7 @@ describe("Public Routes", { sanitizeResources: false, sanitizeOps: false }, () =
 
     it("POST /login with valid credentials succeeds", async () => {
         const user = TEST_USERS[0];
-        const response = await loginUser(user.user, user.passwd);
+        const response = await loginUser(user.user, user.password);
         assertStatus(response, 200);
         assertHasSessionCookie(response);
         await assertBodyContains(response, "Watchtracker");
@@ -37,7 +37,7 @@ describe("Public Routes", { sanitizeResources: false, sanitizeOps: false }, () =
                 "Content-Type": "application/x-www-form-urlencoded",
                 "HX-Request": "true",
             },
-            body: new URLSearchParams({ user: "invalid", passwd: "wrong" }),
+            body: new URLSearchParams({ username: "invalid", password: "wrong" }),
         });
         assertStatus(response, 200);
         await assertBodyContains(response, "login failed");
@@ -45,7 +45,7 @@ describe("Public Routes", { sanitizeResources: false, sanitizeOps: false }, () =
 
     it("POST /logout clears session", async () => {
         const user = TEST_USERS[0];
-        await loginUser(user.user, user.passwd);
+        await loginUser(user.user, user.password);
         const response = await logoutUser(user.user);
         assertStatus(response, 200);
         await assertBodyContains(response, "Login");

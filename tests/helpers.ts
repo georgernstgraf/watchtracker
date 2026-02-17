@@ -7,8 +7,8 @@ import * as config from "../lib/config.ts";
 
 export const BASE_URL = `http://${config.APP_HOST}:${config.APP_PORT}${config.APP_PATH}`;
 export const TEST_USERS = [
-    { user: "test", passwd: "test" },
-    { user: "grafg", passwd: "grafg" },
+    { user: "test", password: "test" },
+    { user: "grafg", password: "grafg" },
 ];
 
 /**
@@ -57,7 +57,7 @@ export async function loginUser(username: string, password: string): Promise<Res
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
             },
-            body: new URLSearchParams({ user: username, passwd: password }),
+            body: new URLSearchParams({ username: username, password: password }),
         },
     );
 

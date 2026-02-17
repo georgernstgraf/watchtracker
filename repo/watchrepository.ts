@@ -190,15 +190,15 @@ export class WatchRepository {
     /**
      * Get watch statistics
      */
-    static async getWatchStats(watchId: string) {
+    static async getWatchStatistics(watchId: string) {
         const measurements = await prisma.measurement.findMany({
             where: { watchId },
             orderBy: { createdAt: "asc" },
         });
 
         const totalMeasurements = measurements.length;
-        const startMeasurements = measurements.filter((m) => m.isStart);
-        const stopMeasurements = measurements.filter((m) => !m.isStart);
+        const startMeasurements = measurements.filter((measurement) => measurement.isStart);
+        const stopMeasurements = measurements.filter((measurement) => !measurement.isStart);
 
         return {
             totalMeasurements,

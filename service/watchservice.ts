@@ -61,14 +61,14 @@ export class WatchService {
     /**
      * Get all watches for a user id
      */
-    static async getUserWatchesByUid(userId: string): Promise<Watch[]> {
+    static async getUserWatchesByUserId(userId: string): Promise<Watch[]> {
         return await WatchRepository.findByUserId(userId);
     }
 
     /**
      * Get all watches for a user name
      */
-    static async getUserWatchesByUname(username: string): Promise<Watch[]> {
+    static async getUserWatchesByUsername(username: string): Promise<Watch[]> {
         return await WatchRepository.findByUsername(username);
     }
 
@@ -81,21 +81,21 @@ export class WatchService {
         const user = await UserRepository.findByName(username);
         const timeZone = user?.timeZone || "UTC";
 
-        const enriched = watchesWithMeasurements.map((w) => this.enrichWatchCard(w, timeZone));
+        const enriched = watchesWithMeasurements.map((watch) => this.enrichWatchCard(watch, timeZone));
 
         switch (sortBy) {
             case "recent_asc":
             case "recent_desc":
-                return enriched.sort((a, b) => {
-                    const aLatest = a.lastUsedDate ? a.lastUsedDate.getTime() : 0;
-                    const bLatest = b.lastUsedDate ? b.lastUsedDate.getTime() : 0;
+                return enriched.sort((watchA, watchB) => {
+                    const aLatest = watchA.lastUsedDate ? watchA.lastUsedDate.getTime() : 0;
+                    const bLatest = watchB.lastUsedDate ? watchB.lastUsedDate.getTime() : 0;
                     return sortBy === "recent_asc" ? aLatest - bLatest : bLatest - aLatest;
                 });
             case "precise_asc":
             case "precise_desc":
-                return enriched.sort((a, b) => {
-                    const aDrift = this.calculateAbsoluteDriftFromCard(a);
-                    const bDrift = this.calculateAbsoluteDriftFromCard(b);
+                return enriched.sort((watchA, watchB) => {
+                    const aDrift = this.calculateAbsoluteDriftFromCard(watchA);
+                    const bDrift = this.calculateAbsoluteDriftFromCard(watchB);
                     return sortBy === "precise_asc" ? aDrift - bDrift : bDrift - aDrift;
                 });
             default:
@@ -111,9 +111,9 @@ export class WatchService {
         const card: WatchCard = { ...watch };
 
         if (measurements.length >= 2) {
-            const enrichedMeasurements = measurements.map((m) => ({
-                ...m,
-                createdAt16: "",
+            const enrichedMeasurements = measurements.map((measurement) => ({
+                ...measurement,
+                createdAtFormatted: "",
                 driftDisplay: "n/a",
                 driftMath: undefined,
             })) as EnrichedMeasurement[];
@@ -126,10 +126,10 @@ export class WatchService {
         }
 
         if (measurements.length > 0) {
-            const lastMeasurement = measurements[measurements.length - 1];
-            const lastDate = lastMeasurement.createdAt instanceof Date
-                ? lastMeasurement.createdAt
-                : new Date(lastMeasurement.createdAt);
+            const latestMeasurement = measurements[measurements.length - 1];
+            const lastDate = latestMeasurement.createdAt instanceof Date
+                ? latestMeasurement.createdAt
+                : new Date(latestMeasurement.createdAt);
             card.lastUsed = TimeZone.getShort(lastDate, timeZone);
             card.lastUsedDate = lastDate;
         }
@@ -189,7 +189,7 @@ export class WatchService {
      * Get watch statistics
      */
     static async getWatchStatistics(watchId: string) {
-        return await WatchRepository.getWatchStats(watchId);
+        return await WatchRepository.getWatchStatistics(watchId);
     }
 
     /**
@@ -277,12 +277,12 @@ export class WatchService {
         const measurements = watchWithMeasurements.measurements || [];
 
         if (measurements.length > 0) {
-            // Enrich measurements with createdAt16 and driftDisplay
-            const measurementsWithDrifts = measurements.map((m) => {
-                const dateObj = m.createdAt instanceof Date ? m.createdAt : new Date(m.createdAt);
+            // Enrich measurements with createdAtFormatted and driftDisplay
+            const measurementsWithDrifts = measurements.map((measurement) => {
+                const dateObj = measurement.createdAt instanceof Date ? measurement.createdAt : new Date(measurement.createdAt);
                 return {
-                    ...m,
-                    createdAt16: TimeZone.get16(dateObj, timeZone),
+                    ...measurement,
+                    createdAtFormatted: TimeZone.formatISODate(dateObj, timeZone),
                     driftDisplay: "n/a",
                     driftMath: undefined,
                 } as EnrichedMeasurement;

@@ -8,15 +8,15 @@ import { toUserDataForViews } from "../lib/viewtypes.ts";
 export default async function slashHandler(c: Context) {
     const session = getSession(c);
     const username = session.username;
-    const full = c.req.header("hx-request") ? "-body" : "-full";
+    const responseSuffix = c.req.header("hx-request") ? "-body" : "-full";
     if (username) {
         const user = await UserService.getUserByName(username);
 
         const data = { user: toUserDataForViews(user), timeZones: TimeZone.timeZones };
-        return c.html(full === "-body" ? renderIndexBody(data) : renderIndexFull(data));
+        return c.html(responseSuffix === "-body" ? renderIndexBody(data) : renderIndexFull(data));
     } else {
         const sessionId = session.getId();
         console.log(`slash.ts: No user found -- rendering login page (${sessionId ? sessionId.substring(0, 8) : 'new'}...)`);
-        return c.html(full === "-body" ? renderLoginContent({}) : renderUnauthFull({}));
+        return c.html(responseSuffix === "-body" ? renderLoginContent({}) : renderUnauthFull({}));
     }
 }

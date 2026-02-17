@@ -2,17 +2,17 @@ import hbs from "handlebars";
 import { walk } from "@std/fs";
 import { partialsDir } from "./config.ts";
 import * as config from "./config.ts";
-// map "template name" => compiled template function
-const map = new Map<string, hbs.TemplateDelegate>();
+// templateCache "template name" => compiled template function
+const templateCache = new Map<string, hbs.TemplateDelegate>();
 
-const hbsData = { appPath: config.APP_PATH };
-export { hbsData as renderData };
+const baseRenderData = { appPath: config.APP_PATH };
+export { baseRenderData as renderData };
 
 /**
  * Render a template with typed data
  */
 export function render<T>(templateName: string, data: T): string {
-    const template = map.get(templateName);
+    const template = templateCache.get(templateName);
     if (!template) {
         throw new Error(`Template not found: ${templateName}`);
     }
@@ -26,7 +26,7 @@ async function loadTemplates(): Promise<void> {
         const templateName = file.replace(`${templatesDir.substring(2)}/`, "").replace(".hbs", "");
         const templateSource = Deno.readTextFileSync(file);
         const template = hbs.compile(templateSource);
-        map.set(templateName, template);
+        templateCache.set(templateName, template);
         hbs.registerPartial(templateName, template);
     }
 }
@@ -99,7 +99,7 @@ hbs.registerHelper("getInitials", function (name: string) {
     if (words.length === 1) {
         return words[0].substring(0, 2).toUpperCase();
     }
-    return words.slice(0, 2).map((w) => w.charAt(0).toUpperCase()).join("");
+    return words.slice(0, 2).map((word) => word.charAt(0).toUpperCase()).join("");
 });
 
 hbs.registerHelper("deviationColor", function (value: number) {
@@ -120,7 +120,7 @@ hbs.registerHelper("abs", function (value: number) {
 
 try {
     await loadTemplates();
-    console.log(`HBS: Templates loaded successfully:, ${JSON.stringify([...map.keys()])}`);
+    console.log(`HBS: Templates loaded successfully:, ${JSON.stringify([...templateCache.keys()])}`);
 } catch (err) {
     console.error(`HBS: Error loading templates:`, err);
     Deno.exit(1);
