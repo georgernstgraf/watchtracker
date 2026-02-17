@@ -28,9 +28,7 @@ document
             }
         }
     });
-document.querySelector('body').addEventListener('keyup', (event) => {
-    if (event.key == 'Escape') htmx.ajax('GET', '/watchtracker/'); // TODO FIXME
-});
+
 
 function getCurrentDateTime() {
     const now = new Date();
