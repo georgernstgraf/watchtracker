@@ -6,6 +6,7 @@
          selectedImageFile: null,
           imagePreview: {{#if watch.image}}'{{appPath}}/watch/image/{{watch.id}}'{{else}}null{{/if}},
          imageCleared: false,
+          originalImageUrl: {{#if watch.image}}'{{appPath}}/watch/image/{{watch.id}}'{{else}}null{{/if}},
          imageError: '',
          init() {
              $watch('selectedImageFile', (file) => {
@@ -43,16 +44,41 @@
          },
          toggleEdit(show) {
              this.editing = show;
-             if (!show) {
+             if (show) {
+                 this.imagePreview = this.originalImageUrl;
+                 this.imageCleared = false;
+                 this.selectedImageFile = null;
+                 this.imageError = '';
+             } else {
                  this.clearImagePreview();
              }
          },
          cancelEdit() {
              if (this.isNew) {
-                 // For new watches, cancel goes back to the watch list
                  htmx.ajax('GET', '{{appPath}}/home', { target: '#mainContent', swap: 'innerHTML' });
              } else {
                  this.toggleEdit(false);
+             }
+         },
+         handleKeydown(event) {
+             if (!this.editing) return;
+             const tag = event.target.tagName.toLowerCase();
+             if (tag === 'input' || tag === 'textarea') {
+                 if (event.key === 'Escape') {
+                     event.target.blur();
+                     this.cancelEdit();
+                 }
+                 return;
+             }
+             if (event.key === 'Escape') {
+                 this.cancelEdit();
+             } else if (event.key === 'Enter') {
+                 event.preventDefault();
+                 this.saveDetails();
+             } else if (event.key === 'Delete' && !this.isNew) {
+                 if (confirm('Are you sure you want to delete this watch?')) {
+                     htmx.ajax('DELETE', '{{appPath}}/watch/{{watch.id}}', { target: '#mainContent', swap: 'innerHTML' });
+                 }
              }
          },
           async saveDetails() {
@@ -64,21 +90,27 @@
                   formData.set('clearImage', 'true');
               }
               const isCreating = this.isNew;
-             const url = isCreating ? '{{appPath}}/watch' : '{{appPath}}/watch/{{watch.id}}';
-             const method = isCreating ? 'POST' : 'PATCH';
-             try {
+              const url = isCreating ? '{{appPath}}/watch' : '{{appPath}}/watch/{{watch.id}}';
+              const method = isCreating ? 'POST' : 'PATCH';
+              try {
                  const response = await fetch(url, {
                      method: method,
                      body: formData
                  });
                  if (response.ok) {
-                     const html = await response.text();
-                     const mainContent = document.getElementById('mainContent');
-                     mainContent.innerHTML = html;
-                     mainContent.querySelectorAll('[hx-get], [hx-post], [hx-put], [hx-patch], [hx-delete]').forEach(el => {
-                         htmx.process(el);
-                     });
-                 } else {
+                      const html = await response.text();
+                      const mainContent = document.getElementById('mainContent');
+                      mainContent.innerHTML = html;
+                      mainContent.querySelectorAll('[hx-get], [hx-post], [hx-put], [hx-patch], [hx-delete]').forEach(el => {
+                          htmx.process(el);
+                      });
+                      if (this.selectedImageFile) {
+                          const img = mainContent.querySelector('img[src*="/watch/image/"]');
+                          if (img) {
+                              img.src = img.src + '?v=' + Date.now();
+                          }
+                      }
+                  } else {
                      const error = await response.text();
                      this.imageError = error || 'Failed to save';
                  }
@@ -86,7 +118,8 @@
                  this.imageError = 'Error: ' + err.message;
              }
          }
-     }">
+     }"
+     @keydown.window="handleKeydown($event)">
     <!-- Back Button (only for existing watches) -->
     <div class="mb-3" x-show="!isNew">
         <button class="btn btn-outline-secondary btn-sm"
