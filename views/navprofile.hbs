@@ -1,5 +1,14 @@
 <!-- #navprofile.hbs -->
-<nav id="profile" class="mb-3">
+<nav id="profile"
+     class="mb-3"
+     x-data="{
+         theme: localStorage.getItem('watchtracker-theme') || 'dark',
+         toggleTheme() {
+             this.theme = this.theme === 'dark' ? 'light' : 'dark';
+             document.documentElement.setAttribute('data-bs-theme', this.theme);
+             localStorage.setItem('watchtracker-theme', this.theme);
+         }
+     }">
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center">
         <h1 class="mb-2 mb-sm-0">Watchtracker</h1>
         <div class="d-flex align-items-center gap-3">
@@ -7,8 +16,8 @@
             <button id="themeToggle"
                     class="btn btn-outline-secondary btn-sm"
                     title="Toggle theme"
-                    onclick="toggleTheme()">
-                <span id="themeIcon">🌙</span>
+                    @click="toggleTheme()">
+                <span id="themeIcon" x-text="theme === 'dark' ? '🌙' : '☀️'">🌙</span>
             </button>
             <form hx-post="{{appPath}}/logout" hx-target="body">
                 <button id="logoutButton"

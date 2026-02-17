@@ -1,16 +1,37 @@
 <!-- #measurements.hbs -->
-<div class="measurements-container">
+<div class="measurements-container"
+     x-data="{
+         showCreate: false,
+         showCreateForm() {
+             this.showCreate = true;
+             const now = new Date();
+             const month = (now.getMonth() + 1).toString().padStart(2, '0');
+             const day = now.getDate().toString().padStart(2, '0');
+             const hour = now.getHours().toString().padStart(2, '0');
+             const minute = now.getMinutes().toString().padStart(2, '0');
+             const formatted = now.getFullYear() + '-' + month + '-' + day + 'T' + hour + ':' + minute;
+             this.$nextTick(() => {
+                 this.$refs.createDatetime.value = formatted;
+                 this.$refs.createValue.focus();
+             });
+         },
+         hideCreateForm() {
+             this.showCreate = false;
+         }
+     }">
     <!-- New Measurement Button -->
     <div class="d-flex justify-content-end mb-2">
         <button title="New Measurement"
                 id="newMeasurement"
                 class="btn btn-outline-secondary btn-sm"
-                onclick="showMeasurementCreate()"> + New </button>
+                x-show="!showCreate"
+                @click="showCreateForm()"> + New </button>
     </div>
 
     <!-- Create Form -->
-    <div style="display:none"
-         id="measurementCreateForm"
+    <div x-show="showCreate"
+         x-cloak
+         x-ref="createForm"
          class="mb-3">
         <div class="card border-secondary">
             <div class="card-body py-2">
@@ -20,12 +41,13 @@
                       hx-target="closest .measurements-container"
                       hx-swap="outerHTML"
                       hx-trigger="trigger">
-                    <input id="measurementCreateDateTime"
+                    <input x-ref="createDatetime"
                            type="datetime-local"
                            name="createdAt"
                            class="form-control form-control-sm d-inline-block mb-1"
                            style="width: auto;">
-                    <input type="number"
+                    <input x-ref="createValue"
+                           type="number"
                            name="value"
                            placeholder="0"
                            class="form-control form-control-sm d-inline-block mb-1"
@@ -43,7 +65,7 @@
                     <div class="btn-group btn-group-sm mt-1">
                         <button title="Cancel"
                                 class="btn btn-outline-secondary"
-                                onclick="event.preventDefault(); hideMeasurementCreate()">Cancel</button>
+                                @click.prevent="hideCreateForm()">Cancel</button>
                         <button title="Save Record"
                                 class="btn btn-outline-secondary"
                                 onclick="event.preventDefault(); htmx.trigger('#newMeasurementForm', 'trigger')">Save</button>
@@ -55,10 +77,12 @@
 
     <!-- Measurement Cards -->
     {{#each watch.measurements}}
-    <div class="card border-secondary mb-2">
+    <div class="card border-secondary mb-2"
+         x-data="{ editing: false }"
+         x-ref="card">
         <!-- Edit Form (hidden by default) -->
-        <div style="display:none"
-             id="{{id}}-edit"
+        <div x-show="editing"
+             x-cloak
              data-id="{{id}}">
             <div class="card-body py-2">
                 <form id="{{id}}-form"
@@ -72,7 +96,8 @@
                            value="{{createdAtFormatted}}"
                            class="form-control form-control-sm d-inline-block mb-1"
                            style="width: auto;">
-                    <input type="number"
+                    <input x-ref="editValue"
+                           type="number"
                            name="value"
                            style="width: 7ch;"
                            value="{{value}}"
@@ -100,10 +125,10 @@
                                 hx-delete="{{../appPath}}/measure/{{id}}"
                                 hx-target="closest .measurements-container"
                                 hx-swap="outerHTML"
-                                onclick="event.preventDefault()">Delete</button>
+                                @click.prevent>Delete</button>
                         <button title="Cancel Edit"
                                 class="btn btn-outline-secondary"
-                                onclick="event.preventDefault(); toggleEditMode('{{id}}', false)">Cancel</button>
+                                @click.prevent="editing = false">Cancel</button>
                         <button title="Save Record"
                                 class="btn btn-outline-secondary"
                                 onclick="event.preventDefault(); htmx.trigger('#{{id}}-form', 'trigger')">Save</button>
@@ -113,7 +138,7 @@
         </div>
 
         <!-- Show View -->
-        <div id="{{id}}-show" data-id="{{id}}">
+        <div x-show="!editing" data-id="{{id}}">
             <div class="card-header py-1 px-3 fw-bold">
                 {{formatDate createdAtFormatted}}
             </div>
@@ -142,7 +167,7 @@
                     <div class="col-auto ms-auto">
                         <button title="Edit Measurement"
                                 class="btn btn-outline-secondary btn-sm"
-                                onclick="toggleEditMode('{{id}}', true)">Edit</button>
+                                @click="editing = true; $nextTick(() => $refs.editValue.focus())">Edit</button>
                     </div>
                 </div>
                 {{#if comment}}
