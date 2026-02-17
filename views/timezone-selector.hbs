@@ -12,7 +12,7 @@
     <!-- Edit mode: Input with datalist and controls -->
     <div x-show="editing"
          x-cloak
-         @keydown.escape.window="editing = false"
+         @keydown.escape="editing = false"
          class="align-items-center gap-2">
         <form hx-patch="{{appPath}}/user"
               hx-target="#timeZoneEdit"
@@ -27,7 +27,8 @@
                    placeholder="Select timezone"
                    class="form-control form-control-sm"
                    style="width: 180px;"
-                   autocomplete="off" />
+                   autocomplete="off"
+                   @keydown.escape="editing = false" />
             <datalist id="timeZoneList">
                 {{#each timeZones}}
                     <option value="{{this}}">{{this}}</option>
