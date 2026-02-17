@@ -3,14 +3,14 @@ import type { User, Watch, Measurement } from "generated-prisma-client";
 export interface EnrichedMeasurement extends Measurement {
     createdAt16: string;
     driftDisplay: string;
-    driftMath?: { durationDays: number; driftSeks: number };
+    driftMath?: { durationDays: number; driftSeconds: number };
 }
 
 export interface EnrichedWatch extends Watch {
     measurements: EnrichedMeasurement[];
     overallMeasure?: {
         durationDays: string;
-        driftSeks: number;
+        driftSeconds: number;
         niceDisplay: string;
     };
 }

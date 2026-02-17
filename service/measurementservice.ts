@@ -1,5 +1,5 @@
-import { MeasurementRepository } from "../repo/measurementRepository.ts";
-import { WatchRepository } from "../repo/watchRepository.ts";
+import { MeasurementRepository } from "../repo/measurementrepository.ts";
+import { WatchRepository } from "../repo/watchrepository.ts";
 import type { Measurement, Prisma } from "generated-prisma-client";
 
 export class MeasurementService {
@@ -210,9 +210,9 @@ export class MeasurementService {
      * Mutates the measurements array to add driftDisplay property
      * Returns overallMeasure object with summary statistics
      */
-    static calculateDrifts(measurements: (Measurement & { driftDisplay?: string; driftMath?: { durationDays: number; driftSeks: number } })[]): {
+    static calculateDrifts(measurements: (Measurement & { driftDisplay?: string; driftMath?: { durationDays: number; driftSeconds: number } })[]): {
         durationDays: string;
-        driftSeks: number;
+        driftSeconds: number;
         niceDisplay: string;
     } | undefined {
         if (!measurements || measurements.length === 0) return undefined;
@@ -236,16 +236,16 @@ export class MeasurementService {
             }
 
             const durationMS = new Date(current.createdAt).getTime() - new Date(previous.createdAt).getTime();
-            const driftSeks = current.value - previous.value;
+            const driftSeconds = current.value - previous.value;
             const durationDays = durationMS / (24 * 60 * 60 * 1000); // ms to days
 
             if (durationDays > 0) {
-                const driftPerDay = driftSeks / durationDays;
+                const driftPerDay = driftSeconds / durationDays;
                 const driftPerDayDisplay = driftPerDay >= 0 ? `+${driftPerDay.toFixed(1)}` : `${driftPerDay.toFixed(1)}`;
                 const durationHours = Math.round(durationMS / (60 * 60 * 1000));
                 const durationDisplay = durationHours < 72 ? `${durationHours}h` : `${Math.round(durationHours / 24)}d`;
                 current.driftDisplay = `${driftPerDayDisplay} s/d (${durationDisplay})`;
-                current.driftMath = { durationDays, driftSeks };
+                current.driftMath = { durationDays, driftSeconds };
             } else {
                 current.driftDisplay = "n/a";
             }
@@ -254,26 +254,26 @@ export class MeasurementService {
         // Calculate overall measure from all driftMath entries
         const onlyMaths = sortedMeasurements
             .map((m) => m.driftMath)
-            .filter((m): m is { durationDays: number; driftSeks: number } => !!m);
+            .filter((m): m is { durationDays: number; driftSeconds: number } => !!m);
 
         if (onlyMaths.length === 0) return undefined;
 
         const overallMeasure = onlyMaths.reduce(
-            (akku, m) => ({
-                durationDays: akku.durationDays + m.durationDays,
-                driftSeks: akku.driftSeks + m.driftSeks,
+            (accumulator, m) => ({
+                durationDays: accumulator.durationDays + m.durationDays,
+                driftSeconds: accumulator.driftSeconds + m.driftSeconds,
             }),
-            { durationDays: 0, driftSeks: 0 },
+            { durationDays: 0, driftSeconds: 0 },
         );
 
-        const driftSeksPerDay = overallMeasure.driftSeks / overallMeasure.durationDays;
-        const niceDisplay = driftSeksPerDay >= 0
-            ? `${driftSeksPerDay.toFixed(1)} s/d fast`
-            : `${(-driftSeksPerDay).toFixed(1)} s/d slow`;
+        const driftSecondsPerDay = overallMeasure.driftSeconds / overallMeasure.durationDays;
+        const niceDisplay = driftSecondsPerDay >= 0
+            ? `${driftSecondsPerDay.toFixed(1)} s/d fast`
+            : `${(-driftSecondsPerDay).toFixed(1)} s/d slow`;
 
         return {
             durationDays: overallMeasure.durationDays.toFixed(0),
-            driftSeks: Math.round(overallMeasure.driftSeks),
+            driftSeconds: Math.round(overallMeasure.driftSeconds),
             niceDisplay,
         };
     }

@@ -4,10 +4,10 @@ import { HTTPException } from "hono/http-exception";
 import { UserService, WatchService, type SortOption } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
 import { renderAllButHeadAndFoot, renderWatchDetails, renderWatchGrid } from "../lib/views.ts";
-import { resizeImage, validateSquareImage } from "../lib/imageUtils.ts";
+import { resizeImage, validateSquareImage } from "../lib/imageutils.ts";
 import { ForbiddenError } from "../lib/errors.ts";
 import type { Prisma } from "generated-prisma-client";
-import type * as types from "../lib/viewTypes.ts";
+import type * as types from "../lib/viewtypes.ts";
 import { getSession } from "../middleware/session.ts";
 
 const watchRouter = new Hono();

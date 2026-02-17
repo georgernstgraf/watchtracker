@@ -1,3 +1,3 @@
-export { UserService } from "./userService.ts";
-export { WatchService, type SortOption } from "./watchService.ts";
-export { MeasurementService } from "./measurementService.ts";
+export { UserService } from "./userservice.ts";
+export { WatchService, type SortOption } from "./watchservice.ts";
+export { MeasurementService } from "./measurementservice.ts";

@@ -1,3 +1,3 @@
-export { UserRepository } from "./userRepository.ts";
-export { WatchRepository } from "./watchRepository.ts";
-export { MeasurementRepository } from "./measurementRepository.ts";
+export { UserRepository } from "./userrepository.ts";
+export { WatchRepository } from "./watchrepository.ts";
+export { MeasurementRepository } from "./measurementrepository.ts";

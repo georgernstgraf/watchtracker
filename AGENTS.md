@@ -99,7 +99,7 @@ import { UserService, WatchService } from "../service/index.ts";
 
 ### Naming Conventions
 
-- **Files**: lowercase (`userService.ts`, `watchRepository.ts`)
+- **Files**: lowercase (`userservice.ts`, `watchrepository.ts`)
 - **Classes**: PascalCase (`UserService`, `WatchRepository`)
 - **Functions/Variables**: camelCase (`findUserById`, `userName`)
 - **Types**: PascalCase (`SessionData`, `renderData`)

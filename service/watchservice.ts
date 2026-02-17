@@ -1,12 +1,12 @@
-import { WatchRepository } from "../repo/watchRepository.ts";
-import { MeasurementRepository } from "../repo/measurementRepository.ts";
-import { UserRepository } from "../repo/userRepository.ts";
-import { UserService } from "./userService.ts";
-import { MeasurementService } from "./measurementService.ts";
-import { TimeZone } from "../lib/timeZone.ts";
+import { WatchRepository } from "../repo/watchrepository.ts";
+import { MeasurementRepository } from "../repo/measurementrepository.ts";
+import { UserRepository } from "../repo/userrepository.ts";
+import { UserService } from "./userservice.ts";
+import { MeasurementService } from "./measurementservice.ts";
+import { TimeZone } from "../lib/timezone.ts";
 import { ForbiddenError } from "../lib/errors.ts";
 import type { Measurement, Prisma, Watch } from "generated-prisma-client";
-import type { EnrichedWatch, EnrichedMeasurement, WatchCard } from "../lib/viewTypes.ts";
+import type { EnrichedWatch, EnrichedMeasurement, WatchCard } from "../lib/viewtypes.ts";
 
 interface WatchWithMeasurements extends Watch {
     measurements: Measurement[];

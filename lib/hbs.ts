@@ -5,8 +5,8 @@ import * as config from "./config.ts";
 // map "template name" => compiled template function
 const map = new Map<string, hbs.TemplateDelegate>();
 
-const hbs_data = { appPath: config.APP_PATH };
-export { hbs_data as renderData };
+const hbsData = { appPath: config.APP_PATH };
+export { hbsData as renderData };
 
 /**
  * Render a template with typed data

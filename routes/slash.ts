@@ -1,5 +1,5 @@
 import { Context } from "hono";
-import { TimeZone } from "../lib/timeZone.ts";
+import { TimeZone } from "../lib/timezone.ts";
 import { UserService, WatchService } from "../service/index.ts";
 import { renderIndexFull, renderIndexBody, renderUnauthFull, renderLoginContent } from "../lib/views.ts";
 import { getSession } from "../middleware/session.ts";

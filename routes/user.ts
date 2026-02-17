@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { TimeZone } from "../lib/timeZone.ts";
+import { TimeZone } from "../lib/timezone.ts";
 import { UserService } from "../service/index.ts";
 import { renderTimezoneSelector } from "../lib/views.ts";
 import { getSession } from "../middleware/session.ts";

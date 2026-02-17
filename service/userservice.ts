@@ -1,5 +1,5 @@
-import { UserRepository } from "../repo/userRepository.ts";
-import { WatchRepository } from "../repo/watchRepository.ts";
+import { UserRepository } from "../repo/userrepository.ts";
+import { WatchRepository } from "../repo/watchrepository.ts";
 import { NotFoundError } from "../lib/errors.ts";
 import type { Prisma, User } from "generated-prisma-client";
 

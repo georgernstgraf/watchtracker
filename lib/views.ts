@@ -1,5 +1,5 @@
 import { render, renderData as baseData } from "./hbs.ts";
-import * as types from "./viewTypes.ts";
+import * as types from "./viewtypes.ts";
 
 /**
  * Internal helper to merge base render data (appPath) with template specific data
@@ -44,7 +44,7 @@ export function renderMeasurements(data: ViewInput<types.MeasurementsViewData>):
 }
 
 export function renderAllButHeadAndFoot(data: ViewInput<types.AllButHeadAndFootData>): string {
-    return render<types.AllButHeadAndFootData>("allButHeadAndFoot", merge(data));
+    return render<types.AllButHeadAndFootData>("allbutheadandfoot", merge(data));
 }
 
 export function renderBodyAuth(data: ViewInput<types.UserWatchData>): string {
@@ -60,11 +60,11 @@ export function renderFooter(data: ViewInput<types.FooterData>): string {
 }
 
 export function renderMainHeading(data: ViewInput<types.MainHeadingData>): string {
-    return render<types.MainHeadingData>("mainHeading", merge(data));
+    return render<types.MainHeadingData>("mainheading", merge(data));
 }
 
 export function renderNavProfile(data: ViewInput<types.NavProfileData>): string {
-    return render<types.NavProfileData>("navProfile", merge(data));
+    return render<types.NavProfileData>("navprofile", merge(data));
 }
 
 export function renderTimezoneSelector(data: ViewInput<types.TimezoneSelectorData>): string {

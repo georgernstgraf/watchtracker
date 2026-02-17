@@ -7,12 +7,12 @@ export class TimeZone {
         idx,
         tz.toLowerCase(),
     ]);
-    static search(inpt: string) {
-        const inptLC = inpt.toLowerCase();
-        const idxes = TimeZone.timeZonesIdxLC
-            .filter((arr) => arr[1].includes(inptLC))
+    static search(input: string) {
+        const inputLowerCase = input.toLowerCase();
+        const indices = TimeZone.timeZonesIdxLC
+            .filter((arr) => arr[1].includes(inputLowerCase))
             .map((a) => a[0]);
-        return idxes.map((i) => [i, TimeZone.timeZones[i]]);
+        return indices.map((i) => [i, TimeZone.timeZones[i]]);
     }
     static get16(date: Date, tz: string): string {
         try {

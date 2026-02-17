@@ -2,7 +2,7 @@ import { Context, MiddlewareHandler } from "hono";
 import { getCookie, setCookie, deleteCookie } from "hono/cookie";
 import { Memcached } from "@avroit/memcached";
 import * as config from "../lib/config.ts";
-import { UserService } from "../service/userService.ts";
+import { UserService } from "../service/userservice.ts";
 
 export type MemcacheData = {
     userId?: string;
