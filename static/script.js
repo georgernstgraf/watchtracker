@@ -29,6 +29,18 @@ document
         }
     });
 
+// Handle I/O errors (network failures, timeouts, etc.)
+document
+    .querySelector('body')
+    .addEventListener('htmx:sendError', (event) => {
+        const messageEl = document.getElementById('errorToastMessage');
+        const toastEl = document.getElementById('errorToast');
+        if (messageEl && toastEl) {
+            messageEl.textContent = 'Network error: ' + (event.detail.errorMessage || 'Connection failed');
+            bootstrap.Toast.getOrCreateInstance(toastEl, { delay: 5000 }).show();
+        }
+    });
+
 
 function getCurrentDateTime() {
     const now = new Date();
