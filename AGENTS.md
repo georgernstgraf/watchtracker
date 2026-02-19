@@ -14,7 +14,7 @@
 ## Build & Development Commands
 
 ```bash
-deno task watch        # Development server with file watching
+deno task dev          # Development server with file watching
 deno task start        # Production server
 deno task check        # TypeScript checking across all modules
 deno task lint         # Lint all TypeScript files
@@ -71,7 +71,7 @@ deno task test          # Run all tests (resets DB, requires server running)
 2. Run `deno task lint` - Linting
 3. Run `deno task test` - **All tests must pass**
 
-> **IMPORTANT**: Tests require the server to be running (`deno task watch` in another terminal).
+> **IMPORTANT**: Tests require the server to be running (`deno task dev` in another terminal).
 
 ## Code Style Guidelines
 
@@ -190,7 +190,7 @@ views/         # Handlebars templates (.hbs)
 ## Development Workflow
 
 1. **Before coding**: Run `deno task check` to ensure type safety
-2. **During development**: Use `deno task watch` for auto-reload
+2. **During development**: Use `deno task dev` for auto-reload
 3. **After changes**: Run `deno task check && deno task lint`
 4. **Database changes**: Run `deno task p_g` after schema changes
 5. **Handling git**: Never commit or push unless asked to do so

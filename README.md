@@ -124,7 +124,7 @@ DENO_ENV=development
 Start the development server with hot reload:
 
 ```bash
-deno task watch
+deno task dev
 ```
 
 The server will be available at `http://localhost:8000/watchtracker`
@@ -139,7 +139,7 @@ deno task pmr         # Reset database
 deno task lint        # Run linter
 deno task check       # TypeScript type checking
 deno task start       # Production server
-deno task watch       # Development server with hot reload
+deno task dev         # Development server with hot reload
 deno task test        # Run tests (resets DB automatically)
 deno task replacedb   # Reset database to clean test state
 deno task purgecss    # Optimize CSS
@@ -193,7 +193,7 @@ Key points:
 - UX/Error: Implement centralized HTMX-aware error handler - issue #75
 - DevOps: Verify Prisma client generation in dev workflow - issue #74
 - Refactor: Consolidate data enrichment logic in WatchService - issue #72
-- DX: Monitor static/ directory in deno task watch - issue #73
+- DX: Monitor static/ directory in deno task dev - issue #73
 - Cleanup: Remove obsolete classes_old/ directory - issue #71
 - Add pms task for prisma migrate status
 - Fix NaN in Entry date: use getWatchForDisplay in user and slash routes - issue #69

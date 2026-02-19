@@ -10,7 +10,7 @@ This testing suite uses Deno's built-in testing framework to test the backend AP
 
 1. Start the development server:
    ```bash
-   deno task watch
+   deno task dev
    ```
 
 2. In another terminal, run the tests:

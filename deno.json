@@ -9,7 +9,7 @@
         "lint": "deno lint lib/*.ts middleware/*.ts routes/*.ts routers/*.ts service/*.ts repo/*.ts main.ts",
         "check": "deno check --all lib/*.ts middleware/*.ts routes/*.ts routers/*.ts service/*.ts repo/*.ts main.ts",
         "start": "deno run --env-file --allow-env --allow-ffi --allow-read --allow-write --allow-net main.ts",
-        "watch": "deno run --env-file --allow-env --allow-ffi --allow-read --allow-write --allow-net --watch=main.ts,lib/,routes/,service/,views/,static/,prisma/schema.prisma --watch-exclude=prisma/client/ main.ts",
+        "dev": "deno run --env-file --allow-env --allow-ffi --allow-read --allow-write --allow-net --watch=main.ts,lib/,routes/,service/,views/,static/,prisma/schema.prisma --watch-exclude=prisma/client/ main.ts",
         "pulldb": "scripts/pulldb.sh",
         "replacedb": "scripts/replacedb.sh",
         "purgecss": "purgecss --config purgecss.config.js",
