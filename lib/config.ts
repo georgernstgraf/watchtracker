@@ -41,3 +41,5 @@ export const isDevelopment = DENO_ENV === "development";
 
 export const saslauthdMux = Deno.env.get("SASLAUTHD_MUX") || "/var/run/saslauthd/mux";
 export const saslauthdLieTrue = Deno.env.get("SASLAUTHD_LIE_TRUE") === "true";
+
+export const DATE_YEAR_THRESHOLD_MONTHS = Number(Deno.env.get("DATE_YEAR_THRESHOLD_MONTHS")) || 9;

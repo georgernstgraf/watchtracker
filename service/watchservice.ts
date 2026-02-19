@@ -291,6 +291,9 @@ export class WatchService {
             // Apply drift calculations (mutates array to add driftDisplay)
             const overallMeasure = MeasurementService.calculateDrifts(measurementsWithDrifts);
 
+            // Group measurements into periods
+            const periods = MeasurementService.groupMeasurementsIntoPeriods(measurementsWithDrifts);
+
             return {
                 id: watch.id,
                 name: watch.name,
@@ -299,6 +302,7 @@ export class WatchService {
                 comment: watch.comment,
                 image: watch.image,
                 measurements: measurementsWithDrifts,
+                periods,
                 overallMeasure,
             };
         }
@@ -311,6 +315,7 @@ export class WatchService {
             comment: watch.comment,
             image: watch.image,
             measurements: [],
+            periods: [],
         };
     }
 }

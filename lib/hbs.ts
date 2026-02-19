@@ -85,6 +85,14 @@ hbs.registerHelper("formatDate", function (dateString: string) {
     const month = monthNames[date.getMonth()];
     const hours = date.getHours().toString().padStart(2, "0");
     const minutes = date.getMinutes().toString().padStart(2, "0");
+
+    const now = new Date();
+    const monthsDiff = (now.getFullYear() - date.getFullYear()) * 12 + (now.getMonth() - date.getMonth());
+    const showYear = monthsDiff >= config.DATE_YEAR_THRESHOLD_MONTHS;
+
+    if (showYear) {
+        return `${day}. ${month} ${date.getFullYear()}, ${hours}:${minutes}`;
+    }
     return `${day}. ${month}, ${hours}:${minutes}`;
 });
 

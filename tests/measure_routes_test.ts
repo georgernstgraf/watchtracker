@@ -37,7 +37,7 @@ describe("Measurement Routes (Read-Only)", { sanitizeResources: false, sanitizeO
             user.user
         );
         assertStatus(response, 200);
-        await assertBodyContains(response, "measurements-container");
+        await assertBodyContains(response, 'id="measurements"');
     });
 
     // Cleanup

@@ -14,8 +14,16 @@ export interface EnrichedMeasurement extends Measurement {
     driftDisplay: string;
 }
 
+export interface MeasurementPeriod {
+    measurements: EnrichedMeasurement[];
+    firstDate: string;
+    lastDate: string;
+    periodDrift: string;
+}
+
 export interface EnrichedWatch extends Watch {
     measurements: EnrichedMeasurement[];
+    periods: MeasurementPeriod[];
     overallMeasure?: {
         durationDays: string;
         driftSeconds: number;

@@ -1,6 +1,7 @@
 import { MeasurementRepository } from "../repo/measurementrepository.ts";
 import { WatchRepository } from "../repo/watchrepository.ts";
 import type { Measurement, Prisma } from "generated-prisma-client";
+import type { EnrichedMeasurement, MeasurementPeriod } from "../lib/viewtypes.ts";
 
 export class MeasurementService {
     /**
@@ -275,6 +276,73 @@ export class MeasurementService {
             durationDays: overallMeasure.durationDays.toFixed(0),
             driftSeconds: Math.round(overallMeasure.driftSeconds),
             niceDisplay,
+        };
+    }
+
+    /**
+     * Group measurements into periods based on isStart flag
+     * Each period starts with a START measurement and includes all subsequent non-START measurements
+     * The oldest measurement is always treated as START
+     * Returns periods sorted by first measurement date (newest period first)
+     */
+    static groupMeasurementsIntoPeriods(measurements: EnrichedMeasurement[]): MeasurementPeriod[] {
+        if (!measurements || measurements.length === 0) return [];
+
+        // Sort by createdAt ascending (oldest first)
+        const sorted = [...measurements].sort(
+            (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
+
+        // Ensure the oldest measurement is treated as START
+        sorted[0].isStart = true;
+
+        const periods: MeasurementPeriod[] = [];
+        let currentPeriod: EnrichedMeasurement[] = [];
+
+        for (const measurement of sorted) {
+            if (measurement.isStart && currentPeriod.length > 0) {
+                // Start of a new period - save the previous one
+                periods.push(this.createPeriod(currentPeriod));
+                currentPeriod = [];
+            }
+            currentPeriod.push(measurement);
+        }
+
+        // Don't forget the last period
+        if (currentPeriod.length > 0) {
+            periods.push(this.createPeriod(currentPeriod));
+        }
+
+        // Sort periods by first measurement date (newest first)
+        return periods.reverse();
+    }
+
+    /**
+     * Create a period object from a list of measurements
+     */
+    private static createPeriod(measurements: EnrichedMeasurement[]): MeasurementPeriod {
+        const first = measurements[0];
+        const last = measurements[measurements.length - 1];
+
+        // Calculate period drift from first to last measurement
+        let periodDrift = "n/a";
+        if (measurements.length >= 2) {
+            const durationMS = new Date(last.createdAt).getTime() - new Date(first.createdAt).getTime();
+            const driftSeconds = last.value - first.value;
+            const durationDays = durationMS / (24 * 60 * 60 * 1000);
+
+            if (durationDays > 0) {
+                const driftPerDay = driftSeconds / durationDays;
+                const sign = driftPerDay >= 0 ? "+" : "";
+                periodDrift = `${sign}${driftPerDay.toFixed(1)} s/d`;
+            }
+        }
+
+        return {
+            measurements: measurements.slice().reverse(),
+            firstDate: first.createdAtFormatted,
+            lastDate: last.createdAtFormatted,
+            periodDrift,
         };
     }
 }
