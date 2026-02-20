@@ -1,5 +1,6 @@
 <!-- #measurements.hbs -->
-<div id="measurements" class="measurements-container"
+<div id="measurements"
+     class="measurements-container"
      x-data="{
          showCreate: false,
          showCreateForm() {
@@ -27,7 +28,6 @@
                 x-show="!showCreate"
                 @click="showCreateForm()"> + New </button>
     </div>
-
     <!-- Create Form -->
     <div x-show="showCreate"
          x-cloak
@@ -55,8 +55,7 @@
                     <label class="text-body-secondary mb-1">
                         <input type="checkbox"
                                name="isStart"
-                               value="true"> Start
-                    </label>
+                               value="true"> Start </label>
                     <input type="text"
                            name="comment"
                            placeholder="comment"
@@ -74,121 +73,117 @@
             </div>
         </div>
     </div>
-
     <!-- Period Cards -->
     {{#each watch.periods}}
-    <div class="card border-primary mb-3">
-        <div class="card-header py-1 px-3 bg-primary bg-opacity-10">
-            <strong>{{formatDate firstDate timezone=../userTimeZone}}</strong> → <strong>{{formatDate lastDate timezone=../userTimeZone}}</strong>
-            <span class="ms-2 badge bg-secondary">{{periodDrift}}</span>
-        </div>
-        <div class="card-body p-2">
-            {{#each measurements}}
-            <div class="card border-secondary mb-2"
-                 x-data="{ editing: false }"
-                 x-ref="card">
-                <!-- Edit Form (hidden by default) -->
-                <div x-show="editing"
-                     x-cloak
-                     data-id="{{id}}">
-                    <div class="card-body py-2">
-                        <form id="{{id}}-form"
-                              class="text-center"
-                              hx-patch="{{../../appPath}}/measure/{{id}}"
-                              hx-target="closest .measurements-container"
-                              hx-swap="outerHTML"
-                              hx-trigger="trigger">
-                            <input type="datetime-local"
-                                   name="createdAt"
-                                   value="{{formatDateTimeLocal createdAt timezone=../../userTimeZone}}"
-                                   class="form-control form-control-sm d-inline-block mb-1"
-                                   style="width: auto;">
-                            <input x-ref="editValue"
-                                   type="number"
-                                   name="value"
-                                   style="width: 7ch;"
-                                   value="{{value}}"
-                                   onfocus="this.select()"
-                                   onclick="this.select()"
-                                   class="form-control form-control-sm d-inline-block mb-1">
-                            <label class="text-body-secondary mb-1">
-                                <input type="checkbox"
-                                       name="isStart"
-                                       value="true"
-                                       {{#if isStart}}checked{{/if}}> Start
-                            </label>
-                            <input type="text"
-                                   name="comment"
-                                   {{#if comment}}
-                                   value="{{comment}}"
-                                   {{else}}
-                                   placeholder="comment"
-                                   {{/if}}
-                                   class="form-control form-control-sm d-inline-block mb-1"
-                                   style="width: auto;">
-                            <div class="btn-group btn-group-sm mt-1">
-                                <button title="Delete Record"
-                                        class="btn btn-outline-danger"
-                                        hx-delete="{{../../appPath}}/measure/{{id}}"
-                                        hx-target="closest .measurements-container"
-                                        hx-swap="outerHTML"
-                                        @click.prevent>Delete</button>
-                                <button title="Cancel Edit"
-                                        class="btn btn-outline-secondary"
-                                        @click.prevent="editing = false">Cancel</button>
-                                <button title="Save Record"
-                                        class="btn btn-outline-secondary"
-                                        onclick="event.preventDefault(); htmx.trigger('#{{id}}-form', 'trigger')">Save</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Show View -->
-                <div x-show="!editing" data-id="{{id}}">
-                    <div class="card-header py-1 px-3 fw-bold">
-                        {{formatDate createdAt timezone=../../userTimeZone showTime=true}}
-                    </div>
-                    <div class="card-body py-2 px-3">
-                        <div class="row align-items-center gx-2">
-                            <div class="col-auto">
-                                <small class="text-body-secondary d-block">Deviation</small>
-                                <span class="{{deviationColor value}} fw-bold">
-                                    {{{deviationArrow value}}} {{abs value}}s
-                                </span>
-                            </div>
-                            <div class="col-auto border-start ps-2">
-                                <small class="text-body-secondary d-block">Type</small>
-                                {{#if isStart}} 🎬 {{else}} ⌛ {{/if}}
-                            </div>
-                            <div class="col-auto border-start ps-2">
-                                <small class="text-body-secondary d-block">Drift</small>
-                                <span>⏱ {{driftDisplay}}</span>
-                            </div>
-                            {{#if comment}}
-                            <div class="col border-start ps-2 d-none d-sm-block">
-                                <small class="text-body-secondary d-block">Comment</small>
-                                <span>{{comment}}</span>
-                            </div>
-                            {{/if}}
-                            <div class="col-auto ms-auto">
-                                <button title="Edit Measurement"
-                                        class="btn btn-outline-secondary btn-sm"
-                                        @click="editing = true; $nextTick(() => $refs.editValue.focus())">Edit</button>
-                            </div>
-                        </div>
-                        {{#if comment}}
-                        <div class="d-block d-sm-none mt-1">
-                            <small class="text-body-secondary">{{comment}}</small>
-                        </div>
-                        {{/if}}
-                    </div>
-                </div>
+        <div class="card border-secondary mb-3">
+            <div class="card-header py-1 px-3 bg-primary bg-opacity-10">
+                <strong>{{formatDate firstDate timezone=../userTimeZone}}</strong> → <strong>{{formatDate lastDate timezone=../userTimeZone}}</strong>
+                <span class="ms-2 badge bg-secondary">{{periodDrift}}</span>
             </div>
-            {{/each}}
+            <div class="card-body p-2">
+                {{#each measurements}}
+                    <div class="card border-secondary mb-2"
+                         x-data="{ editing: false }"
+                         x-ref="card">
+                        <!-- Edit Form (hidden by default) -->
+                        <div x-show="editing"
+                             x-cloak
+                             data-id="{{id}}">
+                            <div class="card-body py-2">
+                                <form id="{{id}}-form"
+                                      class="text-center"
+                                      hx-patch="{{../../appPath}}/measure/{{id}}"
+                                      hx-target="closest .measurements-container"
+                                      hx-swap="outerHTML"
+                                      hx-trigger="trigger">
+                                    <input type="datetime-local"
+                                           name="createdAt"
+                                           value="{{formatDateTimeLocal createdAt timezone=../../userTimeZone}}"
+                                           class="form-control form-control-sm d-inline-block mb-1"
+                                           style="width: auto;">
+                                    <input x-ref="editValue"
+                                           type="number"
+                                           name="value"
+                                           style="width: 7ch;"
+                                           value="{{value}}"
+                                           onfocus="this.select()"
+                                           onclick="this.select()"
+                                           class="form-control form-control-sm d-inline-block mb-1">
+                                    <label class="text-body-secondary mb-1">
+                                        <input type="checkbox"
+                                               name="isStart"
+                                               value="true"
+                                               {{#if isStart}}checked{{/if}}> Start </label>
+                                    <input type="text"
+                                           name="comment"
+                                           {{#if comment}}
+                                           value="{{comment}}"
+                                           {{else}}
+                                           placeholder="comment"
+                                           {{/if}}
+                                           class="form-control form-control-sm d-inline-block mb-1"
+                                           style="width: auto;">
+                                    <div class="btn-group btn-group-sm mt-1">
+                                        <button title="Delete Record"
+                                                class="btn btn-outline-danger"
+                                                hx-delete="{{../../appPath}}/measure/{{id}}"
+                                                hx-target="closest .measurements-container"
+                                                hx-swap="outerHTML"
+                                                @click.prevent>Delete</button>
+                                        <button title="Cancel Edit"
+                                                class="btn btn-outline-secondary"
+                                                @click.prevent="editing = false">Cancel</button>
+                                        <button title="Save Record"
+                                                class="btn btn-outline-secondary"
+                                                onclick="event.preventDefault(); htmx.trigger('#{{id}}-form', 'trigger')">Save</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <!-- Show View -->
+                        <div x-show="!editing"
+                             data-id="{{id}}">
+                            <div class="card-header py-1 px-3 fw-bold">
+                                {{formatDate createdAt timezone=../../userTimeZone showTime=true}}
+                            </div>
+                            <div class="card-body py-2 px-3">
+                                <div class="row align-items-center gx-2">
+                                    <div class="col-auto">
+                                        <small class="text-body-secondary d-block">Deviation</small>
+                                        <span class="{{deviationColor value}} fw-bold">
+                                            {{{deviationArrow value}}} {{abs value}}s </span>
+                                    </div>
+                                    <div class="col-auto border-start ps-2">
+                                        <small class="text-body-secondary d-block">Type</small>
+                                        {{#if isStart}} 🎬 {{else}} ⌛ {{/if}}
+                                    </div>
+                                    <div class="col-auto border-start ps-2">
+                                        <small class="text-body-secondary d-block">Drift</small>
+                                        <span>⏱ {{driftDisplay}}</span>
+                                    </div>
+                                    {{#if comment}}
+                                        <div class="col border-start ps-2 d-none d-sm-block">
+                                            <small class="text-body-secondary d-block">Comment</small>
+                                            <span>{{comment}}</span>
+                                        </div>
+                                    {{/if}}
+                                    <div class="col-auto ms-auto">
+                                        <button title="Edit Measurement"
+                                                class="btn btn-outline-secondary btn-sm"
+                                                @click="editing = true; $nextTick(() => $refs.editValue.focus())">Edit</button>
+                                    </div>
+                                </div>
+                                {{#if comment}}
+                                    <div class="d-block d-sm-none mt-1">
+                                        <small class="text-body-secondary">{{comment}}</small>
+                                    </div>
+                                {{/if}}
+                            </div>
+                        </div>
+                    </div>
+                {{/each}}
+            </div>
         </div>
-    </div>
     {{/each}}
-
-    </div>
+</div>
 <!-- /measurements.hbs -->
