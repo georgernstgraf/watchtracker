@@ -48,9 +48,9 @@
              }
          },
          cancelEdit() {
-             if (this.isNew) {
-                 // For new watches, cancel goes back to the watch list
-                 htmx.ajax('GET', '{{appPath}}/home', { target: '#mainContent', swap: 'innerHTML' });
+              if (this.isNew) {
+                  // For new watches, cancel goes back to the watch list
+                  htmx.ajax('GET', '{{appPath}}/home', { target: '#mainContent', swap: 'innerHTML', pushUrl: '{{appPath}}' });
              } else {
                  this.toggleEdit(false);
              }
@@ -92,7 +92,8 @@
         <button class="btn btn-outline-secondary btn-sm"
                 hx-get='{{appPath}}/home'
                 hx-target='#mainContent'
-                hx-swap='innerHTML'>
+                hx-swap='innerHTML'
+                hx-push-url='{{appPath}}'>
             ← Back to Watches
         </button>
     </div>

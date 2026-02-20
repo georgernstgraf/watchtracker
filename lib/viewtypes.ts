@@ -109,3 +109,11 @@ export interface WatchDetailsViewData extends BaseRenderData {
     watch: EnrichedWatch;
     userTimeZone: string;
 }
+
+// WatchDetailsFullViewData - for watch-details-full.hbs (full-page, direct browser load)
+export interface WatchDetailsFullViewData extends BaseRenderData {
+    watch: EnrichedWatch;
+    userTimeZone: string;
+    user: UserDataForViews;
+    timeZones: string[];
+}

@@ -6,7 +6,8 @@
                  style="cursor: pointer;"
                  hx-get='{{../appPath}}/watch/{{id}}'
                  hx-target='#mainContent'
-                 hx-swap='innerHTML'>
+                 hx-swap='innerHTML'
+                 hx-push-url='{{../appPath}}/watch/{{id}}'>
                 <!-- Square Image Area -->
                 <div class="position-relative ratio ratio-1x1">
                     {{#if image}}

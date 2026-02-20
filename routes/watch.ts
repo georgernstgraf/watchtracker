@@ -3,12 +3,13 @@ import { Hono, type Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { UserService, WatchService, type SortOption } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
-import { renderAllButHeadAndFoot, renderWatchDetails, renderWatchGrid } from "../lib/views.ts";
+import { renderAllButHeadAndFoot, renderWatchDetails, renderWatchDetailsFull, renderWatchGrid } from "../lib/views.ts";
 import { resizeImage, validateSquareImage } from "../lib/imageutils.ts";
 import { ForbiddenError } from "../lib/errors.ts";
 import type { Prisma } from "generated-prisma-client";
 import type * as types from "../lib/viewtypes.ts";
 import { getSession } from "../middleware/session.ts";
+import { TimeZone } from "../lib/timezone.ts";
 
 const watchRouter = new Hono();
 
@@ -49,7 +50,11 @@ watchRouter.get("/watch/new", async (c) => {
         measurements: [],
     } as unknown as types.EnrichedWatch;
     const userTimeZone = await getUserTimeZone(username);
-    return c.html(renderWatchDetails({ watch: emptyWatch, userTimeZone }));
+    if (c.req.header("hx-request")) {
+        return c.html(renderWatchDetails({ watch: emptyWatch, userTimeZone }));
+    }
+    const user = await UserService.getUserByName(username);
+    return c.html(renderWatchDetailsFull({ watch: emptyWatch, userTimeZone, user: { name: user!.name, timeZone: user!.timeZone }, timeZones: TimeZone.timeZones }));
 });
 
 // GET /watch - Legacy route with query param
@@ -182,7 +187,11 @@ async function handleGetDetails(id: string, c: Context) {
     }
     await UserService.setLastWatch(username, watch.id);
     const userTimeZone = await getUserTimeZone(username);
-    return c.html(renderWatchDetails({ watch, userTimeZone }));
+    if (c.req.header("hx-request")) {
+        return c.html(renderWatchDetails({ watch, userTimeZone }));
+    }
+    const user = await UserService.getUserByName(username);
+    return c.html(renderWatchDetailsFull({ watch, userTimeZone, user: { name: user!.name, timeZone: user!.timeZone }, timeZones: TimeZone.timeZones }));
 }
 
 export default watchRouter;

@@ -82,3 +82,7 @@ export function renderWatchGrid(data: ViewInput<types.WatchGridData>): string {
 export function renderWatchDetails(data: ViewInput<types.WatchDetailsViewData>): string {
     return render<types.WatchDetailsViewData>("watch-details", merge(data));
 }
+
+export function renderWatchDetailsFull(data: ViewInput<types.WatchDetailsFullViewData>): string {
+    return render<types.WatchDetailsFullViewData>("watch-details-full", merge(data));
+}
