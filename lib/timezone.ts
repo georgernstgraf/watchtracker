@@ -27,14 +27,7 @@ export class TimeZone {
             return fallback?.substring(0, 16) ?? "Invalid Date";
         }
     }
-    static getShort(date: Date, timezone: string): string {
-        try {
-            const dt = luxon.DateTime.fromJSDate(date, { zone: timezone });
-            return dt.toFormat("d MMM");
-        } catch (_e) {
-            return luxon.DateTime.fromJSDate(date, { zone: "UTC" }).toFormat("d MMM");
-        }
-    }
+
     static parseISODate(str: string, timezone: string) {
         return luxon.DateTime.fromISO(str, { zone: timezone });
     }

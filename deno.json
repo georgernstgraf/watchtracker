@@ -13,7 +13,7 @@
         "pulldb": "scripts/pulldb.sh",
         "replacedb": "scripts/replacedb.sh",
         "purgecss": "purgecss --config purgecss.config.js",
-        "test": "scripts/replacedb.sh && deno test --env-file --allow-env --allow-net tests/"
+        "test": "scripts/test.sh"
     },
     "imports": {
         "@avroit/memcached": "jsr:@avroit/memcached@^0.0.4",

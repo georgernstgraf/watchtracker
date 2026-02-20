@@ -6,7 +6,7 @@ import { MeasurementService } from "./measurementservice.ts";
 import { TimeZone } from "../lib/timezone.ts";
 import { ForbiddenError } from "../lib/errors.ts";
 import type { Measurement, Prisma, Watch } from "generated-prisma-client";
-import type { EnrichedWatch, EnrichedMeasurement, WatchCard } from "../lib/viewtypes.ts";
+import type { EnrichedMeasurement, EnrichedWatch, WatchCard } from "../lib/viewtypes.ts";
 
 interface WatchWithMeasurements extends Watch {
     measurements: Measurement[];
@@ -126,10 +126,8 @@ export class WatchService {
         }
 
         if (measurements.length > 0) {
-            const latestMeasurement = measurements[measurements.length - 1];
-            const lastDate = latestMeasurement.createdAt instanceof Date
-                ? latestMeasurement.createdAt
-                : new Date(latestMeasurement.createdAt);
+            const latestMeasurement = measurements.at(-1)!;
+            const lastDate = latestMeasurement.createdAt instanceof Date ? latestMeasurement.createdAt : new Date(latestMeasurement.createdAt);
             card.lastUsed = TimeZone.formatISODate(lastDate, timeZone);
             card.lastUsedDate = lastDate;
         }
