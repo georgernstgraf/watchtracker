@@ -338,10 +338,13 @@ export class MeasurementService {
             }
         }
 
+        const firstDate = first.createdAt instanceof Date ? first.createdAt : new Date(first.createdAt);
+        const lastDate = last.createdAt instanceof Date ? last.createdAt : new Date(last.createdAt);
+
         return {
             measurements: measurements.slice().reverse(),
-            firstDate: first.createdAtFormatted,
-            lastDate: last.createdAtFormatted,
+            firstDate,
+            lastDate,
             periodDrift,
         };
     }

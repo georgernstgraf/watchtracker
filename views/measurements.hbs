@@ -1,5 +1,5 @@
 <!-- #measurements.hbs -->
-<div class="measurements-container"
+<div id="measurements" class="measurements-container"
      x-data="{
          showCreate: false,
          showCreateForm() {
@@ -79,7 +79,7 @@
     {{#each watch.periods}}
     <div class="card border-primary mb-3">
         <div class="card-header py-1 px-3 bg-primary bg-opacity-10">
-            <strong>{{formatDate firstDate}}</strong> → <strong>{{formatDate lastDate}}</strong>
+            <strong>{{formatDate firstDate timezone=../userTimeZone}}</strong> → <strong>{{formatDate lastDate timezone=../userTimeZone}}</strong>
             <span class="ms-2 badge bg-secondary">{{periodDrift}}</span>
         </div>
         <div class="card-body p-2">
@@ -100,7 +100,7 @@
                               hx-trigger="trigger">
                             <input type="datetime-local"
                                    name="createdAt"
-                                   value="{{createdAtFormatted}}"
+                                   value="{{formatDateTimeLocal createdAt timezone=../../userTimeZone}}"
                                    class="form-control form-control-sm d-inline-block mb-1"
                                    style="width: auto;">
                             <input x-ref="editValue"
@@ -147,7 +147,7 @@
                 <!-- Show View -->
                 <div x-show="!editing" data-id="{{id}}">
                     <div class="card-header py-1 px-3 fw-bold">
-                        {{formatDate createdAtFormatted}}
+                        {{formatDateTime createdAt timezone=../../userTimeZone}}
                     </div>
                     <div class="card-body py-2 px-3">
                         <div class="row align-items-center gx-2">

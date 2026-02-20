@@ -12,6 +12,11 @@ import { getSession } from "../middleware/session.ts";
 
 const watchRouter = new Hono();
 
+async function getUserTimeZone(username: string): Promise<string> {
+    const user = await UserService.getUserByName(username);
+    return user?.timeZone || "UTC";
+}
+
 // GET /home - Return watch cards for back navigation
 watchRouter.get("/home", (c) => {
     return c.html(renderAllButHeadAndFoot({}));
@@ -23,12 +28,13 @@ watchRouter.get("/watches", async (c) => {
     const username = session.username!;
     const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
     const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
-    return c.html(renderWatchGrid({ userWatches }));
+    const userTimeZone = await getUserTimeZone(username);
+    return c.html(renderWatchGrid({ userWatches, userTimeZone }));
 });
 
 // GET /watch/new - Return empty watch form for creating a new watch
 // MUST be defined BEFORE /watch/:id to avoid being matched as an ID
-watchRouter.get("/watch/new", (c) => {
+watchRouter.get("/watch/new", async (c) => {
     const session = getSession(c);
     const username = session.username;
     if (!username) {
@@ -42,7 +48,8 @@ watchRouter.get("/watch/new", (c) => {
         userId: "",
         measurements: [],
     } as unknown as types.EnrichedWatch;
-    return c.html(renderWatchDetails({ watch: emptyWatch }));
+    const userTimeZone = await getUserTimeZone(username);
+    return c.html(renderWatchDetails({ watch: emptyWatch, userTimeZone }));
 });
 
 // GET /watch - Legacy route with query param
@@ -109,7 +116,8 @@ watchRouter.patch("/watch/:id", validateWatchOwnership, async (c) => {
     if (!updatedWatch) {
         throw new HTTPException(404, { message: "Watch not found" });
     }
-    return c.html(renderWatchDetails({ watch: updatedWatch }));
+    const userTimeZone = await getUserTimeZone(username);
+    return c.html(renderWatchDetails({ watch: updatedWatch, userTimeZone }));
 });
 
 watchRouter.post("/watch", async (c) => {
@@ -144,7 +152,8 @@ watchRouter.post("/watch", async (c) => {
     if (!newWatch) {
         throw new HTTPException(500, { message: "Failed to retrieve created watch" });
     }
-    return c.html(renderWatchDetails({ watch: newWatch }));
+    const userTimeZone = await getUserTimeZone(username);
+    return c.html(renderWatchDetails({ watch: newWatch, userTimeZone }));
 });
 
 watchRouter.delete("/watch/:id", validateWatchOwnership, async (c) => {
@@ -172,7 +181,8 @@ async function handleGetDetails(id: string, c: Context) {
         throw new HTTPException(403, { message: "Wrong Watch ID" });
     }
     await UserService.setLastWatch(username, watch.id);
-    return c.html(renderWatchDetails({ watch }));
+    const userTimeZone = await getUserTimeZone(username);
+    return c.html(renderWatchDetails({ watch, userTimeZone }));
 }
 
 export default watchRouter;

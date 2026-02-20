@@ -1,11 +1,16 @@
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { MeasurementService, WatchService } from "../service/index.ts";
+import { MeasurementService, UserService, WatchService } from "../service/index.ts";
 import { validateWatchOwnership, validateMeasurementOwnership } from "../middleware/ownership.ts";
 import { renderMeasurements } from "../lib/views.ts";
 import { getSession } from "../middleware/session.ts";
 
 const measurementRouter = new Hono();
+
+async function getUserTimeZone(username: string): Promise<string> {
+    const user = await UserService.getUserByName(username);
+    return user?.timeZone || "UTC";
+}
 
 // POST /measure/:watchId - Create a new measurement for a watch
 measurementRouter.post("/measure/:watchId", validateWatchOwnership, async (c) => {
@@ -34,7 +39,8 @@ measurementRouter.post("/measure/:watchId", validateWatchOwnership, async (c) =>
     if (!watch) {
         throw new HTTPException(403, { message: "Wrong Watch ID" });
     }
-    return c.html(renderMeasurements({ watch }));
+    const userTimeZone = await getUserTimeZone(username);
+    return c.html(renderMeasurements({ watch, userTimeZone }));
 });
 
 measurementRouter.delete("/measure/:measurementId", validateMeasurementOwnership, async (c) => {
@@ -53,7 +59,8 @@ measurementRouter.delete("/measure/:measurementId", validateMeasurementOwnership
     if (!watch) {
         throw new HTTPException(403, { message: "Wrong Watch ID" });
     }
-    return c.html(renderMeasurements({ watch }));
+    const userTimeZone = await getUserTimeZone(username);
+    return c.html(renderMeasurements({ watch, userTimeZone }));
 });
 
 measurementRouter.patch("/measure/:measurementId", validateMeasurementOwnership, async (c) => {
@@ -100,7 +107,8 @@ measurementRouter.patch("/measure/:measurementId", validateMeasurementOwnership,
     if (!watch) {
         throw new HTTPException(403, { message: "Wrong Watch ID" });
     }
-    return c.html(renderMeasurements({ watch }));
+    const userTimeZone = await getUserTimeZone(username);
+    return c.html(renderMeasurements({ watch, userTimeZone }));
 });
 
 export default measurementRouter;

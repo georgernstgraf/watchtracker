@@ -2,6 +2,7 @@ import hbs from "handlebars";
 import { walk } from "@std/fs";
 import { partialsDir } from "./config.ts";
 import * as config from "./config.ts";
+import moment from "moment-timezone";
 // templateCache "template name" => compiled template function
 const templateCache = new Map<string, hbs.TemplateDelegate>();
 
@@ -59,41 +60,71 @@ hbs.registerHelper("eq", function (a: unknown, b: unknown) {
     return a === b;
 });
 
-hbs.registerHelper("formatDate", function (dateString: string) {
-    if (!dateString || dateString === "undefined" || dateString === "null") {
-        return "Invalid Date";
+function parseDateInput(input: unknown): Date | null {
+    if (!input || input === "undefined" || input === "null") {
+        return null;
     }
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-        return "Invalid Date";
+    if (input instanceof Date) {
+        return isNaN(input.getTime()) ? null : input;
     }
-    const day = date.getDate();
-    const monthNames = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sept",
-        "Oct",
-        "Nov",
-        "Dec",
-    ];
-    const month = monthNames[date.getMonth()];
-    const hours = date.getHours().toString().padStart(2, "0");
-    const minutes = date.getMinutes().toString().padStart(2, "0");
+    if (typeof input === "string" || typeof input === "number") {
+        const date = new Date(input);
+        return isNaN(date.getTime()) ? null : date;
+    }
+    return null;
+}
 
-    const now = new Date();
-    const monthsDiff = (now.getFullYear() - date.getFullYear()) * 12 + (now.getMonth() - date.getMonth());
+interface DateFormatOptions {
+    showTime?: boolean;
+    timezone?: string;
+}
+
+function formatDateWithTimezone(dateInput: unknown, options: DateFormatOptions): string {
+    const date = parseDateInput(dateInput);
+    if (!date) return "Invalid Date";
+
+    const timezone = options.timezone || "UTC";
+    const showTime = options.showTime || false;
+
+    const momentDate = moment(date).tz(timezone);
+    const day = momentDate.date();
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"];
+    const month = monthNames[momentDate.month()];
+    const year = momentDate.year();
+    const hours = momentDate.format("HH");
+    const minutes = momentDate.format("mm");
+
+    const now = moment().tz(timezone);
+    const monthsDiff = (now.year() - year) * 12 + (now.month() - momentDate.month());
     const showYear = monthsDiff >= config.DATE_YEAR_THRESHOLD_MONTHS;
 
-    if (showYear) {
-        return `${day}. ${month} ${date.getFullYear()}, ${hours}:${minutes}`;
+    if (showTime) {
+        return showYear ? `${day}. ${month} ${year}, ${hours}:${minutes}` : `${day}. ${month}, ${hours}:${minutes}`;
     }
-    return `${day}. ${month}, ${hours}:${minutes}`;
+    return showYear ? `${day}. ${month} ${year}` : `${day}. ${month}`;
+}
+
+hbs.registerHelper("formatDate", function (dateInput: unknown, options: hbs.HelperOptions) {
+    return formatDateWithTimezone(dateInput, options.hash || {});
+});
+
+hbs.registerHelper("formatDateTime", function (dateInput: unknown, options: hbs.HelperOptions) {
+    return formatDateWithTimezone(dateInput, { ...options.hash, showTime: true });
+});
+
+hbs.registerHelper("formatDateTimeLocal", function (dateInput: unknown, options: hbs.HelperOptions) {
+    const date = parseDateInput(dateInput);
+    if (!date) return "";
+
+    const timezone = options.hash?.timezone || "UTC";
+    const momentDate = moment(date).tz(timezone);
+
+    const year = momentDate.year();
+    const month = momentDate.format("MM");
+    const day = momentDate.format("DD");
+    const hours = momentDate.format("HH");
+    const minutes = momentDate.format("mm");
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
 });
 
 hbs.registerHelper("plusOne", function (val: number) {

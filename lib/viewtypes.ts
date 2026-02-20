@@ -10,14 +10,13 @@ export function toUserDataForViews(user: User): UserDataForViews {
 }
 
 export interface EnrichedMeasurement extends Measurement {
-    createdAtFormatted: string;
     driftDisplay: string;
 }
 
 export interface MeasurementPeriod {
     measurements: EnrichedMeasurement[];
-    firstDate: string;
-    lastDate: string;
+    firstDate: Date;
+    lastDate: Date;
     periodDrift: string;
 }
 
@@ -34,7 +33,6 @@ export interface EnrichedWatch extends Watch {
 export interface WatchCard extends Watch {
     precision?: string;
     daysMeasured?: string;
-    lastUsed?: string;
     lastUsedDate?: Date;
 }
 
@@ -62,6 +60,7 @@ export interface UserWatchData extends BaseRenderData {
 
 export interface MeasurementsViewData extends BaseRenderData {
     watch: EnrichedWatch;
+    userTimeZone: string;
 }
 
 export interface AllButHeadAndFootData extends BaseRenderData {
@@ -102,9 +101,11 @@ export interface UserWatchesData extends BaseRenderData {
 // WatchGridData - for watchgrid.hbs
 export interface WatchGridData extends BaseRenderData {
     userWatches: WatchCard[];
+    userTimeZone: string;
 }
 
 // WatchDetailsViewData - for watch-details.hbs
 export interface WatchDetailsViewData extends BaseRenderData {
     watch: EnrichedWatch;
+    userTimeZone: string;
 }

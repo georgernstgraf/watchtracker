@@ -1,9 +1,7 @@
 import { WatchRepository } from "../repo/watchrepository.ts";
 import { MeasurementRepository } from "../repo/measurementrepository.ts";
 import { UserRepository } from "../repo/userrepository.ts";
-import { UserService } from "./userservice.ts";
 import { MeasurementService } from "./measurementservice.ts";
-import { TimeZone } from "../lib/timezone.ts";
 import { ForbiddenError } from "../lib/errors.ts";
 import type { Measurement, Prisma, Watch } from "generated-prisma-client";
 import type { EnrichedMeasurement, EnrichedWatch, WatchCard } from "../lib/viewtypes.ts";
@@ -78,10 +76,8 @@ export class WatchService {
     static async getUserWatchesSorted(username: string, sortBy: SortOption = "recent_desc"): Promise<WatchCard[]> {
         const watches = await WatchRepository.findByUsernameWithAllMeasurements(username);
         const watchesWithMeasurements = watches as WatchWithMeasurements[];
-        const user = await UserRepository.findByName(username);
-        const timeZone = user?.timeZone || "UTC";
 
-        const enriched = watchesWithMeasurements.map((watch) => this.enrichWatchCard(watch, timeZone));
+        const enriched = watchesWithMeasurements.map((watch) => this.enrichWatchCard(watch));
 
         switch (sortBy) {
             case "recent_asc":
@@ -106,14 +102,13 @@ export class WatchService {
     /**
      * Enrich a watch with card display stats
      */
-    private static enrichWatchCard(watch: WatchWithMeasurements, timeZone: string): WatchCard {
+    private static enrichWatchCard(watch: WatchWithMeasurements): WatchCard {
         const measurements = watch.measurements;
         const card: WatchCard = { ...watch };
 
         if (measurements.length >= 2) {
             const enrichedMeasurements = measurements.map((measurement) => ({
                 ...measurement,
-                createdAtFormatted: "",
                 driftDisplay: "n/a",
                 driftMath: undefined,
             })) as EnrichedMeasurement[];
@@ -128,7 +123,6 @@ export class WatchService {
         if (measurements.length > 0) {
             const latestMeasurement = measurements.at(-1)!;
             const lastDate = latestMeasurement.createdAt instanceof Date ? latestMeasurement.createdAt : new Date(latestMeasurement.createdAt);
-            card.lastUsed = TimeZone.formatISODate(lastDate, timeZone);
             card.lastUsedDate = lastDate;
         }
 
@@ -266,21 +260,15 @@ export class WatchService {
             return null;
         }
 
-        // Get user's timezone for date formatting
-        const user = await UserService.getUserByName(username);
-        const timeZone = user?.timeZone || "UTC";
-
         // Cast to WatchWithMeasurements to handle the composite type from Prisma
         const watchWithMeasurements = watch as WatchWithMeasurements;
         const measurements = watchWithMeasurements.measurements || [];
 
         if (measurements.length > 0) {
-            // Enrich measurements with createdAtFormatted and driftDisplay
+            // Enrich measurements with driftDisplay
             const measurementsWithDrifts = measurements.map((measurement) => {
-                const dateObj = measurement.createdAt instanceof Date ? measurement.createdAt : new Date(measurement.createdAt);
                 return {
                     ...measurement,
-                    createdAtFormatted: TimeZone.formatISODate(dateObj, timeZone),
                     driftDisplay: "n/a",
                     driftMath: undefined,
                 } as EnrichedMeasurement;
