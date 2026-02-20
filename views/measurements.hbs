@@ -147,7 +147,7 @@
                 <!-- Show View -->
                 <div x-show="!editing" data-id="{{id}}">
                     <div class="card-header py-1 px-3 fw-bold">
-                        {{formatDateTime createdAt timezone=../../userTimeZone}}
+                        {{formatDate createdAt timezone=../../userTimeZone showTime=true}}
                     </div>
                     <div class="card-body py-2 px-3">
                         <div class="row align-items-center gx-2">

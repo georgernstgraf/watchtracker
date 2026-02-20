@@ -74,17 +74,9 @@ function parseDateInput(input: unknown): Date | null {
     return null;
 }
 
-interface DateFormatOptions {
-    showTime?: boolean;
-    timezone?: string;
-}
-
-function formatDateWithTimezone(dateInput: unknown, options: DateFormatOptions): string {
+function formatDateWithTimezone(dateInput: Date, timezone: string = "UTC", showTime: boolean = false): string {
     const date = parseDateInput(dateInput);
     if (!date) return "Invalid Date";
-
-    const timezone = options.timezone || "UTC";
-    const showTime = options.showTime || false;
 
     const momentDate = moment(date).tz(timezone);
     const day = momentDate.date();
@@ -104,27 +96,28 @@ function formatDateWithTimezone(dateInput: unknown, options: DateFormatOptions):
     return showYear ? `${day}. ${month} ${year}` : `${day}. ${month}`;
 }
 
-hbs.registerHelper("formatDate", function (dateInput: unknown, options: hbs.HelperOptions) {
-    return formatDateWithTimezone(dateInput, options.hash || {});
-});
-
-hbs.registerHelper("formatDateTime", function (dateInput: unknown, options: hbs.HelperOptions) {
-    return formatDateWithTimezone(dateInput, { ...options.hash, showTime: true });
-});
-
-hbs.registerHelper("formatDateTimeLocal", function (dateInput: unknown, options: hbs.HelperOptions) {
+function formatDateTimeLocal(dateInput: Date, timezone: string = "UTC"): string {
     const date = parseDateInput(dateInput);
     if (!date) return "";
 
-    const timezone = options.hash?.timezone || "UTC";
     const momentDate = moment(date).tz(timezone);
-
     const year = momentDate.year();
     const month = momentDate.format("MM");
     const day = momentDate.format("DD");
     const hours = momentDate.format("HH");
     const minutes = momentDate.format("mm");
     return `${year}-${month}-${day}T${hours}:${minutes}`;
+}
+
+hbs.registerHelper("formatDate", function (dateInput: unknown, options: hbs.HelperOptions) {
+    const timezone = options.hash?.timezone || "UTC";
+    const showTime = options.hash?.showTime || false;
+    return formatDateWithTimezone(dateInput as Date, timezone, showTime);
+});
+
+hbs.registerHelper("formatDateTimeLocal", function (dateInput: unknown, options: hbs.HelperOptions) {
+    const timezone = options.hash?.timezone || "UTC";
+    return formatDateTimeLocal(dateInput as Date, timezone);
 });
 
 hbs.registerHelper("plusOne", function (val: number) {
