@@ -43,23 +43,6 @@ async function listHBSFilesRecursive(dir: string): Promise<string[]> {
     return dirEntries;
 }
 
-hbs.registerHelper("let", function (this: unknown, options: hbs.HelperOptions) {
-    const context = Object.assign({}, this, options.hash);
-    return options.fn(context);
-});
-
-hbs.registerHelper("or", function (...args: unknown[]) {
-    return args.slice(0, -1).some(Boolean);
-});
-
-hbs.registerHelper("not", function (value: unknown) {
-    return !value;
-});
-
-hbs.registerHelper("eq", function (a: unknown, b: unknown) {
-    return a === b;
-});
-
 function formatDateWithTimezone(date: Date, timezone: string = "UTC", showTime: boolean = false): string {
     const momentDate = moment(date).tz(timezone);
     const day = momentDate.date();
@@ -89,11 +72,6 @@ hbs.registerHelper("formatDateTimeLocal", function (dateInput: Date, options: hb
     const timezone = options.hash?.timezone || "UTC";
     const momentDate = moment(dateInput).tz(timezone);
     return `${momentDate.year()}-${momentDate.format("MM")}-${momentDate.format("DD")}T${momentDate.format("HH")}:${momentDate.format("mm")}`;
-});
-
-hbs.registerHelper("plusOne", function (val: number) {
-    if (val === 0) return 1;
-    return val;
 });
 
 hbs.registerHelper("getInitials", function (name: string) {
