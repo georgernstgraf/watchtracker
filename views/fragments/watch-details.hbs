@@ -1,4 +1,4 @@
-<!-- #watch-details.hbs -->
+<!-- fragments/watch-details.hbs -->
 <div id="watchDetails"
      x-data="{
          isNew: {{#if watch.id}}false{{else}}true{{/if}},
@@ -48,9 +48,9 @@
              }
          },
          cancelEdit() {
-              if (this.isNew) {
-                  // For new watches, cancel goes back to the watch list
-                  htmx.ajax('GET', '{{appPath}}/home', { target: '#mainContent', swap: 'innerHTML', pushUrl: '{{appPath}}' });
+             if (this.isNew) {
+                 // For new watches, cancel goes back to the watch list
+                 htmx.ajax('GET', '{{appPath}}/home', { target: '#mainContent', swap: 'innerHTML', pushUrl: '{{appPath}}' });
              } else {
                  this.toggleEdit(false);
              }
@@ -213,10 +213,8 @@
             </div>
 
             <!-- Measurements Section -->
-            <div id="measurements">
-                {{> measurements}}
-            </div>
+            {{> fragments/measurements}}
         </div>
     </div>
 </div>
-<!-- /watch-details.hbs -->
+<!-- /fragments/watch-details.hbs -->

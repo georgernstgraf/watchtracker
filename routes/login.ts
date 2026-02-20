@@ -1,7 +1,7 @@
 import { Context } from "hono";
 import { UserService } from "../service/index.ts";
 import { TimeZone } from "../lib/timezone.ts";
-import { renderLoginContent, renderBodyAuth, renderUnauthFull } from "../lib/views.ts";
+import { renderLoginContent, renderBodyAuth, renderPageUnauth } from "../lib/views.ts";
 import authenticate from "../lib/auth.ts";
 import { getSession } from "../middleware/session.ts";
 import { toUserDataForViews } from "../lib/viewtypes.ts";
@@ -26,7 +26,7 @@ async function handleGetLogin(c: Context) {
         }));
     }
 
-    return c.html(full === "-content" ? renderLoginContent({}) : renderUnauthFull({}));
+    return c.html(full === "-content" ? renderLoginContent({}) : renderPageUnauth({}));
 }
 
 async function handlePostLogin(c: Context) {

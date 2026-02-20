@@ -10,79 +10,60 @@ function merge<T>(data: T): T & types.BaseRenderData {
 
 type ViewInput<T> = Omit<T, keyof types.BaseRenderData>;
 
-export function renderError(data: ViewInput<types.ErrorData>): string {
-    return render<types.ErrorData>("error", merge(data));
+// --- Layouts (full HTML pages for direct browser loads) ---
+
+export function renderPageAuth(data: ViewInput<types.UserWatchData>): string {
+    return render<types.UserWatchData>("layouts/page-auth", merge(data));
 }
 
-export function renderErrorFull(data: ViewInput<types.ErrorData>): string {
-    return render<types.ErrorData>("error-full", merge(data));
+export function renderPageUnauth(data: ViewInput<types.LoginData>): string {
+    return render<types.LoginData>("layouts/page-unauth", merge(data));
 }
 
-export function renderLoginContent(data: ViewInput<types.LoginData>): string {
-    return render<types.LoginData>("login-content", merge(data));
+export function renderPageWatchDetails(data: ViewInput<types.PageWatchDetailsData>): string {
+    return render<types.PageWatchDetailsData>("layouts/page-watch-details", merge(data));
+}
+
+export function renderPageError(data: ViewInput<types.ErrorData>): string {
+    return render<types.ErrorData>("layouts/page-error", merge(data));
+}
+
+// --- Fragments (HTMX-swappable pieces rendered by route handlers) ---
+
+export function renderBodyAuth(data: ViewInput<types.UserWatchData>): string {
+    return render<types.UserWatchData>("fragments/body-auth", merge(data));
 }
 
 export function renderBodyUnauth(data: ViewInput<types.LoginData>): string {
-    return render<types.LoginData>("body-unauth", merge(data));
+    return render<types.LoginData>("fragments/body-unauth", merge(data));
 }
 
-export function renderUnauthFull(data: ViewInput<types.LoginData>): string {
-    return render<types.LoginData>("unauth-full", merge(data));
-}
-
-export function renderIndexFull(data: ViewInput<types.UserWatchData>): string {
-    return render<types.UserWatchData>("index-full", merge(data));
-}
-
-export function renderIndexBody(data: ViewInput<types.UserWatchData>): string {
-    // This template is actually "body-auth" for HTMX requests to the main page
-    return render<types.UserWatchData>("body-auth", merge(data));
-}
-
-export function renderMeasurements(data: ViewInput<types.MeasurementsViewData>): string {
-    return render<types.MeasurementsViewData>("measurements", merge(data));
-}
-
-export function renderAllButHeadAndFoot(data: ViewInput<types.AllButHeadAndFootData>): string {
-    return render<types.AllButHeadAndFootData>("allbutheadandfoot", merge(data));
-}
-
-export function renderBodyAuth(data: ViewInput<types.UserWatchData>): string {
-    return render<types.UserWatchData>("body-auth", merge(data));
-}
-
-export function renderHead(data: ViewInput<types.HeadData>): string {
-    return render<types.HeadData>("head", merge(data));
-}
-
-export function renderFooter(data: ViewInput<types.FooterData>): string {
-    return render<types.FooterData>("footer", merge(data));
-}
-
-export function renderMainHeading(data: ViewInput<types.MainHeadingData>): string {
-    return render<types.MainHeadingData>("mainheading", merge(data));
-}
-
-export function renderNavProfile(data: ViewInput<types.NavProfileData>): string {
-    return render<types.NavProfileData>("navprofile", merge(data));
-}
-
-export function renderTimezoneSelector(data: ViewInput<types.TimezoneSelectorData>): string {
-    return render<types.TimezoneSelectorData>("timezone-selector", merge(data));
-}
-
-export function renderUserWatches(data?: ViewInput<types.UserWatchesData>): string {
-    return render<types.UserWatchesData>("userwatches", merge(data || {}));
+export function renderWatchList(data: ViewInput<types.WatchListData>): string {
+    return render<types.WatchListData>("fragments/watch-list", merge(data));
 }
 
 export function renderWatchGrid(data: ViewInput<types.WatchGridData>): string {
-    return render<types.WatchGridData>("watchgrid", merge(data));
+    return render<types.WatchGridData>("fragments/watch-grid", merge(data));
 }
 
 export function renderWatchDetails(data: ViewInput<types.WatchDetailsViewData>): string {
-    return render<types.WatchDetailsViewData>("watch-details", merge(data));
+    return render<types.WatchDetailsViewData>("fragments/watch-details", merge(data));
 }
 
-export function renderWatchDetailsFull(data: ViewInput<types.WatchDetailsFullViewData>): string {
-    return render<types.WatchDetailsFullViewData>("watch-details-full", merge(data));
+export function renderMeasurements(data: ViewInput<types.MeasurementsViewData>): string {
+    return render<types.MeasurementsViewData>("fragments/measurements", merge(data));
+}
+
+export function renderLoginContent(data: ViewInput<types.LoginData>): string {
+    return render<types.LoginData>("fragments/login-content", merge(data));
+}
+
+export function renderError(data: ViewInput<types.ErrorData>): string {
+    return render<types.ErrorData>("fragments/error", merge(data));
+}
+
+// --- Partials (rendered directly only by specific routes) ---
+
+export function renderTimezoneSelector(data: ViewInput<types.TimezoneSelectorData>): string {
+    return render<types.TimezoneSelectorData>("partials/timezone-selector", merge(data));
 }

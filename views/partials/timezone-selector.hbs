@@ -1,10 +1,10 @@
-<!-- #timezone-selector.hbs -->
-<div id="timezoneSelectorContainer"
+<!-- partials/timezone-selector.hbs -->
+<div id="timezoneSelector"
      x-data="{ editing: false, timeZone: '{{user.timeZone}}' }"
      class="d-inline-block">
     <!-- Default view: Button-like display -->
     <button x-show="!editing"
-            @click="editing = true; $nextTick(() => document.getElementById('timeZoneSelector').focus())"
+            @click="editing = true; $nextTick(() => document.getElementById('timezoneInput').focus())"
             class="btn btn-outline-secondary btn-sm px-2"
             title="Click to change timezone: {{user.timeZone}}"
             type="button">&nbsp;🌐&nbsp;&nbsp;&nbsp;{{user.timeZone}}
@@ -15,13 +15,13 @@
          @keydown.escape="editing = false"
          class="align-items-center gap-2">
         <form hx-patch="{{appPath}}/user"
-              hx-target="#timezoneSelectorContainer"
+              hx-target="#timezoneSelector"
               hx-swap="outerHTML"
               hx-trigger="submit"
               @htmx:after-request="editing = false"
               class="d-flex align-items-center gap-2">
-            <input id="timeZoneSelector"
-                   list="timeZoneList"
+            <input id="timezoneInput"
+                   list="timezoneList"
                    name="timeZone"
                    :value="timeZone"
                    placeholder="Select timezone"
@@ -29,7 +29,7 @@
                    style="width: 180px;"
                    autocomplete="off"
                    @keydown.escape="editing = false" />
-            <datalist id="timeZoneList">
+            <datalist id="timezoneList">
                 {{#each timeZones}}
                     <option value="{{this}}">{{this}}</option>
                 {{/each}}
@@ -47,4 +47,4 @@
         </form>
     </div>
 </div>
-<!-- /timezone-selector.hbs -->
+<!-- /partials/timezone-selector.hbs -->

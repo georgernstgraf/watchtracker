@@ -1,0 +1,51 @@
+<!-- partials/head.hbs -->
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+    <script>
+          // Theme loading - runs before page renders to prevent flash
+          (function() {
+                const theme = localStorage.getItem('watchtracker-theme') || 'dark';
+                document.documentElement.setAttribute('data-bs-theme', theme);
+          })();
+    </script>
+    <script>
+          // HTMX loading spinner
+          document.addEventListener('DOMContentLoaded', function() {
+                // Create spinner overlay
+                const spinner = document.createElement('div');
+                spinner.id = 'htmx-spinner';
+                spinner.innerHTML = '<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>';
+                document.body.appendChild(spinner);
+                
+                // Show/hide on HTMX events
+                let requestCount = 0;
+                document.body.addEventListener('htmx:beforeRequest', function() {
+                      requestCount++;
+                      spinner.classList.add('show');
+                });
+                document.body.addEventListener('htmx:afterRequest', function() {
+                      requestCount--;
+                      if (requestCount <= 0) {
+                            requestCount = 0;
+                            spinner.classList.remove('show');
+                      }
+                });
+          });
+    </script>
+    <link rel="stylesheet"
+          href="{{appPath}}/static/bootstrap.css" />
+    <link rel="stylesheet"
+          href="{{appPath}}/static/frontend.css" />
+    <link rel="icon"
+          href="{{appPath}}/static/favicon.ico"
+          type="image/x-icon">
+    <script src="https://unpkg.com/htmx.org@2.0.2"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="{{appPath}}/static/script.js"
+            defer></script>
+    <script src="{{appPath}}/static/bootstrap.bundle.min.js"></script>
+    <title>Watchtracker</title>
+</head>
+<!-- /partials/head.hbs -->

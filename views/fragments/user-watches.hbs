@@ -1,4 +1,4 @@
-<!-- #userwatches.hbs -->
+<!-- fragments/user-watches.hbs -->
 <div id='userWatches'
      x-data="{ sortBy: localStorage.getItem('watchtracker-sortBy') || 'recent_desc' }"
      x-init="htmx.ajax('GET', '{{appPath}}/watches?sort=' + sortBy, { target: '#watchGrid', swap: 'innerHTML' })">
@@ -41,4 +41,4 @@
         Add new Watch
     </button>
 </div>
-<!-- /userwatches.hbs -->
+<!-- /fragments/user-watches.hbs -->

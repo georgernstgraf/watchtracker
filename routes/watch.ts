@@ -3,7 +3,7 @@ import { Hono, type Context } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { UserService, WatchService, type SortOption } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
-import { renderAllButHeadAndFoot, renderWatchDetails, renderWatchDetailsFull, renderWatchGrid } from "../lib/views.ts";
+import { renderWatchList, renderWatchDetails, renderPageWatchDetails, renderWatchGrid } from "../lib/views.ts";
 import { resizeImage, validateSquareImage } from "../lib/imageutils.ts";
 import { ForbiddenError } from "../lib/errors.ts";
 import type { Prisma } from "generated-prisma-client";
@@ -20,7 +20,7 @@ async function getUserTimeZone(username: string): Promise<string> {
 
 // GET /home - Return watch cards for back navigation
 watchRouter.get("/home", (c) => {
-    return c.html(renderAllButHeadAndFoot({}));
+    return c.html(renderWatchList({}));
 });
 
 // GET /watches - Return watch grid for HTMX sort buttons
@@ -54,7 +54,7 @@ watchRouter.get("/watch/new", async (c) => {
         return c.html(renderWatchDetails({ watch: emptyWatch, userTimeZone }));
     }
     const user = await UserService.getUserByName(username);
-    return c.html(renderWatchDetailsFull({ watch: emptyWatch, userTimeZone, user: { name: user!.name, timeZone: user!.timeZone }, timeZones: TimeZone.timeZones }));
+    return c.html(renderPageWatchDetails({ watch: emptyWatch, userTimeZone, user: { name: user!.name, timeZone: user!.timeZone }, timeZones: TimeZone.timeZones }));
 });
 
 // GET /watch - Legacy route with query param
@@ -172,7 +172,7 @@ watchRouter.delete("/watch/:id", validateWatchOwnership, async (c) => {
         }
         throw err;
     }
-    return c.html(renderAllButHeadAndFoot({}));
+    return c.html(renderWatchList({}));
 });
 
 async function handleGetDetails(id: string, c: Context) {
@@ -191,7 +191,7 @@ async function handleGetDetails(id: string, c: Context) {
         return c.html(renderWatchDetails({ watch, userTimeZone }));
     }
     const user = await UserService.getUserByName(username);
-    return c.html(renderWatchDetailsFull({ watch, userTimeZone, user: { name: user!.name, timeZone: user!.timeZone }, timeZones: TimeZone.timeZones }));
+    return c.html(renderPageWatchDetails({ watch, userTimeZone, user: { name: user!.name, timeZone: user!.timeZone }, timeZones: TimeZone.timeZones }));
 }
 
 export default watchRouter;

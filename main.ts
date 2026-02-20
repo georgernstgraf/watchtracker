@@ -3,7 +3,7 @@
 import { Hono } from "hono";
 import { ContentfulStatusCode } from "hono/utils/http-status";
 import { prisma } from "./lib/db.ts";
-import { renderError, renderErrorFull } from "./lib/views.ts";
+import { renderError, renderPageError } from "./lib/views.ts";
 import { publicRouter } from "./routers/publicrouter.ts";
 import { protectedRouter } from "./routers/protectedrouter.ts";
 import { globalSessionMiddleware } from "./middleware/session.ts";
@@ -116,7 +116,7 @@ function main() {
         if (isHTMX) {
             return c.html(renderError(errorData), status as ContentfulStatusCode);
         } else {
-            return c.html(renderErrorFull(errorData), status as ContentfulStatusCode);
+            return c.html(renderPageError(errorData), status as ContentfulStatusCode);
         }
     });
 

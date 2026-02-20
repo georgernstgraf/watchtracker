@@ -63,55 +63,30 @@ export interface MeasurementsViewData extends BaseRenderData {
     userTimeZone: string;
 }
 
-export interface AllButHeadAndFootData extends BaseRenderData {
+// WatchListData - for fragments/watch-list.hbs
+export interface WatchListData extends BaseRenderData {
 }
 
-// HeadData - for head.hbs (HTML head section)
-export interface HeadData extends BaseRenderData {
-    // Only needs appPath from BaseRenderData
-}
-
-// FooterData - for footer.hbs
-export interface FooterData extends BaseRenderData {
-    // Only needs appPath from BaseRenderData
-}
-
-// MainHeadingData - for mainHeading.hbs
-export interface MainHeadingData extends BaseRenderData {
-    // Only needs appPath from BaseRenderData
-}
-
-// NavProfileData - for navProfile.hbs
-export interface NavProfileData extends BaseRenderData {
-    user: UserDataForViews;
-    timeZones: string[];
-}
-
-// TimezoneSelectorData - for timezone-selector.hbs
+// TimezoneSelectorData - for partials/timezone-selector.hbs
 export interface TimezoneSelectorData extends BaseRenderData {
     user: UserDataForViews;
     timeZones: string[];
 }
 
-// UserWatchesData - for userwatches.hbs (shell only)
-export interface UserWatchesData extends BaseRenderData {
-    // No data needed - grid is loaded via HTMX
-}
-
-// WatchGridData - for watchgrid.hbs
+// WatchGridData - for fragments/watch-grid.hbs
 export interface WatchGridData extends BaseRenderData {
     userWatches: WatchCard[];
     userTimeZone: string;
 }
 
-// WatchDetailsViewData - for watch-details.hbs
+// WatchDetailsViewData - for fragments/watch-details.hbs
 export interface WatchDetailsViewData extends BaseRenderData {
     watch: EnrichedWatch;
     userTimeZone: string;
 }
 
-// WatchDetailsFullViewData - for watch-details-full.hbs (full-page, direct browser load)
-export interface WatchDetailsFullViewData extends BaseRenderData {
+// PageWatchDetailsData - for layouts/page-watch-details.hbs (full-page, direct browser load)
+export interface PageWatchDetailsData extends BaseRenderData {
     watch: EnrichedWatch;
     userTimeZone: string;
     user: UserDataForViews;
