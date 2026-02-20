@@ -41,7 +41,7 @@
                 </div>
                 <div class="d-flex justify-content-around small">
                     {{#if daysMeasured}}<span title="Days measured">{{daysMeasured}}d</span>{{else}}<span>-</span>{{/if}}
-                    {{#if lastUsed}}<span title="Last used">{{lastUsed}}</span>{{else}}<span>-</span>{{/if}}
+                    {{#if lastUsed}}<span title="Last used">{{formatDate lastUsed}}</span>{{else}}<span>-</span>{{/if}}
                 </div>
             </div>
         </div>

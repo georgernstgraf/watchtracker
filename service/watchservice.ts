@@ -130,7 +130,7 @@ export class WatchService {
             const lastDate = latestMeasurement.createdAt instanceof Date
                 ? latestMeasurement.createdAt
                 : new Date(latestMeasurement.createdAt);
-            card.lastUsed = TimeZone.getShort(lastDate, timeZone);
+            card.lastUsed = TimeZone.formatISODate(lastDate, timeZone);
             card.lastUsedDate = lastDate;
         }
 
