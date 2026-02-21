@@ -36,7 +36,7 @@ async function authenticate(user: string, password: string) {
         method: "POST",
         body: JSON.stringify({
             user,
-            password,
+            passwd: password,
         }),
         headers: { "Content-Type": "application/json" },
     });
