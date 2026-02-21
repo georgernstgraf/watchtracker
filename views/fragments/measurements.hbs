@@ -3,18 +3,13 @@
      class="measurements-container"
      x-data="{
          showCreate: false,
+         createDatetime: '',
          showCreateForm() {
              this.showCreate = true;
              const now = new Date();
-             const month = (now.getMonth() + 1).toString().padStart(2, '0');
-             const day = now.getDate().toString().padStart(2, '0');
-             const hour = now.getHours().toString().padStart(2, '0');
-             const minute = now.getMinutes().toString().padStart(2, '0');
-             const formatted = now.getFullYear() + '-' + month + '-' + day + 'T' + hour + ':' + minute;
-             this.$nextTick(() => {
-                 this.$refs.createDatetime.value = formatted;
-                 this.$refs.createValue.focus();
-             });
+             const pad = n => n.toString().padStart(2, '0');
+             this.createDatetime = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate()) + 'T' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+             this.$nextTick(() => this.$refs.createValue.focus());
          },
          hideCreateForm() {
              this.showCreate = false;
@@ -41,7 +36,7 @@
                       hx-target="closest .measurements-container"
                       hx-swap="outerHTML"
                       hx-trigger="trigger">
-                    <input x-ref="createDatetime"
+                    <input x-model="createDatetime"
                            type="datetime-local"
                            name="createdAt"
                            class="form-control form-control-sm d-inline-block mb-1"

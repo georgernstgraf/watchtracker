@@ -1,4 +1,4 @@
-<!-- partials/nav-auth.hbs -->
+<!-- partials/nav.hbs -->
 <nav id="navBar"
      class="mb-3"
      x-data="{
@@ -12,21 +12,25 @@
     <div class="d-flex flex-column flex-sm-row justify-content-between align-items-center">
         <h1 class="mb-2 mb-sm-0">Watchtracker</h1>
         <div class="d-flex align-items-center gap-3">
-            {{> partials/timezone-selector}}
+            {{#if user}}
+                {{> partials/timezone-selector}}
+            {{/if}}
             <button id="themeToggle"
                     class="btn btn-outline-secondary btn-sm"
                     title="Toggle theme"
                     @click="toggleTheme()">
                 <span id="themeIcon" x-text="theme === 'dark' ? '🌙' : '☀️'">🌙</span>
             </button>
-            <form hx-post="{{appPath}}/logout" hx-target="body">
-                <button id="logoutButton"
-                        class="btn btn-outline-secondary btn-sm"
-                        title="Log out {{user.name}}">
-                    logout {{user.name}}
-                </button>
-            </form>
+            {{#if user}}
+                <form hx-post="{{appPath}}/logout" hx-target="body">
+                    <button id="logoutButton"
+                            class="btn btn-outline-secondary btn-sm"
+                            title="Log out {{user.name}}">
+                        logout {{user.name}}
+                    </button>
+                </form>
+            {{/if}}
         </div>
     </div>
 </nav>
-<!-- /partials/nav-auth.hbs -->
+<!-- /partials/nav.hbs -->
