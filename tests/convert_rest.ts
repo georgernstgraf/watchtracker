@@ -42,7 +42,14 @@ function parseRestFile(content: string): RestRequest[] {
         // Parse method and URL
         const parts = requestLine.split(/\s+/);
         const method = parts[0];
-        const url = parts[1];
+        let url = parts[1];
+
+        // Strip base URL if present (e.g. http://localhost:16631/watchtracker)
+        url = url.replace(/^https?:\/\/[^\/]+(\/[^\/]+)?/, (match, p1) => {
+            // If p1 matches APP_PATH, strip it all. 
+            // This is a bit heuristic but better than hardcoded.
+            return "";
+        });
 
         // Parse headers
         const headers: Record<string, string> = {};
@@ -66,7 +73,7 @@ function parseRestFile(content: string): RestRequest[] {
 
         requests.push({
             method,
-            url: url.replace("http://localhost:16631/watchtracker", ""),
+            url,
             headers,
             body: body.trim() || undefined,
         });

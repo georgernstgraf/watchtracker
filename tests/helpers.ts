@@ -5,7 +5,8 @@
 import { assertEquals, assertExists } from "@std/assert";
 import * as config from "../lib/config.ts";
 
-export const BASE_URL = `http://${config.APP_HOST}:${config.APP_PORT}${config.APP_PATH}`;
+const TEST_HOST = config.APP_HOST === "0.0.0.0" ? "localhost" : config.APP_HOST;
+export const BASE_URL = `http://${TEST_HOST}:${config.APP_PORT}${config.APP_PATH}`;
 export const TEST_USERS = [
     { user: "test", password: "test" },
     { user: "grafg", password: "grafg" },

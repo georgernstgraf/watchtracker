@@ -11,11 +11,12 @@ import {
     logoutUser,
     clearSessions,
     TEST_USERS,
+    BASE_URL,
 } from "./helpers.ts";
 
 describe("Public Routes", { sanitizeResources: false, sanitizeOps: false }, () => {
     it("GET / returns login page when not authenticated", async () => {
-        const response = await fetch("http://localhost:8000/watchtracker/", {
+        const response = await fetch(BASE_URL + "/", {
             headers: { "HX-Request": "true" },
         });
         assertStatus(response, 200);
@@ -31,7 +32,7 @@ describe("Public Routes", { sanitizeResources: false, sanitizeOps: false }, () =
     });
 
     it("POST /login with invalid credentials fails", async () => {
-        const response = await fetch("http://localhost:8000/watchtracker/login", {
+        const response = await fetch(BASE_URL + "/login", {
             method: "POST",
             headers: {
                 "Content-Type": "application/x-www-form-urlencoded",
