@@ -20,13 +20,13 @@
                 class="btn btn-outline-secondary btn-sm"
                 :class="{ 'active': sortBy === 'precise_asc' }"
                 @click="sortBy = 'precise_asc'; localStorage.setItem('watchtracker-sortBy', 'precise_asc'); htmx.ajax('GET', '{{appPath}}/watches?sort=precise_asc', { target: '#watchGrid', swap: 'innerHTML' })">
-            Precise ↑
+            Precise ↓
         </button>
         <button type="button"
                 class="btn btn-outline-secondary btn-sm"
                 :class="{ 'active': sortBy === 'precise_desc' }"
                 @click="sortBy = 'precise_desc'; localStorage.setItem('watchtracker-sortBy', 'precise_desc'); htmx.ajax('GET', '{{appPath}}/watches?sort=precise_desc', { target: '#watchGrid', swap: 'innerHTML' })">
-            Precise ↓
+            Precise ↑
         </button>
     </div>
     <!-- Watch Cards Grid -->
