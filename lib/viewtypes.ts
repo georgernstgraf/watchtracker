@@ -34,6 +34,8 @@ export interface WatchCard extends Watch {
     precision?: string;
     daysMeasured?: string;
     lastUsedDate?: Date;
+    lastUsedTimestamp: number;
+    absoluteDrift: number;
 }
 
 export interface BaseRenderData {

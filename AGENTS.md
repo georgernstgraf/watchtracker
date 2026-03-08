@@ -45,8 +45,8 @@ agent-browser connect 9222
 
 **Usage:**
 ```bash
-# Open the app (always use /watchtracker path)
-agent-browser open http://127.0.0.1:8000/watchtracker
+# Open the app from the configured .env APP_URL
+agent-browser open "$APP_URL"
 
 # Get interactive elements
 agent-browser snapshot -i
@@ -208,3 +208,15 @@ views/         # Handlebars templates (.hbs)
 - **Templates**: Handlebars with partials auto-loaded from `views/`
 - **Time Zones**: Use `lib/timeZone.ts` with moment-timezone and luxon for TZ handling
 - **Auth**: External API authentication via `lib/auth.ts`, test credentials: user=test, passwd=test
+
+## Knowledge Bootstrap
+Before starting any task, read the following files in order:
+1. `docs/ai/HANDOFF.md` <- **read first, act on it**
+2. `docs/ai/CONVENTIONS.md`
+3. `docs/ai/DECISIONS.md`
+4. `docs/ai/PITFALLS.md`
+5. `docs/ai/STATE.md`
+6. `docs/ai/DOMAIN.md` (if task involves business logic)
+
+If `HANDOFF.md` contains open tasks, complete them before starting
+any new work unless the user explicitly says otherwise.

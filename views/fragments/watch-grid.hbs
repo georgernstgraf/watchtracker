@@ -1,7 +1,11 @@
 <!-- fragments/watch-grid.hbs -->
-<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mb-3">
+<div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-3 mb-3"
+     data-watch-grid>
     {{#each userWatches}}
-        <div class="col">
+        <div class="col"
+             data-watch-card
+             data-last-used-timestamp="{{lastUsedTimestamp}}"
+             data-absolute-drift="{{absoluteDrift}}">
             <div class="card h-100 border-secondary"
                  style="cursor: pointer;"
                  hx-get='{{../appPath}}/watch/{{id}}'

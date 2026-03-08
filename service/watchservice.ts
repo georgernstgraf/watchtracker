@@ -10,8 +10,6 @@ interface WatchWithMeasurements extends Watch {
     measurements: Measurement[];
 }
 
-export type SortOption = "recent_asc" | "recent_desc" | "precise_asc" | "precise_desc";
-
 export class WatchService {
     /**
      * Create a new watch for a user
@@ -71,32 +69,13 @@ export class WatchService {
     }
 
     /**
-     * Get all watches for a user name with sorting and stats
+     * Get all watches for a user name with card stats
      */
-    static async getUserWatchesSorted(username: string, sortBy: SortOption = "recent_desc"): Promise<WatchCard[]> {
+    static async getUserWatchCards(username: string): Promise<WatchCard[]> {
         const watches = await WatchRepository.findByUsernameWithAllMeasurements(username);
         const watchesWithMeasurements = watches as WatchWithMeasurements[];
 
-        const enriched = watchesWithMeasurements.map((watch) => this.enrichWatchCard(watch));
-
-        switch (sortBy) {
-            case "recent_asc":
-            case "recent_desc":
-                return enriched.sort((watchA, watchB) => {
-                    const aLatest = watchA.lastUsedDate ? watchA.lastUsedDate.getTime() : 0;
-                    const bLatest = watchB.lastUsedDate ? watchB.lastUsedDate.getTime() : 0;
-                    return sortBy === "recent_asc" ? aLatest - bLatest : bLatest - aLatest;
-                });
-            case "precise_asc":
-            case "precise_desc":
-                return enriched.sort((watchA, watchB) => {
-                    const aDrift = this.calculateAbsoluteDriftFromCard(watchA);
-                    const bDrift = this.calculateAbsoluteDriftFromCard(watchB);
-                    return sortBy === "precise_asc" ? aDrift - bDrift : bDrift - aDrift;
-                });
-            default:
-                return enriched;
-        }
+        return watchesWithMeasurements.map((watch) => this.enrichWatchCard(watch));
     }
 
     /**
@@ -104,7 +83,7 @@ export class WatchService {
      */
     private static enrichWatchCard(watch: WatchWithMeasurements): WatchCard {
         const measurements = watch.measurements;
-        const card: WatchCard = { ...watch };
+        const card: WatchCard = { ...watch, lastUsedTimestamp: 0, absoluteDrift: Infinity };
 
         if (measurements.length >= 2) {
             const enrichedMeasurements = measurements.map((measurement) => ({
@@ -117,6 +96,7 @@ export class WatchService {
             if (overallMeasure) {
                 card.precision = overallMeasure.niceDisplay;
                 card.daysMeasured = overallMeasure.durationDays;
+                card.absoluteDrift = this.calculateAbsoluteDrift(overallMeasure.niceDisplay);
             }
         }
 
@@ -124,6 +104,7 @@ export class WatchService {
             const latestMeasurement = measurements.at(-1)!;
             const lastDate = latestMeasurement.createdAt instanceof Date ? latestMeasurement.createdAt : new Date(latestMeasurement.createdAt);
             card.lastUsedDate = lastDate;
+            card.lastUsedTimestamp = lastDate.getTime();
         }
 
         return card;
@@ -132,9 +113,8 @@ export class WatchService {
     /**
      * Calculate the absolute overall drift for a watch card
      */
-    private static calculateAbsoluteDriftFromCard(card: WatchCard): number {
-        if (!card.precision) return Infinity;
-        const match = card.precision.match(/([+-]?\d+(?:\.\d+)?)\s*s\/d/);
+    private static calculateAbsoluteDrift(precision: string): number {
+        const match = precision.match(/([+-]?\d+(?:\.\d+)?)\s*s\/d/);
         if (!match) return Infinity;
         return Math.abs(parseFloat(match[1]));
     }

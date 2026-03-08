@@ -82,9 +82,9 @@ DATABASE_URL=file:../watchtracker.db
 
 # Server Configuration
 APP_HOST=0.0.0.0
-APP_PORT=8000
+APP_PORT=<port-from-.env>
 APP_PATH=/watchtracker
-APP_URL=http://localhost:8000/watchtracker
+APP_URL=http://localhost:<port-from-.env>/watchtracker
 
 # Authentication
 AUTH_API_URL=https://your-auth-api.com/verify
@@ -127,7 +127,7 @@ Start the development server with hot reload:
 deno task dev
 ```
 
-The server will be available at `http://localhost:8000/watchtracker`
+The server will be available at the `APP_URL` configured in `.env`.
 
 ### Available Commands
 

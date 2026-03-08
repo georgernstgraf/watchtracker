@@ -25,12 +25,12 @@ describe("Watch Routes (Read-Only)", { sanitizeResources: false, sanitizeOps: fa
         await assertBodyContains(response, "Manero"); // Should contain test watch
     });
 
-    it("GET /watches with sort parameter works", async () => {
+    it("GET /watches returns sortable card attributes", async () => {
         const user = TEST_USERS[1]; // grafg
         await loginUser(user.user, user.password);
-        const response = await fetchWithAuth("/watches?sort=recent_desc", {}, user.user);
+        const response = await fetchWithAuth("/watches", {}, user.user);
         assertStatus(response, 200);
-        await response.body?.cancel();
+        await assertBodyContains(response, "data-watch-card");
     });
 
     it("GET /watch/:id returns watch details", async () => {
@@ -140,11 +140,10 @@ describe("Watch Routes (Write Operations)", { sanitizeResources: false, sanitize
         const listResponse = await fetchWithAuth("/watches", {}, user.user);
         const listBody = await listResponse.text();
         
-        // Find the watch ID - look for hx-get attribute containing /watch/ID
-        // The HTML looks like: hx-get='/watchtracker/watch/abc123'
-        const watchMatch = listBody.match(/\/watch\/([a-z0-9]+)/);
+        // Find the created watch card by its unique title and extract the watch ID from its hx-get attribute.
+        const watchMatch = listBody.match(new RegExp(`hx-get='[^']*\\/watch\\/([a-z0-9]+)'[\\s\\S]*?<h5 class="card-title mb-1">${uniqueName}</h5>`));
         if (!watchMatch) {
-            throw new Error("Could not find any watch ID in list");
+            throw new Error("Could not find created watch ID in list");
         }
         const watchId = watchMatch[1];
         

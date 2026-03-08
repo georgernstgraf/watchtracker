@@ -1,7 +1,7 @@
 import { Buffer } from "node:buffer";
 import { Hono, type Context } from "hono";
 import { HTTPException } from "hono/http-exception";
-import { UserService, WatchService, type SortOption } from "../service/index.ts";
+import { UserService, WatchService } from "../service/index.ts";
 import { validateWatchOwnership } from "../middleware/ownership.ts";
 import { renderWatchList, renderWatchDetails, renderPageWatchDetails, renderWatchGrid } from "../lib/views.ts";
 import { resizeImage, validateSquareImage } from "../lib/imageutils.ts";
@@ -23,12 +23,11 @@ watchRouter.get("/home", (c) => {
     return c.html(renderWatchList({}));
 });
 
-// GET /watches - Return watch grid for HTMX sort buttons
+// GET /watches - Return watch grid for HTMX initial load
 watchRouter.get("/watches", async (c) => {
     const session = getSession(c);
     const username = session.username!;
-    const sortBy = (c.req.query("sort") as SortOption) || "recent_desc";
-    const userWatches = await WatchService.getUserWatchesSorted(username, sortBy);
+    const userWatches = await WatchService.getUserWatchCards(username);
     const userTimeZone = await getUserTimeZone(username);
     return c.html(renderWatchGrid({ userWatches, userTimeZone }));
 });

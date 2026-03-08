@@ -3,7 +3,28 @@ import ms from "ms";
 export const DENO_ENV = Deno.env.get("DENO_ENV") || "development";
 
 export const APP_HOST = Deno.env.get("APP_HOST") || "localhost";
-export const APP_PORT = Number(Deno.env.get("APP_PORT")) || 8000;
+export const APP_URL = Deno.env.get("APP_URL") || "";
+
+let appPort = Deno.env.get("APP_PORT");
+if (!appPort && APP_URL) {
+    try {
+        const parsedUrl = new URL(APP_URL);
+        appPort = parsedUrl.port || undefined;
+    } catch {
+        console.error(`Invalid APP_URL value: "${APP_URL}".`);
+        Deno.exit(1);
+    }
+}
+
+if (!appPort) {
+    console.error("APP_PORT must be set in .env or derivable from APP_URL.");
+    Deno.exit(1);
+}
+export const APP_PORT = Number(appPort);
+if (!Number.isInteger(APP_PORT) || APP_PORT <= 0) {
+    console.error(`Invalid APP_PORT value: "${appPort}". Use a positive integer in .env.`);
+    Deno.exit(1);
+}
 export const APP_PATH = Deno.env.get("APP_PATH") || "";
 
 export const AUTH_API_URL = Deno.env.get("AUTH_API_URL") || "";
