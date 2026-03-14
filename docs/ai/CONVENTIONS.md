@@ -15,3 +15,4 @@ Follow these without question. Do not deviate unless explicitly told.
 ## Sorting
 - Sort watch overview cards in the frontend from raw numeric or timestamp values, not from formatted display strings.
 - Expose frontend sort keys for watch cards through template attributes such as `data-*` values.
+- Keep the watch overview sort UI as two Alpine-controlled toggle buttons, one for `Recent` and one for `Precise`, with the active arrow derived from the current `sortBy` state.
