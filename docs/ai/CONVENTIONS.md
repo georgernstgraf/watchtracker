@@ -7,6 +7,7 @@ Follow these without question. Do not deviate unless explicitly told.
 - Keep watch overview cards as Handlebars template-rendered components; do not replace them with client-side rendering.
 - Load the watch overview grid initially with an HTMX `GET /watches` request.
 - Persist the selected watch overview sort mode in `localStorage` under `watchtracker-sortBy`.
+- In measurement rows, display the signed deviation value directly, but derive color and indicator glyphs from `driftDisplay`; start measurements must stay neutral.
 
 ## Configuration
 - Read application URLs and ports from `.env`-backed config; do not hardcode a specific development port in code or docs.

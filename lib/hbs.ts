@@ -95,6 +95,35 @@ hbs.registerHelper("deviationArrow", function (value: number) {
     return "";
 });
 
+hbs.registerHelper("driftDirectionColor", function (driftText: string) {
+    if (!driftText || typeof driftText !== "string") return "text-body-secondary";
+    if (driftText.includes("fast")) return "text-success";
+    if (driftText.includes("slow")) return "text-danger";
+    return "text-body-secondary";
+});
+
+hbs.registerHelper("driftDirectionArrow", function (driftText: string) {
+    if (!driftText || typeof driftText !== "string") return "";
+    if (driftText.includes("fast")) return new hbs.SafeString("&#8593;"); // ↑
+    if (driftText.includes("slow")) return new hbs.SafeString("&#8595;"); // ↓
+    return "";
+});
+
+hbs.registerHelper("measurementDriftColor", function (driftText: string, isStart: boolean) {
+    if (isStart || !driftText || typeof driftText !== "string") return "";
+    if (driftText.startsWith("0.0") || driftText.startsWith("+0.0") || driftText.startsWith("-0.0")) return "text-warning";
+    if (driftText.startsWith("-")) return "text-danger";
+    if (driftText.startsWith("+")) return "text-success";
+    return "";
+});
+
+hbs.registerHelper("measurementDriftArrow", function (driftText: string, isStart: boolean) {
+    if (isStart || !driftText || typeof driftText !== "string") return "";
+    if (driftText.startsWith("-")) return new hbs.SafeString("&#8595;"); // ↓
+    if (driftText.startsWith("0.0") || driftText.startsWith("+0.0") || driftText.startsWith("-0.0")) return new hbs.SafeString("&#8801;"); // ≡
+    return "";
+});
+
 hbs.registerHelper("abs", function (value: number) {
     return Math.abs(value);
 });

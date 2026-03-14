@@ -47,7 +47,7 @@
                         <p class="card-text small mb-1">{{comment}}</p>
                     {{/if}}
                     <div class="d-flex justify-content-around small mt-1">
-                        {{#if precision}}<span title="Precision">{{precision}}</span>{{else}}<span>-</span>{{/if}}
+                        {{#if precision}}<span title="Precision" class="{{driftDirectionColor precision}}">{{{driftDirectionArrow precision}}} {{precision}}</span>{{else}}<span>-</span>{{/if}}
                     </div>
                     <div class="d-flex justify-content-around small">
                         {{#if daysMeasured}}<span title="Days measured">{{daysMeasured}}d</span>{{else}}<span>-</span>{{/if}}

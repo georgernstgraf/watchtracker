@@ -163,7 +163,7 @@
                         {{/if}}
                         {{#if watch.overallMeasure}}
                         <small class="text-body-secondary">{{watch.overallMeasure.durationDays}} days</small>
-                        <small class="text-body-secondary">· {{watch.overallMeasure.niceDisplay}}</small>
+                        <small class="{{driftDirectionColor watch.overallMeasure.niceDisplay}}">· {{{driftDirectionArrow watch.overallMeasure.niceDisplay}}} {{watch.overallMeasure.niceDisplay}}</small>
                         {{/if}}
                         <button class="btn btn-outline-secondary btn-sm ms-auto py-0 px-1"
                                 @click="toggleEdit(true)"
