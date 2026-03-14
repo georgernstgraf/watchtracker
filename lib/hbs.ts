@@ -119,8 +119,9 @@ hbs.registerHelper("measurementDriftColor", function (driftText: string, isStart
 
 hbs.registerHelper("measurementDriftArrow", function (driftText: string, isStart: boolean) {
     if (isStart || !driftText || typeof driftText !== "string") return "";
-    if (driftText.startsWith("-")) return new hbs.SafeString("&#8595;"); // ↓
     if (driftText.startsWith("0.0") || driftText.startsWith("+0.0") || driftText.startsWith("-0.0")) return new hbs.SafeString("&#8801;"); // ≡
+    if (driftText.startsWith("-")) return new hbs.SafeString("&#8595;"); // ↓
+    if (driftText.startsWith("+")) return new hbs.SafeString("&#8593;"); // ↑
     return "";
 });
 

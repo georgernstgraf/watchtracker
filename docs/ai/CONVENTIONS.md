@@ -8,6 +8,8 @@ Follow these without question. Do not deviate unless explicitly told.
 - Load the watch overview grid initially with an HTMX `GET /watches` request.
 - Persist the selected watch overview sort mode in `localStorage` under `watchtracker-sortBy`.
 - In measurement rows, display the signed deviation value directly, but derive color and indicator glyphs from `driftDisplay`; start measurements must stay neutral.
+- Keep drift arrows on watch overview cards without any color emphasis; reserve drift colors for watch details and measurement rows.
+- Use wider responsive action buttons in watch-details edit mode and evenly distributed sort buttons on the overview page without changing the underlying Alpine or HTMX behavior.
 
 ## Configuration
 - Read application URLs and ports from `.env`-backed config; do not hardcode a specific development port in code or docs.

@@ -60,10 +60,10 @@
      }"
      x-init="init()">
     <!-- Sort Controls -->
-    <div class="d-grid gap-2 d-sm-flex justify-content-sm-between mb-2">
+    <div class="d-grid gap-2 d-lg-flex justify-content-lg-between align-items-stretch mb-2">
         <template x-for="sortKey in ['recent', 'precise']" :key="sortKey">
             <button type="button"
-                    class="btn btn-outline-secondary btn-sm flex-sm-fill"
+                    class="btn btn-outline-secondary btn-sm w-100 flex-lg-fill py-2"
                     :class="{ 'active': sortBy.startsWith(sortKey + '_') }"
                     @click="toggleSort(sortKey)">
                 <span x-text="`${getSortLabel(sortKey)} ${getSortDirectionIcon(sortBy.split('_')[0] === sortKey ? sortBy.split('_')[1] : (sortKey === 'recent' ? 'desc' : 'asc'))}`"></span>
