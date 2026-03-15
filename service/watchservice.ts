@@ -11,6 +11,8 @@ interface WatchWithMeasurements extends Watch {
 }
 
 export class WatchService {
+    private static readonly STALE_START_MAX_AGE_DAYS = 31;
+
     /**
      * Create a new watch for a user
      */
@@ -235,7 +237,14 @@ export class WatchService {
      * Get complete watch data for display with measurements and calculated drifts
      */
     static async getWatchForDisplay(username: string, watchId?: string): Promise<EnrichedWatch | null> {
-        const watch = await this.getUserWatchWithMeasurements(username, watchId);
+        const userWatch = await this.getUserWatchWithMeasurements(username, watchId);
+        if (!userWatch) {
+            return null;
+        }
+
+        await this.deleteStaleLatestStartMeasurement(userWatch.id);
+
+        const watch = await this.getUserWatchWithMeasurements(username, userWatch.id);
         if (!watch) {
             return null;
         }
@@ -283,5 +292,22 @@ export class WatchService {
             measurements: [],
             periods: [],
         };
+    }
+
+    private static async deleteStaleLatestStartMeasurement(watchId: string): Promise<void> {
+        const latestMeasurement = await MeasurementRepository.findLatestByWatchId(watchId);
+        if (!latestMeasurement || !latestMeasurement.isStart) {
+            return;
+        }
+
+        const latestCreatedAt = latestMeasurement.createdAt instanceof Date ? latestMeasurement.createdAt : new Date(latestMeasurement.createdAt);
+        const staleThreshold = new Date();
+        staleThreshold.setDate(staleThreshold.getDate() - this.STALE_START_MAX_AGE_DAYS);
+
+        if (latestCreatedAt > staleThreshold) {
+            return;
+        }
+
+        await MeasurementRepository.delete({ id: latestMeasurement.id });
     }
 }

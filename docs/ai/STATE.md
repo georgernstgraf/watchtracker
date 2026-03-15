@@ -20,6 +20,9 @@ Wrap up imported prompt issues and small maintainability improvements.
 - [x] Updated issue `#132` by assigning clearer unique IDs to important one-off UI elements across watch details, overview, measurements, and navigation templates.
 - [x] Renamed the measurement create form ID and updated the matching `htmx.trigger(...)` call so behavior stayed intact.
 - [x] Verified the issue `#132` implementation with `deno task check`, `deno task lint`, and `deno task test`.
+- [x] Updated issue `#125` so watch details lazily delete stale latest `start` measurements older than 31 days instead of relying on startup cleanup.
+- [x] Added a regression test that preserves recent latest `start` measurements during watch-details loading.
+- [x] Verified the issue `#125` implementation with `deno task check`, `deno task lint`, and `deno task test`.
 
 ## Pending
 - [ ] Optionally make `scripts/test.sh` detect and handle an already running server on the configured `.env` `APP_PORT` more explicitly.

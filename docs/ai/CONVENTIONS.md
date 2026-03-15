@@ -16,6 +16,9 @@ Follow these without question. Do not deviate unless explicitly told.
 - Read application URLs and ports from `.env`-backed config; do not hardcode a specific development port in code or docs.
 - Prefer `APP_URL` in scripts and docs when a full browser URL is needed.
 
+## Service Layer
+- Run stale latest-start cleanup lazily when loading a watch for display, instead of sweeping all watches on application startup.
+
 ## Sorting
 - Sort watch overview cards in the frontend from raw numeric or timestamp values, not from formatted display strings.
 - Expose frontend sort keys for watch cards through template attributes such as `data-*` values.

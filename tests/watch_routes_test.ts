@@ -41,6 +41,55 @@ describe("Watch Routes (Read-Only)", { sanitizeResources: false, sanitizeOps: fa
         await assertBodyContains(response, "Manero");
     });
 
+    it("GET /watch/:id preserves recent latest start measurements", async () => {
+        const user = TEST_USERS[1]; // grafg
+        await loginUser(user.user, user.password);
+
+        const watchResponse = await fetchWithAuth(`/watch/${TEST_WATCH_ID}`, {}, user.user);
+        assertStatus(watchResponse, 200);
+        await watchResponse.body?.cancel();
+
+        const measurementResponse = await fetchWithAuth(
+            `/measure/${TEST_WATCH_ID}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+                body: new URLSearchParams({
+                    value: "17",
+                    isStart: "true",
+                    comment: "recent start test",
+                }),
+            },
+            user.user,
+        );
+        assertStatus(measurementResponse, 200);
+        const measurementBody = await measurementResponse.text();
+        const measurementIdMatch = measurementBody.match(/data-id="([^"]+)"/);
+        if (!measurementIdMatch) {
+            throw new Error("Could not find created measurement ID for recent start test");
+        }
+
+        const measurementId = measurementIdMatch[1];
+        const response = await fetchWithAuth(`/watch/${TEST_WATCH_ID}`, {}, user.user);
+        assertStatus(response, 200);
+        const responseBody = await response.text();
+        if (!responseBody.includes("recent start test")) {
+            throw new Error("Expected recent latest start measurement to remain visible in watch details");
+        }
+
+        const deleteResponse = await fetchWithAuth(
+            `/measure/${measurementId}`,
+            {
+                method: "DELETE",
+            },
+            user.user,
+        );
+        assertStatus(deleteResponse, 200);
+        await deleteResponse.body?.cancel();
+    });
+
     it("GET /watch/:id with invalid ID returns 403", async () => {
         const user = TEST_USERS[1]; // grafg
         await loginUser(user.user, user.password);
