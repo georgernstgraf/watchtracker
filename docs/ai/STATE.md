@@ -1,9 +1,9 @@
 # Project State
 
-Current status as of 2026-03-14.
+Current status as of 2026-03-15.
 
 ## Current Focus
-Wrap up the imported prompt issues and small follow-up UI corrections.
+Wrap up imported prompt issues and small maintainability improvements.
 
 ## Completed (this cycle)
 - [x] Replaced the four watch overview sort buttons with two Alpine-driven toggle buttons for `Recent` and `Precise`.
@@ -17,6 +17,9 @@ Wrap up the imported prompt issues and small follow-up UI corrections.
 - [x] Kept drift arrows on watch overview cards but removed their color emphasis.
 - [x] Restored the positive-drift upward arrow in measurement rows and fixed zero-drift ordering so `+0.0` still renders as `≡`.
 - [x] Verified the issue `#131` implementation with `deno task check`, `deno task lint`, and `deno task test`.
+- [x] Updated issue `#132` by assigning clearer unique IDs to important one-off UI elements across watch details, overview, measurements, and navigation templates.
+- [x] Renamed the measurement create form ID and updated the matching `htmx.trigger(...)` call so behavior stayed intact.
+- [x] Verified the issue `#132` implementation with `deno task check`, `deno task lint`, and `deno task test`.
 
 ## Pending
 - [ ] Optionally make `scripts/test.sh` detect and handle an already running server on the configured `.env` `APP_PORT` more explicitly.

@@ -8,5 +8,6 @@ Read this file carefully before making changes in affected areas.
 - When the watch grid is loaded by HTMX, apply the persisted or default Alpine sort immediately after the swap so the backend's arbitrary order never flashes as final state.
 - Do not style measurement deviation rows from the raw deviation sign; use the calculated `driftDisplay` for non-start rows, while start measurements remain uncolored and arrowless.
 - In measurement drift helpers, check the zero-drift case before generic positive-drift handling so `+0.0` renders as `≡` instead of `↑`.
+- When renaming template IDs, also update matching `htmx.trigger(...)`, `hx-target`, or DOM selector references in the same change.
 - `deno task test` can fail with unrelated 404s if the `.env` `APP_PORT` is already occupied; the spawned dev server exits with `EADDRINUSE`, and the test suite may hit the wrong listener.
 - `deno task test` may still pass while logging `EADDRINUSE` if another server is already listening on the configured `.env` `APP_PORT`.

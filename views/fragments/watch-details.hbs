@@ -88,8 +88,8 @@
          }
      }">
     <!-- Back Button (only for existing watches) -->
-    <div class="mb-3" x-show="!isNew">
-        <button class="btn btn-outline-secondary btn-sm"
+    <div id="watchDetailsBackContainer" class="mb-3" x-show="!isNew">
+        <button id="watchDetailsBackButton" class="btn btn-outline-secondary btn-sm"
                 hx-get='{{appPath}}/home'
                 hx-target='#mainContent'
                 hx-swap='innerHTML'
@@ -103,7 +103,7 @@
         <div class="col-12 col-md-5 col-lg-5">
             <div class="position-sticky top-0 pt-2">
                 <!-- Normal View -->
-                <div x-show="!editing">
+                <div id="watchDetailsImageView" x-show="!editing">
                     {{#if watch.image}}
                     <img src="{{appPath}}/watch/image/{{watch.id}}"
                          class="img-fluid w-100"
@@ -117,9 +117,9 @@
                     {{/if}}
                 </div>
                 <!-- Edit View -->
-                <div x-show="editing" x-cloak>
-                    <div class="ratio ratio-1x1">
-                        <div class="d-flex align-items-center justify-content-center bg-secondary rounded">
+                <div id="watchDetailsImageEditView" x-show="editing" x-cloak>
+                    <div id="watchDetailsImagePreviewRatio" class="ratio ratio-1x1">
+                        <div id="watchDetailsImagePreviewContainer" class="d-flex align-items-center justify-content-center bg-secondary rounded">
                             <template x-if="!imagePreview">
                                 <span class="text-muted">No image selected</span>
                             </template>
@@ -133,13 +133,13 @@
                            accept="image/jpeg,image/png,image/webp"
                            class="d-none"
                            @change="selectedImageFile = $event.target.files[0]">
-                    <div class="mt-2 text-center">
-                        <button type="button"
+                    <div id="watchDetailsImageActions" class="mt-2 text-center">
+                        <button id="watchDetailsChooseImageButton" type="button"
                                 class="btn btn-outline-secondary btn-sm"
                                 @click="$refs.imageInput.click()">
                             Choose Image
                         </button>
-                        <button type="button"
+                        <button id="watchDetailsClearImageButton" type="button"
                                 class="btn btn-outline-warning btn-sm ms-1"
                                 x-show="imagePreview"
                                 @click="clearImagePreview()">
@@ -154,10 +154,10 @@
         <!-- Right Column: Watch Info + Measurements -->
         <div class="col-12 col-md-7 col-lg-7">
             <!-- Watch Name/Comment Card -->
-            <div class="card border-secondary mb-3" x-show="!editing">
-                <div class="card-body py-2">
-                    <h5 class="card-title mb-0">{{watch.name}}</h5>
-                    <div class="d-flex align-items-center gap-2">
+            <div id="watchDetailsSummaryCard" class="card border-secondary mb-3" x-show="!editing">
+                <div id="watchDetailsSummaryBody" class="card-body py-2">
+                    <h5 id="watchDetailsName" class="card-title mb-0">{{watch.name}}</h5>
+                    <div id="watchDetailsMetaRow" class="d-flex align-items-center gap-2">
                         {{#if watch.comment}}
                         <small class="text-body-secondary">{{watch.comment}}</small>
                         {{/if}}
@@ -165,7 +165,7 @@
                         <small class="text-body-secondary">{{watch.overallMeasure.durationDays}} days</small>
                         <small class="{{driftDirectionColor watch.overallMeasure.niceDisplay}}">· {{{driftDirectionArrow watch.overallMeasure.niceDisplay}}} {{watch.overallMeasure.niceDisplay}}</small>
                         {{/if}}
-                        <button class="btn btn-outline-secondary btn-sm ms-auto py-0 px-1"
+                        <button id="watchDetailsEditButton" class="btn btn-outline-secondary btn-sm ms-auto py-0 px-1"
                                 @click="toggleEdit(true)"
                                 title="Edit Name, Comment and Image">
                             ✏️
@@ -175,8 +175,8 @@
             </div>
 
             <!-- Edit Card -->
-            <div class="card border-secondary mb-3" x-show="editing" x-cloak>
-                <div class="card-body">
+            <div id="watchDetailsEditCard" class="card border-secondary mb-3" x-show="editing" x-cloak>
+                <div id="watchDetailsEditBody" class="card-body">
                     <form x-ref="watchForm"
                           hx-encoding="multipart/form-data">
                         <input type="text"
@@ -192,8 +192,8 @@
                                {{/if}}
                                class="form-control form-control-sm mb-2">
                     </form>
-                    <div class="d-grid gap-2 d-sm-flex">
-                        <button class="btn btn-outline-danger flex-sm-fill py-2"
+                    <div id="watchDetailsEditActions" class="d-grid gap-2 d-sm-flex">
+                        <button id="watchDetailsDeleteButton" class="btn btn-outline-danger flex-sm-fill py-2"
                                 title="Delete Watch"
                                 x-show="!isNew"
                                 hx-delete="{{appPath}}/watch/{{watch.id}}"
@@ -201,10 +201,10 @@
                                 hx-swap="innerHTML"
                                 hx-confirm="Are you sure you want to delete this watch?"
                                 onclick="event.preventDefault()">Delete</button>
-                        <button class="btn btn-outline-secondary flex-sm-fill py-2"
+                        <button id="watchDetailsCancelButton" class="btn btn-outline-secondary flex-sm-fill py-2"
                                 title="Cancel"
                                 @click="cancelEdit()">Cancel</button>
-                        <button class="btn btn-outline-secondary flex-sm-fill py-2"
+                        <button id="watchDetailsSaveButton" class="btn btn-outline-secondary flex-sm-fill py-2"
                                 title="Save"
                                 @click="saveDetails()">Save</button>
                     </div>

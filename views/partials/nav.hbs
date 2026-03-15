@@ -22,7 +22,7 @@
                 <span id="themeIcon" x-text="theme === 'dark' ? '🌙' : '☀️'">🌙</span>
             </button>
             {{#if user}}
-                <form hx-post="{{appPath}}/logout" hx-target="body">
+                <form id="logoutForm" hx-post="{{appPath}}/logout" hx-target="body">
                     <button id="logoutButton"
                             class="btn btn-outline-secondary btn-sm"
                             title="Log out {{user.name}}">

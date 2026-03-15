@@ -16,21 +16,22 @@
          }
      }">
     <!-- New Measurement Button -->
-    <div class="d-flex justify-content-end mb-2">
+    <div id="measurementCreateActions" class="d-flex justify-content-end mb-2">
         <button title="New Measurement"
-                id="newMeasurement"
+                id="measurementCreateButton"
                 class="btn btn-outline-secondary btn-sm"
                 x-show="!showCreate"
                 @click="showCreateForm()"> + New </button>
     </div>
     <!-- Create Form -->
-    <div x-show="showCreate"
+    <div id="measurementCreatePanel"
+         x-show="showCreate"
          x-cloak
          x-ref="createForm"
          class="mb-3">
         <div class="card border-secondary">
             <div class="card-body py-2">
-                <form id="newMeasurementForm"
+                <form id="measurementCreateForm"
                       class="text-center"
                       hx-post="{{appPath}}/measure/{{watch.id}}"
                       hx-target="closest .measurements-container"
@@ -62,7 +63,7 @@
                                 @click.prevent="hideCreateForm()">Cancel</button>
                         <button title="Save Record"
                                 class="btn btn-outline-secondary"
-                                onclick="event.preventDefault(); htmx.trigger('#newMeasurementForm', 'trigger')">Save</button>
+                                 onclick="event.preventDefault(); htmx.trigger('#measurementCreateForm', 'trigger')">Save</button>
                     </div>
                 </form>
             </div>
