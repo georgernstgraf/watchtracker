@@ -1,6 +1,6 @@
 # Project State
 
-Current status as of 2026-03-15.
+Current status as of 2026-07-17. Added issue #135 (memcached pool staleness).
 
 ## Current Focus
 Wrap up imported prompt issues and small maintainability improvements.
@@ -25,6 +25,7 @@ Wrap up imported prompt issues and small maintainability improvements.
 - [x] Verified the issue `#125` implementation with `deno task check`, `deno task lint`, and `deno task test`.
 
 ## Pending
+- [ ] #135 — Fix memcached connection pool staleness (`@avroit/memcached` recycles broken `Deno.Conn` after server restart → EPIPE loop).
 - [ ] Optionally make `scripts/test.sh` detect and handle an already running server on the configured `.env` `APP_PORT` more explicitly.
 
 ## Blockers

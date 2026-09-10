@@ -11,3 +11,4 @@ Read this file carefully before making changes in affected areas.
 - When renaming template IDs, also update matching `htmx.trigger(...)`, `hx-target`, or DOM selector references in the same change.
 - `deno task test` can fail with unrelated 404s if the `.env` `APP_PORT` is already occupied; the spawned dev server exits with `EADDRINUSE`, and the test suite may hit the wrong listener.
 - `deno task test` may still pass while logging `EADDRINUSE` if another server is already listening on the configured `.env` `APP_PORT`.
+- `@avroit/memcached@0.0.4` returns a broken `Deno.Conn` back to its pool when `write()` fails (EPIPE). After a memcached restart/memcachedd, the pooled connections are stale and every subsequent session lookup fails with `BrokenPipe`. Cycle the Deno app (`svc -t /home/georg/service/watchtracker`) after any memcached restart on murl until issue #135 is fixed.
